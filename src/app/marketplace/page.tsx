@@ -1,42 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getProducts, Product } from "@/services/productService";
 import API from "@/services/api";
 
-type Product = {
-  _id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  location: string;
-  farmer: string;
-};
+export default function Marketplace() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
 
-export default function MarketplacePage() {
-  const [products] = useState<Product[]>([
-    {
-      _id: "demo-1",
-      name: "Maize",
-      price: 1200,
-      quantity: 50,
-      location: "Kaduna",
-      farmer: "Farmer A",
-    },
-    {
-      _id: "demo-2",
-      name: "Rice",
-      price: 2100,
-      quantity: 30,
-      location: "Kano",
-      farmer: "Farmer B",
-    },
-  ]);
+  useEffect(() => {
+    getProducts()
+      .then(setProducts)
+      .catch((err) => setFetchError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleBuy = async (productId: string, price: number) => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     if (!user._id) {
-      alert("Login first");
+      alert("Please login first");
       return;
     }
 
@@ -50,7 +34,7 @@ export default function MarketplacePage() {
 
       const order = orderRes.data;
 
-      // 2. Initialize payment
+      // 2. Initialize Paystack payment
       const paymentRes = await API.post("/api/payment/initialize", {
         email: user.email,
         amount: order.totalPrice,
@@ -58,33 +42,64 @@ export default function MarketplacePage() {
         callback_url: `${window.location.origin}/payment-success`,
       });
 
-      // 3. Redirect to Paystack
+      // 3. Redirect to Paystack checkout
       window.location.href = paymentRes.data.data.authorization_url;
-
     } catch (error) {
       console.error(error);
-      alert("Payment failed");
+      alert("Payment failed. Please try again.");
     }
   };
 
   return (
-    <main style={{ padding: "2rem" }}>
+    <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
       <h1>Marketplace</h1>
-      <p>Buy produce from farmers.</p>
+      <p style={{ color: "#555" }}>Fresh farm produce directly from farmers.</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1rem", marginTop: "1rem" }}>
-        {products.map((product) => (
-          <article key={product._id} style={{ border: "1px solid #ddd", borderRadius: 12, padding: "1rem" }}>
-            <h2 style={{ marginTop: 0 }}>{product.name}</h2>
-            <p>Price: NGN {product.price.toLocaleString()}</p>
-            <p>Quantity: {product.quantity}</p>
-            <p>Location: {product.location}</p>
-            <p>Farmer: {product.farmer}</p>
-            <button type="button" onClick={() => handleBuy(product._id, product.price)}>
-              Buy Now
+      {loading && <p>Loading products...</p>}
+      {fetchError && <p style={{ color: "red" }}>Error: {fetchError}</p>}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gap: "20px",
+        }}
+      >
+        {products.map((product: any) => (
+          <div
+            key={product._id}
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              padding: "15px",
+              boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h3>{product.name}</h3>
+            <p>₦{product.price}</p>
+            <p>{product.quantity} units</p>
+            <p>{product.location}</p>
+
+            <button
+              style={{
+                marginTop: "10px",
+                padding: "8px",
+                background: "#16a34a",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+              onClick={() => handleBuy(product._id, product.price)}
+            >
+              Buy
             </button>
-          </article>
+          </div>
         ))}
+
+        {!loading && products.length === 0 && !fetchError && (
+          <p>No products listed yet.</p>
+        )}
       </div>
     </main>
   );
