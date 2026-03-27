@@ -292,7 +292,7 @@ export default function AdminDashboardPage() {
         minHeight: "100vh",
       }}
     >
-      <style jsx global>{`
+      <style>{`
         @media print {
           .no-print {
             display: none !important;
