@@ -76,9 +76,31 @@ export default function AdminDashboardPage() {
       API.get("/api/admin/orders", { headers: { Authorization: token } }),
     ])
       .then(([usersRes, productsRes, ordersRes]) => {
-        setUsers(usersRes.data);
-        setProducts(productsRes.data);
-        setOrders(ordersRes.data);
+        const usersPayload = usersRes.data as any;
+        const productsPayload = productsRes.data as any;
+        const ordersPayload = ordersRes.data as any;
+
+        const usersData = Array.isArray(usersPayload)
+          ? usersPayload
+          : Array.isArray(usersPayload?.users)
+          ? usersPayload.users
+          : [];
+
+        const productsData = Array.isArray(productsPayload)
+          ? productsPayload
+          : Array.isArray(productsPayload?.products)
+          ? productsPayload.products
+          : [];
+
+        const ordersData = Array.isArray(ordersPayload)
+          ? ordersPayload
+          : Array.isArray(ordersPayload?.orders)
+          ? ordersPayload.orders
+          : [];
+
+        setUsers(usersData);
+        setProducts(productsData);
+        setOrders(ordersData);
       })
       .catch((err: any) => {
         setError(err?.response?.data?.message || "Failed to load admin dashboard.");
@@ -292,21 +314,6 @@ export default function AdminDashboardPage() {
         minHeight: "100vh",
       }}
     >
-      <style>{`
-        @media print {
-          .no-print {
-            display: none !important;
-          }
-          .print-card {
-            break-inside: avoid;
-            page-break-inside: avoid;
-          }
-          .admin-board {
-            background: #ffffff !important;
-          }
-        }
-      `}</style>
-
       <section
         className="print-card"
         style={{

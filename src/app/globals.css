@@ -40,3 +40,10 @@ input {
 button {
   cursor: pointer;
 }
+
+/* Admin dashboard print styles */
+@media print {
+  .no-print { display: none !important; }
+  .print-card { break-inside: avoid; page-break-inside: avoid; }
+  .admin-board { background: #ffffff !important; }
+}
