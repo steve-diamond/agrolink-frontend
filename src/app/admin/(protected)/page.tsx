@@ -61,6 +61,7 @@ export default function AdminDashboardPage() {
   const [rangeDays, setRangeDays] = useState<DateRange>(90);
 
   const getToken = () => localStorage.getItem("token") ?? "";
+  const authHeader = () => ({ Authorization: `Bearer ${getToken()}` });
 
   useEffect(() => {
     const token = getToken();
@@ -71,9 +72,9 @@ export default function AdminDashboardPage() {
     }
 
     Promise.all([
-      API.get("/api/admin/users", { headers: { Authorization: token } }),
-      API.get("/api/admin/products", { headers: { Authorization: token } }),
-      API.get("/api/admin/orders", { headers: { Authorization: token } }),
+      API.get("/api/admin/users", { headers: authHeader() }),
+      API.get("/api/admin/products", { headers: authHeader() }),
+      API.get("/api/admin/orders", { headers: authHeader() }),
     ])
       .then(([usersRes, productsRes, ordersRes]) => {
         const usersPayload = usersRes.data as any;
@@ -112,7 +113,7 @@ export default function AdminDashboardPage() {
     if (!confirm(`Delete this ${type.slice(0, -1)}? This cannot be undone.`)) return;
     setDeleting(id);
     try {
-      await API.delete(`/api/admin/${type}/${id}`, { headers: { Authorization: getToken() } });
+      await API.delete(`/api/admin/${type}/${id}`, { headers: authHeader() });
       if (type === "users") setUsers((prev) => prev.filter((u) => u._id !== id));
       if (type === "products") setProducts((prev) => prev.filter((p) => p._id !== id));
       if (type === "orders") setOrders((prev) => prev.filter((o) => o._id !== id));
@@ -129,7 +130,7 @@ export default function AdminDashboardPage() {
   const approveFarmer = async (id: string) => {
     try {
       await API.patch(`/api/admin/users/${id}/approve`, null, {
-        headers: { Authorization: getToken() },
+        headers: authHeader(),
       });
       setUsers((prev) =>
         prev.map((user) => (user._id === id ? { ...user, approved: true } : user))
