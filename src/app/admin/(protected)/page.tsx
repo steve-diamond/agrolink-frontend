@@ -39,7 +39,9 @@ type AdminProduct = {
 type AdminOrder = {
   _id: string;
   totalPrice: number;
+  totalAmount?: number;
   status: string;
+  paymentStatus?: string;
   createdAt?: string;
   buyerId?: {
     name?: string;
@@ -47,7 +49,19 @@ type AdminOrder = {
   };
   productId?: {
     name?: string;
+    price?: number;
+    location?: string;
   };
+  products?: Array<{
+    productId?: {
+      _id?: string;
+      name?: string;
+      price?: number;
+      location?: string;
+    };
+    quantity: number;
+  }>;
+  quantity?: number;
 };
 
 export default function AdminDashboardPage() {
@@ -150,12 +164,43 @@ export default function AdminDashboardPage() {
     return ageDays <= rangeDays;
   });
 
+  const getOrderItems = (order: AdminOrder) => {
+    if (Array.isArray(order.products) && order.products.length > 0) {
+      return order.products;
+    }
+
+    if (order.productId) {
+      return [{ productId: order.productId, quantity: order.quantity ?? 0 }];
+    }
+
+    return [];
+  };
+
+  const getOrderTotal = (order: AdminOrder) => Number(order.totalAmount ?? order.totalPrice ?? 0);
+
+  const getOrderQuantity = (order: AdminOrder) =>
+    getOrderItems(order).reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+
+  const getOrderSummary = (order: AdminOrder) => {
+    const items = getOrderItems(order);
+
+    if (items.length === 0) {
+      return "Unknown";
+    }
+
+    if (items.length === 1) {
+      return items[0].productId?.name || "Unknown";
+    }
+
+    return `${items.length} items`;
+  };
+
   const totalUsers = users.length;
   const totalProducts = products.length;
   const totalOrders = filteredOrders.length;
 
   const totalRevenue = filteredOrders.reduce(
-    (sum: number, order: any) => sum + order.totalPrice,
+    (sum: number, order: AdminOrder) => sum + getOrderTotal(order),
     0
   );
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
@@ -265,13 +310,16 @@ export default function AdminDashboardPage() {
       ["Average Order Value", String(averageOrderValue)],
       ["Farmer Approval Rate", `${approvalRate.toFixed(1)}%`],
       [],
-      ["Order ID", "Product", "Buyer", "Status", "Total Price", "Created At"],
+      ["Order ID", "Products", "Buyer", "Status", "Payment Status", "Total Price", "Created At"],
       ...filteredOrders.map((order) => [
         order._id,
-        order.productId?.name || "Unknown",
+        getOrderItems(order)
+          .map((item) => `${item.productId?.name || "Unknown"} x${item.quantity}`)
+          .join(" | "),
         order.buyerId?.email || "Unknown",
         order.status || "unknown",
-        String(order.totalPrice || 0),
+        order.paymentStatus || "pending",
+        String(getOrderTotal(order)),
         order.createdAt || "",
       ]),
     ];
@@ -623,8 +671,54 @@ export default function AdminDashboardPage() {
       <section>
         <h2>Orders</h2>
         {orders.map((o: any) => (
-          <div key={o._id}>
-            {o.productId?.name} - {o.buyerId?.email} - ₦{o.totalPrice}
+          <div
+            key={o._id}
+            style={{
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              padding: "12px",
+              background: "#fff",
+              marginBottom: "12px",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+              <strong>{getOrderSummary(o)}</strong>
+              <span style={{ color: "#475569", textTransform: "capitalize" }}>
+                {o.status} / {o.paymentStatus || "pending"}
+              </span>
+            </div>
+            <div style={{ marginTop: "6px", color: "#475569" }}>
+              Buyer: {o.buyerId?.email || "Unknown"}
+            </div>
+            <div style={{ marginTop: "6px", color: "#475569" }}>
+              Quantity: {getOrderQuantity(o)}
+            </div>
+            <div style={{ marginTop: "6px", fontWeight: 600 }}>
+              Total: {currencyFormatter.format(getOrderTotal(o))}
+            </div>
+            <div style={{ marginTop: "10px", display: "grid", gap: "8px" }}>
+              {getOrderItems(o).map((item, index) => (
+                <div
+                  key={`${o._id}-${item.productId?._id ?? index}`}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "12px",
+                    paddingTop: "8px",
+                    borderTop: "1px solid #e5e7eb",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 500 }}>{item.productId?.name || "Unknown Product"}</div>
+                    <div style={{ fontSize: "13px", color: "#64748b" }}>{item.productId?.location || "No location"}</div>
+                  </div>
+                  <div style={{ textAlign: "right", whiteSpace: "nowrap", color: "#334155" }}>
+                    <div>Qty: {item.quantity}</div>
+                    <div style={{ fontSize: "13px" }}>{currencyFormatter.format(Number(item.productId?.price || 0))}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </section>

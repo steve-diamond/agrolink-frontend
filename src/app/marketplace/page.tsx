@@ -8,15 +8,16 @@ export default function Marketplace() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
+  const [buyingProductId, setBuyingProductId] = useState<string | null>(null);
 
   useEffect(() => {
     getProducts()
-      .then(setProducts)
+      .then((items) => setProducts(items.filter((item: any) => item?.approved === true)))
       .catch((err) => setFetchError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleBuy = async (productId: string, price: number) => {
+  const handleBuyNow = async (productId: string) => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     if (!user._id) {
@@ -25,82 +26,89 @@ export default function Marketplace() {
     }
 
     try {
-      // 1. Create order
+      setBuyingProductId(productId);
+
       const orderRes = await API.post("/api/orders", {
-        productId,
-        buyerId: user._id,
-        quantity: 1,
+        products: [{ productId, quantity: 1 }],
       });
 
       const order = orderRes.data;
 
-      // 2. Initialize Paystack payment
       const paymentRes = await API.post("/api/payment/initialize", {
         email: user.email,
-        amount: order.totalPrice,
+        amount: order.totalAmount ?? order.totalPrice,
         orderId: order._id,
         callback_url: `${window.location.origin}/payment-success`,
       });
 
-      // 3. Redirect to Paystack checkout
       window.location.href = paymentRes.data.data.authorization_url;
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Payment failed. Please try again.");
+      alert(error?.response?.data?.message || error?.response?.data?.error || "Payment failed. Please try again.");
+    } finally {
+      setBuyingProductId(null);
     }
   };
 
   return (
-    <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h1>Marketplace</h1>
-      <p style={{ color: "#555" }}>Fresh farm produce directly from farmers.</p>
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="rounded-2xl bg-gradient-to-r from-emerald-900 via-green-800 to-lime-700 p-6 text-white shadow-xl">
+        <h1 className="text-3xl font-bold sm:text-4xl">Marketplace</h1>
+        <p className="mt-2 max-w-2xl text-sm text-emerald-100 sm:text-base">
+          Fresh farm produce from approved farmers across AgroLink.
+        </p>
+      </section>
 
-      {loading && <p>Loading products...</p>}
-      {fetchError && <p style={{ color: "red" }}>Error: {fetchError}</p>}
+      {loading ? (
+        <p className="mt-6 text-slate-600">Loading approved products...</p>
+      ) : null}
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {products.map((product: any) => (
-          <div
+      {fetchError ? (
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          Error: {fetchError}
+        </div>
+      ) : null}
+
+      {!loading && products.length === 0 && !fetchError ? (
+        <p className="mt-6 text-slate-600">No approved products available yet.</p>
+      ) : null}
+
+      <section className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        {products.map((product: Product) => (
+          <article
             key={product._id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              padding: "15px",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-            }}
+            className="overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
           >
-            <h3>{product.name}</h3>
-            <p>₦{product.price}</p>
-            <p>{product.quantity} units</p>
-            <p>{product.location}</p>
+            {product.imageUrl ? (
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                className="h-48 w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-48 items-center justify-center bg-emerald-50 text-sm font-medium text-emerald-700">
+                No image available
+              </div>
+            )}
 
-            <button
-              style={{
-                marginTop: "10px",
-                padding: "8px",
-                background: "#16a34a",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-              onClick={() => handleBuy(product._id, product.price)}
-            >
-              Buy
-            </button>
-          </div>
+            <div className="space-y-2 p-4">
+              <h2 className="line-clamp-1 text-lg font-semibold text-slate-900">{product.name}</h2>
+              <p className="text-sm text-slate-500">{product.category || "General"}</p>
+              <p className="text-xl font-bold text-emerald-700">₦{Number(product.price).toLocaleString()}</p>
+              <p className="text-sm text-slate-600">{product.location}</p>
+
+              <button
+                type="button"
+                className="mt-2 w-full rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={() => handleBuyNow(product._id)}
+                disabled={buyingProductId === product._id}
+              >
+                {buyingProductId === product._id ? "Creating Order..." : "Buy Now"}
+              </button>
+            </div>
+          </article>
         ))}
-
-        {!loading && products.length === 0 && !fetchError && (
-          <p>No products listed yet.</p>
-        )}
-      </div>
+      </section>
     </main>
   );
 }

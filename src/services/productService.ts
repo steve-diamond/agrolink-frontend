@@ -5,7 +5,10 @@ export type Product = {
   name: string;
   price: number;
   quantity: number;
+  category?: string;
   location: string;
+  description?: string;
+  imageUrl?: string;
   farmer?: string;
   createdAt?: string;
   updatedAt?: string;
