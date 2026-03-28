@@ -48,6 +48,7 @@ type AdminOrder = {
     email?: string;
   };
   productId?: {
+    _id?: string;
     name?: string;
     price?: number;
     location?: string;
