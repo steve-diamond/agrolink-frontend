@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Inline styles are used extensively in the admin dashboard — allow them.
+      "@next/next/no-css-in-js": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
