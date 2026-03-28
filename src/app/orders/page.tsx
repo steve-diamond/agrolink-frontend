@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import API from "@/services/api";
 
 type OrderProduct = {
@@ -36,11 +37,17 @@ type Order = {
 };
 
 export default function OrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      router.replace("/login");
+      return;
+    }
+
     API.get<Order[]>("/api/orders")
       .then((res) => setOrders(res.data))
       .catch((err) => setError(err?.response?.data?.message || "Failed to load orders."))

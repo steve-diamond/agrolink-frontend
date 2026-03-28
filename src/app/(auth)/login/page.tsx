@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import API from "@/services/api";
 import { useRouter } from "next/navigation";
 
-export default function Login() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const registered = searchParams.get("registered") === "1";
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,6 +44,12 @@ export default function Login() {
     <main style={{ padding: "20px" }}>
       <h1>Login</h1>
 
+      {registered && (
+        <p style={{ background: "#dcfce7", color: "#15803d", padding: "10px 14px", borderRadius: "8px", border: "1px solid #86efac", marginBottom: "16px" }}>
+          Account created! Please log in.
+        </p>
+      )}
+
       <form onSubmit={handleSubmit}>
         <input
           name="email"
@@ -63,6 +73,19 @@ export default function Login() {
           {isSubmitting ? "Logging in..." : "Login"}
         </button>
       </form>
+
+      <p style={{ marginTop: "16px", color: "#64748b" }}>
+        Don&apos;t have an account?{" "}
+        <Link href="/register" style={{ color: "#16a34a", fontWeight: 600 }}>Register here</Link>
+      </p>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

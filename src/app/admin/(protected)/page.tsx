@@ -22,6 +22,10 @@ type AdminProduct = {
   name: string;
   price: number;
   quantity: number;
+  approved?: boolean;
+  category?: string;
+  location?: string;
+  description?: string;
 };
 
 type AdminOrder = {
@@ -129,6 +133,19 @@ export default function AdminDashboardPage() {
 
   const deleteUser = (id: string) => handleDelete("users", id);
   const deleteProduct = (id: string) => handleDelete("products", id);
+
+  const approveProduct = async (id: string) => {
+    try {
+      await API.patch(`/api/admin/products/${id}/approve`, null, {
+        headers: authHeader(),
+      });
+      setProducts((prev) =>
+        prev.map((p) => (p._id === id ? { ...p, approved: true } : p))
+      );
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Failed to approve product.");
+    }
+  };
 
   const approveFarmer = async (id: string) => {
     try {
@@ -509,12 +526,78 @@ export default function AdminDashboardPage() {
 
       <section>
         <h2>Products</h2>
-        {products.map((p: any) => (
-          <div key={p._id}>
-            {p.name} - ₦{p.price}
-            <button onClick={() => deleteProduct(p._id)}>Delete</button>
-          </div>
-        ))}
+        {products.length === 0 && <p style={{ color: "#64748b" }}>No products found.</p>}
+        <div style={{ display: "grid", gap: "10px" }}>
+          {products.map((p) => (
+            <div
+              key={p._id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+                background: p.approved ? "#f0fdf4" : "#fffbeb",
+                border: `1px solid ${p.approved ? "#86efac" : "#fde68a"}`,
+                borderRadius: "8px",
+                padding: "10px 14px",
+              }}
+            >
+              <div>
+                <strong>{p.name}</strong>
+                <span style={{ marginLeft: "10px", color: "#475569" }}>₦{p.price}</span>
+                {p.category && <span style={{ marginLeft: "8px", color: "#94a3b8", fontSize: "12px" }}>{p.category}</span>}
+                {p.location && <span style={{ marginLeft: "8px", color: "#94a3b8", fontSize: "12px" }}>📍 {p.location}</span>}
+                <span
+                  style={{
+                    marginLeft: "10px",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: p.approved ? "#16a34a" : "#854d0e",
+                    background: p.approved ? "#dcfce7" : "#fef9c3",
+                    padding: "2px 8px",
+                    borderRadius: "99px",
+                  }}
+                >
+                  {p.approved ? "Approved" : "Pending Approval"}
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                {!p.approved && (
+                  <button
+                    onClick={() => approveProduct(p._id)}
+                    disabled={deleting === p._id}
+                    style={{
+                      background: "#16a34a",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "6px 14px",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Approve
+                  </button>
+                )}
+                <button
+                  onClick={() => deleteProduct(p._id)}
+                  disabled={deleting === p._id}
+                  style={{
+                    background: "#dc2626",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {deleting === p._id ? "Deleting…" : "Delete"}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       <hr />
