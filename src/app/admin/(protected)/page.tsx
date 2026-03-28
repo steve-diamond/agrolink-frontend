@@ -700,7 +700,7 @@ export default function AdminDashboardPage() {
             <div style={{ marginTop: "10px", display: "grid", gap: "8px" }}>
               {getOrderItems(o).map((item, index) => (
                 <div
-                  key={`${o._id}-${item.productId?._id ?? index}`}
+                  key={`${o._id}-${index}`}
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
