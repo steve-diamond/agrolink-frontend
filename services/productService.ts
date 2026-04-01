@@ -10,14 +10,30 @@ export type Product = {
   description?: string;
   imageUrl?: string;
   farmer?: string;
+  approved?: boolean;
   createdAt?: string;
   updatedAt?: string;
 };
 
 export type NewProduct = Omit<Product, "_id" | "createdAt" | "updatedAt">;
 
-export async function getProducts(): Promise<Product[]> {
-  const res = await API.get<Product[]>("/api/products");
+export type ProductFilters = {
+  approved?: boolean;
+  farmer?: string;
+  category?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+};
+
+export async function getProducts(filters: ProductFilters = {}): Promise<Product[]> {
+  const res = await API.get<Product[]>("/api/products", {
+    params: {
+      ...filters,
+      approved:
+        typeof filters.approved === "boolean" ? String(filters.approved) : undefined,
+    },
+  });
   return res.data;
 }
 

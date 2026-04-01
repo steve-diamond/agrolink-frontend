@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import API from "@/services/api";
+import { createProduct } from "@/services/productService";
 
 type ProductForm = {
   name: string;
@@ -67,10 +67,7 @@ export default function FarmerUploadPage() {
     setSubmitting(true);
 
     try {
-      const rawUser = localStorage.getItem("user") || "{}";
-      const user = JSON.parse(rawUser);
-
-      await API.post("/api/products", {
+      await createProduct({
         name: form.name.trim(),
         price: Number(form.price),
         quantity: Number(form.quantity),
@@ -78,11 +75,10 @@ export default function FarmerUploadPage() {
         location: form.location.trim(),
         description: form.description.trim(),
         imageUrl: form.imageUrl.trim(),
-        farmer: user.name,
       });
 
       setForm(initialForm);
-      setSuccess("Product uploaded successfully.");
+      setSuccess("Product uploaded successfully and is now pending admin approval.");
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || requestError?.response?.data?.error || "Failed to upload product.");
     } finally {
@@ -103,6 +99,9 @@ export default function FarmerUploadPage() {
         <h1 className="mt-2 text-3xl font-semibold">Upload a Product</h1>
         <p className="mt-2 max-w-2xl text-sm text-green-100 sm:text-base">
           Add fresh produce to the marketplace with complete listing details so buyers can discover and order quickly.
+        </p>
+        <p className="mt-3 rounded-xl bg-white/10 px-3 py-2 text-sm text-green-50">
+          Uploaded products remain hidden from buyers until an admin approves them.
         </p>
       </section>
 

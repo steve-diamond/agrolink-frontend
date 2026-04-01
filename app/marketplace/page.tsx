@@ -9,27 +9,44 @@ export default function Marketplace() {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
   const [buyingProductId, setBuyingProductId] = useState<string | null>(null);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    getProducts()
-      .then((items) => setProducts(items.filter((item: any) => item?.approved === true)))
+    getProducts({ approved: true })
+      .then((items) => {
+        setProducts(items);
+        setQuantities(
+          Object.fromEntries(items.map((item) => [item._id, 1]))
+        );
+      })
       .catch((err) => setFetchError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleBuyNow = async (productId: string) => {
+  const handleBuyNow = async (product: Product) => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const quantity = quantities[product._id] ?? 1;
 
     if (!user._id) {
       alert("Please login first");
       return;
     }
 
+    if (user.role !== "buyer") {
+      alert("Only buyers can place orders. Please log in with a buyer account.");
+      return;
+    }
+
+    if (quantity < 1 || quantity > Number(product.quantity || 0)) {
+      alert("Please choose a valid quantity.");
+      return;
+    }
+
     try {
-      setBuyingProductId(productId);
+      setBuyingProductId(product._id);
 
       const orderRes = await API.post("/api/orders", {
-        products: [{ productId, quantity: 1 }],
+        products: [{ productId: product._id, quantity }],
       });
 
       const order = orderRes.data;
@@ -96,11 +113,34 @@ export default function Marketplace() {
               <p className="text-sm text-slate-500">{product.category || "General"}</p>
               <p className="text-xl font-bold text-emerald-700">₦{Number(product.price).toLocaleString()}</p>
               <p className="text-sm text-slate-600">{product.location}</p>
+              <p className="text-sm text-slate-500">Available: {product.quantity}</p>
+
+              <label
+                htmlFor={`quantity-${product._id}`}
+                className="mt-2 block text-sm font-medium text-slate-700"
+              >
+                Quantity
+              </label>
+              <input
+                id={`quantity-${product._id}`}
+                type="number"
+                min={1}
+                max={Math.max(1, Number(product.quantity || 1))}
+                value={quantities[product._id] ?? 1}
+                onChange={(event) => {
+                  const nextQuantity = Number(event.target.value);
+                  setQuantities((current) => ({
+                    ...current,
+                    [product._id]: Number.isFinite(nextQuantity) && nextQuantity > 0 ? nextQuantity : 1,
+                  }));
+                }}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
+              />
 
               <button
                 type="button"
                 className="mt-2 w-full rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
-                onClick={() => handleBuyNow(product._id)}
+                onClick={() => handleBuyNow(product)}
                 disabled={buyingProductId === product._id}
               >
                 {buyingProductId === product._id ? "Creating Order..." : "Buy Now"}
