@@ -27,14 +27,19 @@ export type ProductFilters = {
 };
 
 export async function getProducts(filters: ProductFilters = {}): Promise<Product[]> {
-  const res = await API.get<Product[]>("/api/products", {
+  const res = await API.get("/api/products", {
     params: {
       ...filters,
       approved:
         typeof filters.approved === "boolean" ? String(filters.approved) : undefined,
     },
   });
-  return res.data;
+  // Backend may return a plain array OR a wrapped { data: { items: [] } } shape
+  const raw = res.data as unknown;
+  if (Array.isArray(raw)) return raw as Product[];
+  if (Array.isArray((raw as any)?.data?.items)) return (raw as any).data.items as Product[];
+  if (Array.isArray((raw as any)?.products)) return (raw as any).products as Product[];
+  return [];
 }
 
 export async function createProduct(data: NewProduct): Promise<Product> {
