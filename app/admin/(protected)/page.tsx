@@ -369,7 +369,7 @@ export default function AdminDashboardPage() {
             <p className="m-0 text-xs uppercase tracking-[0.08em] text-slate-300">
               Investor Control Room
             </p>
-            <h1 className="mt-2 text-3xl font-semibold">AgroLink Executive Dashboard</h1>
+            <h1 className="mt-2 text-3xl font-semibold">DOS AGROLINK NIGERIA Executive Dashboard</h1>
             <p className="mt-2 text-slate-300">
               Live market intelligence, operations, and approval performance.
             </p>

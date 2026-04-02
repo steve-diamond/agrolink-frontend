@@ -51,7 +51,7 @@ type CopyPack = {
 };
 
 const ENGLISH: CopyPack = {
-  appName: "Dos AgroLink Nigeria",
+  appName: "DOS AGROLINK NIGERIA",
   tagline: "Digital platform for Nigerian smallholder farmers",
   welcome: "Welcome",
   login: "Login",
@@ -72,7 +72,7 @@ const ENGLISH: CopyPack = {
   myFarm: "My Farm",
   finance: "Financial Services",
   marketplaceHeading: "Marketplace",
-  marketplaceSubheading: "Fresh farm produce from approved farmers across AgroLink.",
+  marketplaceSubheading: "Fresh farm produce from approved farmers across DOS AGROLINK NIGERIA.",
   loading: "Loading...",
   loadingProducts: "Loading approved products...",
   loadingOrders: "Loading your orders...",

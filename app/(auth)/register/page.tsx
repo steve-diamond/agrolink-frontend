@@ -58,7 +58,7 @@ export default function RegisterPage() {
       </section>
 
       <section className="card p-5">
-        <p className="mt-0 text-sm text-slate-600">Join AgroLink as a buyer or farmer.</p>
+        <p className="mt-0 text-sm text-slate-600">Join DOS AGROLINK NIGERIA as a buyer or farmer.</p>
 
         {error && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">

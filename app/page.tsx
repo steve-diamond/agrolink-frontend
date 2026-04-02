@@ -44,10 +44,10 @@ const painPoints = [
 ];
 
 const faqs = [
-  "What does Agrolinking do in simple terms?",
+  "What does DOS AGROLINK NIGERIA do in simple terms?",
   "Do you only operate in Nigeria?",
-  "What makes Agrolinking different from other agtech companies?",
-  "How can my organization partner with Agrolinking?",
+  "What makes DOS AGROLINK NIGERIA different from other agtech companies?",
+  "How can my organization partner with DOS AGROLINK NIGERIA?",
   "Are you a non-profit organization?",
 ];
 
@@ -63,7 +63,7 @@ export default function Home() {
           <p className="section-kicker">OUR VISION</p>
           <h2>A connected, Sustainable African Agribusiness</h2>
           <p>
-            AgroLinking delivers a vibrant African agribusiness ecosystem where every farmer, processor,
+            DOS AGROLINK NIGERIA delivers a vibrant African agribusiness ecosystem where every farmer, processor,
             and stakeholder thrives. We connect through the right information, shorten uncertainty in production,
             and foster transparent market access to amplify food security, economic empowerment, and environmental
             balance across the continent.
@@ -75,7 +75,7 @@ export default function Home() {
         <p className="section-kicker">VALUE</p>
         <h2>From Data to Decisions, From Farm to Fork</h2>
         <p className="section-intro">
-          AgroLinking transforms fragmented agriculture into connected outcomes for teams, processors, and investors.
+          DOS AGROLINK NIGERIA transforms fragmented agriculture into connected outcomes for teams, processors, and investors.
           One trusted flow from source to service.
         </p>
 
@@ -94,7 +94,7 @@ export default function Home() {
 
       <section className="story-block">
         <p className="section-kicker">REAL</p>
-        <h2>We built AgroLinking because we&apos;ve been in your shoes!</h2>
+        <h2>We built DOS AGROLINK NIGERIA because we&apos;ve been in your shoes!</h2>
         <p className="section-intro">
           Our journey did not start with a business plan. It began with shared reality. We have stood in the fields,
           walked the markets, and built in uncertainty. This is why our platform is designed around trust, visibility,
@@ -129,7 +129,7 @@ export default function Home() {
         <p className="section-kicker">FAQs</p>
         <h2>Frequently Asked Questions</h2>
         <p className="section-intro">
-          AgroLinking welcomes inquiries from farmers, processors, agribusinesses, and institutions.
+          DOS AGROLINK NIGERIA welcomes inquiries from farmers, processors, agribusinesses, and institutions.
         </p>
 
         <div className="faq-grid">
@@ -146,7 +146,7 @@ export default function Home() {
 
       <footer className="landing-footer">
         <div className="footer-brand">
-          <Image src={dosLogo} alt="Dos AgroLink logo" width={50} height={50} className="footer-logo" />
+          <Image src={dosLogo} alt="DOS AGROLINK NIGERIA logo" width={50} height={50} className="footer-logo" />
           <h3>Bring Verifiable Truth to Your Chain?</h3>
           <Link href="/contact" className="cta-link">
             Talk to us
@@ -165,7 +165,7 @@ export default function Home() {
         <div className="footer-contact">
           <h4>Reach Out</h4>
           <p>+234 806 1139 719</p>
-          <p>info@agrolinking.com</p>
+          <p>info@dosagrolinknigeria.com</p>
           <form className="newsletter-form" action="#">
             <input type="email" placeholder="Enter your email address" aria-label="Email address" />
             <button type="submit">Submit</button>
@@ -173,7 +173,7 @@ export default function Home() {
         </div>
 
         <div className="footer-bottom">
-          <p>agrolinking</p>
+          <p>DOS AGROLINK NIGERIA</p>
           <div>
             <a href="#">Privacy Policy</a>
             <a href="#">Refund Policy</a>

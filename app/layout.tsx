@@ -5,7 +5,7 @@ import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dos AgroLink Nigeria",
+  title: "DOS AGROLINK NIGERIA",
   description: "Digital platform for Nigerian smallholder farmers.",
   manifest: "/manifest.webmanifest",
 };

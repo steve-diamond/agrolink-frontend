@@ -79,12 +79,12 @@ export default function NavBar() {
       >
         <Image
           src={dosLogo}
-          alt="Dos AgroLink logo"
+          alt="DOS AGROLINK NIGERIA logo"
           width={42}
           height={42}
           className="rounded-lg border border-white/55"
         />
-        <span>Dos AgroLink</span>
+        <span>DOS AGROLINK NIGERIA</span>
       </Link>
 
       <Link href="/marketplace" className={linkBase}>Marketplace</Link>
