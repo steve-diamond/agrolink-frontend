@@ -80,7 +80,14 @@ export default function FarmerUploadPage() {
       setForm(initialForm);
       setSuccess("Product uploaded successfully and is now pending admin approval.");
     } catch (requestError: any) {
-      setError(requestError?.response?.data?.message || requestError?.response?.data?.error || "Failed to upload product.");
+      const details = requestError?.response?.data?.details;
+      const detailedMessage = Array.isArray(details) && details.length > 0 ? details[0] : undefined;
+      setError(
+        detailedMessage ||
+          requestError?.response?.data?.message ||
+          requestError?.response?.data?.error ||
+          "Failed to upload product."
+      );
     } finally {
       setSubmitting(false);
     }
