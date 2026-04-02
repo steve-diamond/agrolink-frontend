@@ -5,6 +5,17 @@ import { useEffect, useState } from "react";
 import { getProducts, Product } from "@/services/productService";
 import API from "@/services/api";
 
+const isValidRemoteImageUrl = (value?: string) => {
+  if (!value) return false;
+
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+};
+
 export default function Marketplace() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,9 +108,9 @@ export default function Marketplace() {
             key={product._id}
             className="overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
           >
-            {product.imageUrl ? (
+            {isValidRemoteImageUrl(product.imageUrl) ? (
               <Image
-                src={product.imageUrl}
+                src={product.imageUrl as string}
                 alt={product.name}
                 width={800}
                 height={480}
