@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import API from "@/services/api";
+import { normalizeProductsResponse } from "@/services/productService";
 
 type AuthUser = {
   _id: string;
@@ -19,8 +20,8 @@ type Product = {
   quantity: number;
   category?: string;
   location?: string;
-  approved: boolean;
-  farmer: string;
+  approved?: boolean;
+  farmer?: string;
 };
 
 type OrderLineItem = {
@@ -46,11 +47,13 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    API.get<{ products: Product[] } | Product[]>("/api/products")
+    API.get("/api/products", {
+      params: {
+        farmer: user._id,
+      },
+    })
       .then((res) => {
-        const all = Array.isArray(res.data)
-          ? res.data
-          : (res.data as any)?.products ?? [];
+        const all = normalizeProductsResponse(res.data as unknown);
         setProducts(all.filter((p: Product) => p.farmer === user._id));
       })
       .catch(() => setProducts([]))
