@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import API from "@/services/api";
+import { useLocalizedCopy } from "@/services/useLocalizedCopy";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { copy } = useLocalizedCopy();
 
   const [form, setForm] = useState({
     name: "",
@@ -48,68 +50,25 @@ export default function RegisterPage() {
     }
   };
 
-  const inputStyle: React.CSSProperties = {
-    padding: "10px 12px",
-    border: "1px solid #cbd5e1",
-    borderRadius: "8px",
-    fontSize: "15px",
-    outline: "none",
-    width: "100%",
-    boxSizing: "border-box",
-  };
-
   return (
-    <main
-      style={{
-        minHeight: "80vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#f8fafc",
-      }}
-    >
-      <div
-        style={{
-          background: "white",
-          border: "1px solid #e2e8f0",
-          borderRadius: "16px",
-          padding: "36px 32px",
-          width: "100%",
-          maxWidth: "420px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-        }}
-      >
-        <h1 style={{ margin: "0 0 6px", fontSize: "24px", color: "#0f172a" }}>
-          Create an account
-        </h1>
-        <p style={{ margin: "0 0 24px", color: "#64748b", fontSize: "14px" }}>
-          Join AgroLink as a buyer or farmer.
-        </p>
+    <main className="mx-auto grid max-w-xl gap-4 py-6">
+      <section className="card bg-gradient-to-br from-green-950 via-green-900 to-green-700 p-5 text-green-50">
+        <h1 className="m-0 text-3xl font-bold">{copy.createAccount}</h1>
+        <p className="mb-0 mt-1 text-sm text-green-100">{copy.tagline}</p>
+      </section>
+
+      <section className="card p-5">
+        <p className="mt-0 text-sm text-slate-600">Join AgroLink as a buyer or farmer.</p>
 
         {error && (
-          <div
-            style={{
-              background: "#fef2f2",
-              border: "1px solid #fca5a5",
-              borderRadius: "8px",
-              padding: "10px 14px",
-              color: "#dc2626",
-              marginBottom: "16px",
-              fontSize: "14px",
-            }}
-          >
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "14px" }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151" }}>
-              Full Name
-            </label>
+        <form onSubmit={handleSubmit} className="grid gap-3">
+          <label className="grid gap-1 text-sm font-semibold text-green-950">
+            {copy.fullName}
             <input
               name="name"
               type="text"
@@ -117,14 +76,12 @@ export default function RegisterPage() {
               value={form.name}
               onChange={handleChange}
               required
-              style={inputStyle}
+              className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
             />
-          </div>
+          </label>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151" }}>
-              Email
-            </label>
+          <label className="grid gap-1 text-sm font-semibold text-green-950">
+            {copy.email}
             <input
               name="email"
               type="email"
@@ -132,14 +89,12 @@ export default function RegisterPage() {
               value={form.email}
               onChange={handleChange}
               required
-              style={inputStyle}
+              className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
             />
-          </div>
+          </label>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151" }}>
-              Password
-            </label>
+          <label className="grid gap-1 text-sm font-semibold text-green-950">
+            {copy.password}
             <input
               name="password"
               type="password"
@@ -148,37 +103,25 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               minLength={6}
-              style={inputStyle}
+              className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
             />
-          </div>
+          </label>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151" }}>
-              I am a…
-            </label>
+          <label className="grid gap-1 text-sm font-semibold text-green-950">
+            {copy.buyer} / {copy.farmer}
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
-              style={{ ...inputStyle, background: "white" }}
+              className="min-h-12 rounded-lg border border-green-200 bg-white px-3 outline-none ring-green-200 focus:ring"
             >
-              <option value="buyer">Buyer — browse and purchase produce</option>
-              <option value="farmer">Farmer — list and sell my produce</option>
+              <option value="buyer">{copy.buyer} - browse and purchase produce</option>
+              <option value="farmer">{copy.farmer} - list and sell produce</option>
             </select>
-          </div>
+          </label>
 
           {form.role === "farmer" && (
-            <p
-              style={{
-                margin: 0,
-                fontSize: "13px",
-                color: "#854d0e",
-                background: "#fef9c3",
-                padding: "8px 12px",
-                borderRadius: "6px",
-                border: "1px solid #fde68a",
-              }}
-            >
+            <p className="m-0 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
               Farmer accounts require admin approval before you can list products.
             </p>
           )}
@@ -186,29 +129,19 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            style={{
-              background: loading ? "#86efac" : "#16a34a",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              padding: "12px",
-              fontSize: "15px",
-              fontWeight: 600,
-              cursor: loading ? "not-allowed" : "pointer",
-              marginTop: "4px",
-            }}
+            className="btn-primary touch-target disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Creating account…" : "Create Account"}
+            {loading ? "Creating account..." : copy.createAccount}
           </button>
         </form>
 
-        <p style={{ textAlign: "center", marginTop: "20px", fontSize: "14px", color: "#64748b" }}>
+        <p className="mb-0 mt-4 text-sm text-slate-600">
           Already have an account?{" "}
-          <Link href="/login" style={{ color: "#2563eb", fontWeight: 600, textDecoration: "none" }}>
-            Log in
+          <Link href="/login" className="font-bold text-green-700 no-underline hover:text-green-800">
+            {copy.login}
           </Link>
         </p>
-      </div>
+      </section>
     </main>
   );
 }

@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProduct } from "@/services/productService";
+import { enqueueCreateProduct, flushOfflineQueue, getPendingQueueCount } from "@/services/offlineQueue";
+import { useLocalizedCopy } from "@/services/useLocalizedCopy";
+import { getCopy } from "@/services/uiCopy";
+import { getStoredLanguage } from "@/services/uiLanguage";
 
 type ProductForm = {
   name: string;
@@ -26,11 +30,13 @@ const initialForm: ProductForm = {
 
 export default function FarmerUploadPage() {
   const router = useRouter();
+  const { copy } = useLocalizedCopy();
   const [form, setForm] = useState<ProductForm>(initialForm);
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [pendingOffline, setPendingOffline] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -53,7 +59,34 @@ export default function FarmerUploadPage() {
     }
 
     setCheckingAccess(false);
+    setPendingOffline(getPendingQueueCount());
   }, [router]);
+
+  useEffect(() => {
+    const syncQueued = async () => {
+      if (!navigator.onLine) {
+        return;
+      }
+
+      const result = await flushOfflineQueue((payload) => createProduct(payload as any));
+      if (result.processed > 0) {
+        const liveCopy = getCopy(getStoredLanguage());
+        setSuccess(`${liveCopy.syncedOfflineUploads}: ${result.processed}`);
+      }
+      setPendingOffline(getPendingQueueCount());
+    };
+
+    const onOnline = () => {
+      syncQueued().catch(() => undefined);
+    };
+
+    window.addEventListener("online", onOnline);
+    syncQueued().catch(() => undefined);
+
+    return () => {
+      window.removeEventListener("online", onOnline);
+    };
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -67,7 +100,7 @@ export default function FarmerUploadPage() {
     setSubmitting(true);
 
     try {
-      await createProduct({
+      const payload = {
         name: form.name.trim(),
         price: Number(form.price),
         quantity: Number(form.quantity),
@@ -75,7 +108,17 @@ export default function FarmerUploadPage() {
         location: form.location.trim(),
         description: form.description.trim(),
         imageUrl: form.imageUrl.trim(),
-      });
+      };
+
+      if (!navigator.onLine) {
+        enqueueCreateProduct(payload);
+        setForm(initialForm);
+        setPendingOffline(getPendingQueueCount());
+        setSuccess(copy.offlineSaved);
+        return;
+      }
+
+      await createProduct(payload);
 
       setForm(initialForm);
       setSuccess("Product uploaded successfully and is now pending admin approval.");
@@ -101,7 +144,7 @@ export default function FarmerUploadPage() {
     <main className="mx-auto max-w-3xl p-6 sm:p-8">
       <section className="rounded-2xl bg-gradient-to-br from-green-800 to-green-600 p-6 text-green-50 shadow-xl shadow-green-900/20">
         <p className="m-0 text-xs uppercase tracking-widest text-green-200">
-          Farmer Workspace
+          {copy.myFarm}
         </p>
         <h1 className="mt-2 text-3xl font-semibold">Upload a Product</h1>
         <p className="mt-2 max-w-2xl text-sm text-green-100 sm:text-base">
@@ -110,6 +153,11 @@ export default function FarmerUploadPage() {
         <p className="mt-3 rounded-xl bg-white/10 px-3 py-2 text-sm text-green-50">
           Uploaded products remain hidden from buyers until an admin approves them.
         </p>
+        {pendingOffline > 0 ? (
+          <p className="mt-3 rounded-xl border border-amber-200/80 bg-amber-100/20 px-3 py-2 text-sm text-amber-100">
+            {copy.pendingOfflineUploads}: {pendingOffline}
+          </p>
+        ) : null}
       </section>
 
       <section className="mt-5 rounded-2xl border border-emerald-100 bg-white p-6 shadow-lg shadow-slate-900/5">
@@ -233,7 +281,7 @@ export default function FarmerUploadPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-lg bg-emerald-700 px-4 py-2 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn-primary touch-target disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? "Uploading..." : "Upload Product"}
             </button>
@@ -241,7 +289,7 @@ export default function FarmerUploadPage() {
             <button
               type="button"
               onClick={() => router.push("/dashboard")}
-              className="rounded-lg border border-emerald-300 bg-white px-4 py-2 font-semibold text-emerald-800 transition hover:bg-emerald-50"
+              className="btn-secondary touch-target"
             >
               Back to Dashboard
             </button>

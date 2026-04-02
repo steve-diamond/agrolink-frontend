@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getProducts, Product } from "@/services/productService";
 import API from "@/services/api";
+import { useLocalizedCopy } from "@/services/useLocalizedCopy";
 
 const isValidRemoteImageUrl = (value?: string) => {
   if (!value) return false;
@@ -25,6 +26,7 @@ const getStoredUser = () => {
 };
 
 export default function Marketplace() {
+  const { copy } = useLocalizedCopy();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
@@ -90,14 +92,14 @@ export default function Marketplace() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <section className="rounded-2xl bg-gradient-to-r from-emerald-900 via-green-800 to-lime-700 p-6 text-white shadow-xl">
-        <h1 className="text-3xl font-bold sm:text-4xl">Marketplace</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">{copy.marketplaceHeading}</h1>
         <p className="mt-2 max-w-2xl text-sm text-emerald-100 sm:text-base">
-          Fresh farm produce from approved farmers across AgroLink.
+          {copy.marketplaceSubheading}
         </p>
       </section>
 
       {loading ? (
-        <p className="mt-6 text-slate-600">Loading approved products...</p>
+        <p className="mt-6 text-slate-600">{copy.loadingProducts}</p>
       ) : null}
 
       {fetchError ? (
@@ -127,7 +129,7 @@ export default function Marketplace() {
               />
             ) : (
               <div className="flex h-48 items-center justify-center bg-emerald-50 text-sm font-medium text-emerald-700">
-                No image available
+                {copy.noImage}
               </div>
             )}
 
@@ -136,13 +138,13 @@ export default function Marketplace() {
               <p className="text-sm text-slate-500">{product.category || "General"}</p>
               <p className="text-xl font-bold text-emerald-700">₦{Number(product.price).toLocaleString()}</p>
               <p className="text-sm text-slate-600">{product.location}</p>
-              <p className="text-sm text-slate-500">Available: {product.quantity}</p>
+              <p className="text-sm text-slate-500">{copy.available}: {product.quantity}</p>
 
               <label
                 htmlFor={`quantity-${product._id}`}
                 className="mt-2 block text-sm font-medium text-slate-700"
               >
-                Quantity
+                {copy.quantity}
               </label>
               <input
                 id={`quantity-${product._id}`}
@@ -166,8 +168,15 @@ export default function Marketplace() {
                 onClick={() => handleBuyNow(product)}
                 disabled={buyingProductId === product._id}
               >
-                {buyingProductId === product._id ? "Creating Order..." : "Buy Now"}
+                {buyingProductId === product._id ? copy.creatingOrder : copy.buyNow}
               </button>
+
+              <a
+                href="tel:+2348030001020"
+                className="mt-2 block w-full rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-center text-sm font-semibold text-amber-800 no-underline transition hover:bg-amber-100"
+              >
+                {copy.callAgent} (Negotiate)
+              </a>
             </div>
           </article>
         ))}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import API from "@/services/api";
 import { normalizeProductsResponse } from "@/services/productService";
+import { useLocalizedCopy } from "@/services/useLocalizedCopy";
 
 type AuthUser = {
   _id: string;
@@ -41,17 +42,13 @@ type Order = {
   createdAt?: string;
 };
 
-// ─── Farmer sub-dashboard ────────────────────────────────────────────────────
 function FarmerDashboard({ user }: { user: AuthUser }) {
+  const { copy } = useLocalizedCopy();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    API.get("/api/products", {
-      params: {
-        farmer: user._id,
-      },
-    })
+    API.get("/api/products", { params: { farmer: user._id } })
       .then((res) => {
         const all = normalizeProductsResponse(res.data as unknown);
         setProducts(all.filter((p: Product) => p.farmer === user._id));
@@ -61,81 +58,50 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
   }, [user._id]);
 
   return (
-    <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "10px" }}>
-        <div>
-          <h1 style={{ margin: 0 }}>Farmer Dashboard</h1>
-          <p style={{ color: "#64748b", margin: "4px 0 0" }}>Welcome, {user.name}</p>
-        </div>
-        <Link
-          href="/farmer/upload"
-          style={{
-            background: "#16a34a",
-            color: "white",
-            padding: "10px 20px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: 600,
-          }}
-        >
-          + Upload New Product
+    <main className="mx-auto grid max-w-5xl gap-4">
+      <section className="card bg-gradient-to-br from-green-950 via-green-900 to-green-700 p-5 text-green-50">
+        <p className="m-0 text-xs uppercase tracking-[0.16em] text-green-100">{copy.myFarm}</p>
+        <h1 className="m-0 mt-1 text-3xl font-bold">{copy.welcome}, {user.name}</h1>
+        <p className="mb-0 mt-2 text-sm text-green-100">Track crop listings and sync updates even with weak network.</p>
+      </section>
+
+      <section className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="m-0 text-xl font-bold text-green-950">{copy.myProducts}</h2>
+        <Link href="/farmer/upload" className="btn-primary touch-target inline-flex items-center justify-center px-4 no-underline">
+          + {copy.uploadNewProduct}
         </Link>
-      </div>
+      </section>
 
-      <h2 style={{ color: "#1e293b" }}>My Products</h2>
+      {loading ? <p className="m-0 text-sm text-slate-600">{copy.loadingProducts}</p> : null}
 
-      {loading && <p>Loading your products…</p>}
+      {!loading && products.length === 0 ? (
+        <section className="card border-dashed p-5 text-center">
+          <p className="m-0 text-slate-600">{copy.noProductsYet}</p>
+          <Link href="/farmer/upload" className="mt-3 inline-block font-bold text-green-700 no-underline">{copy.uploadFirstProduct}</Link>
+        </section>
+      ) : null}
 
-      {!loading && products.length === 0 && (
-        <div style={{ textAlign: "center", padding: "40px", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
-          <p style={{ color: "#64748b", fontSize: "16px" }}>You haven&apos;t listed any products yet.</p>
-          <Link href="/farmer/upload" style={{ color: "#16a34a", fontWeight: 600 }}>Upload your first product →</Link>
-        </div>
-      )}
-
-      <div style={{ display: "grid", gap: "12px" }}>
-        {products.map((p) => (
-          <div
-            key={p._id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "8px",
-              padding: "14px 18px",
-              background: p.approved ? "#f0fdf4" : "#fffbeb",
-              border: `1px solid ${p.approved ? "#86efac" : "#fde68a"}`,
-              borderRadius: "10px",
-            }}
-          >
-            <div>
-              <strong style={{ fontSize: "16px" }}>{p.name}</strong>
-              <span style={{ marginLeft: "12px", color: "#475569" }}>₦{p.price}</span>
-              {p.category && <span style={{ marginLeft: "8px", color: "#94a3b8", fontSize: "12px" }}>{p.category}</span>}
-              {p.location && <span style={{ marginLeft: "8px", color: "#94a3b8", fontSize: "12px" }}>📍 {p.location}</span>}
+      <section className="grid gap-3">
+        {products.map((product) => (
+          <article key={product._id} className={`card p-4 ${product.approved ? "border-emerald-200 bg-emerald-50/60" : "border-amber-200 bg-amber-50/60"}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="m-0 text-lg font-bold text-green-950">{product.name}</h3>
+                <p className="m-0 mt-1 text-sm text-slate-600">NGN {Number(product.price).toLocaleString()} · Qty {product.quantity}</p>
+              </div>
+              <span className={`rounded-full px-3 py-1 text-xs font-bold ${product.approved ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                {product.approved ? copy.approved : copy.pending}
+              </span>
             </div>
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: 600,
-                color: p.approved ? "#16a34a" : "#854d0e",
-                background: p.approved ? "#dcfce7" : "#fef9c3",
-                padding: "3px 10px",
-                borderRadius: "99px",
-              }}
-            >
-              {p.approved ? "✓ Approved — visible in marketplace" : "⏳ Pending admin approval"}
-            </span>
-          </div>
+          </article>
         ))}
-      </div>
+      </section>
     </main>
   );
 }
 
-// ─── Buyer sub-dashboard ─────────────────────────────────────────────────────
 function BuyerDashboard({ user }: { user: AuthUser }) {
+  const { copy } = useLocalizedCopy();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -147,102 +113,59 @@ function BuyerDashboard({ user }: { user: AuthUser }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const getItems = (o: Order): OrderLineItem[] => {
-    if (Array.isArray(o.products) && o.products.length) return o.products;
-    if (o.productId) return [{ productId: o.productId, quantity: o.quantity ?? 0 }];
+  const getItems = (order: Order): OrderLineItem[] => {
+    if (Array.isArray(order.products) && order.products.length) return order.products;
+    if (order.productId) return [{ productId: order.productId, quantity: order.quantity ?? 0 }];
     return [];
   };
 
-  const getTotal = (o: Order) => Number(o.totalAmount ?? o.totalPrice ?? 0);
-
-  const statusColor: Record<string, string> = {
-    pending: "#f59e0b",
-    paid: "#3b82f6",
-    delivered: "#22c55e",
-  };
-
   return (
-    <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "10px" }}>
-        <div>
-          <h1 style={{ margin: 0 }}>Buyer Dashboard</h1>
-          <p style={{ color: "#64748b", margin: "4px 0 0" }}>Welcome, {user.name}</p>
-        </div>
-        <Link
-          href="/marketplace"
-          style={{
-            background: "#2563eb",
-            color: "white",
-            padding: "10px 20px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: 600,
-          }}
-        >
-          Browse Marketplace
+    <main className="mx-auto grid max-w-5xl gap-4">
+      <section className="card bg-gradient-to-br from-green-950 via-green-900 to-green-700 p-5 text-green-50">
+        <p className="m-0 text-xs uppercase tracking-[0.16em] text-green-100">{copy.marketHub}</p>
+        <h1 className="m-0 mt-1 text-3xl font-bold">{copy.welcome}, {user.name}</h1>
+        <p className="mb-0 mt-2 text-sm text-green-100">Check order status and negotiate with trusted farmers.</p>
+      </section>
+
+      <section className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="m-0 text-xl font-bold text-green-950">{copy.myOrders}</h2>
+        <Link href="/marketplace" className="btn-primary touch-target inline-flex items-center justify-center px-4 no-underline">
+          {copy.marketHub}
         </Link>
-      </div>
+      </section>
 
-      <h2 style={{ color: "#1e293b" }}>My Orders</h2>
+      {loading ? <p className="m-0 text-sm text-slate-600">{copy.loadingOrders}</p> : null}
+      {error ? <p className="m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p> : null}
 
-      {loading && <p>Loading your orders…</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {!loading && !error && orders.length === 0 ? (
+        <section className="card border-dashed p-5 text-center">
+          <p className="m-0 text-slate-600">{copy.noOrdersYet}</p>
+          <Link href="/marketplace" className="mt-3 inline-block font-bold text-green-700 no-underline">{copy.browseMarketplace}</Link>
+        </section>
+      ) : null}
 
-      {!loading && !error && orders.length === 0 && (
-        <div style={{ textAlign: "center", padding: "40px", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
-          <p style={{ color: "#64748b", fontSize: "16px" }}>No orders yet.</p>
-          <Link href="/marketplace" style={{ color: "#2563eb", fontWeight: 600 }}>Shop the marketplace →</Link>
-        </div>
-      )}
-
-      <div style={{ display: "grid", gap: "14px" }}>
+      <section className="grid gap-3">
         {orders.map((order) => {
           const items = getItems(order);
-          const total = getTotal(order);
-          const status = order.status || "pending";
+          const total = Number(order.totalAmount ?? order.totalPrice ?? 0);
           return (
-            <div
-              key={order._id}
-              style={{
-                border: "1px solid #e2e8f0",
-                borderRadius: "10px",
-                padding: "16px",
-                background: "#fff",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-                <strong>{items.length > 1 ? `${items.length} items` : items[0]?.productId?.name ?? "Order"}</strong>
-                <span
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    color: statusColor[status] ?? "#64748b",
-                    background: "#f1f5f9",
-                    padding: "2px 10px",
-                    borderRadius: "99px",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {status}
-                </span>
+            <article key={order._id} className="card p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="m-0 text-base font-bold text-green-950">
+                  {items.length > 1 ? `${items.length} items` : items[0]?.productId?.name || "Order"}
+                </h3>
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">{order.status}</span>
               </div>
-              <p style={{ margin: "8px 0 0", color: "#475569", fontWeight: 600 }}>
-                Total: ₦{total.toLocaleString()}
-              </p>
-              {order.createdAt && (
-                <p style={{ margin: "4px 0 0", color: "#94a3b8", fontSize: "13px" }}>
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </p>
-              )}
-            </div>
+              <p className="m-0 mt-2 text-sm text-slate-700">Total: NGN {total.toLocaleString()}</p>
+              {order.createdAt ? <p className="m-0 mt-1 text-xs text-slate-500">{new Date(order.createdAt).toLocaleDateString()}</p> : null}
+            </article>
           );
         })}
-      </div>
+      </section>
     </main>
   );
 }
 
-// ─── Main dashboard (role router) ────────────────────────────────────────────
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -257,7 +180,7 @@ export default function Dashboard() {
     }
 
     try {
-      const parsed: AuthUser = JSON.parse(raw);
+      const parsed = JSON.parse(raw) as AuthUser;
       if (parsed.role === "admin") {
         router.replace("/admin");
         return;
@@ -269,7 +192,7 @@ export default function Dashboard() {
   }, [router]);
 
   if (!user) {
-    return <main style={{ padding: "40px", textAlign: "center" }}><p>Loading…</p></main>;
+    return <main className="p-8 text-center text-slate-600">Loading...</main>;
   }
 
   if (user.role === "farmer") return <FarmerDashboard user={user} />;
