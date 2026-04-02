@@ -16,6 +16,14 @@ const isValidRemoteImageUrl = (value?: string) => {
   }
 };
 
+const getStoredUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "{}");
+  } catch {
+    return {};
+  }
+};
+
 export default function Marketplace() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +44,7 @@ export default function Marketplace() {
   }, []);
 
   const handleBuyNow = async (product: Product) => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const user = getStoredUser();
     const quantity = quantities[product._id] ?? 1;
 
     if (!user._id) {
