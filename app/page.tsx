@@ -1,43 +1,192 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import dosLogo from "../dos logo.jpg";
-import { useLocalizedCopy } from "@/services/useLocalizedCopy";
+
+const audienceCards = [
+  {
+    title: "For Agribusinesses",
+    body: "Build, grow, and scale with connected supply intelligence and traceable workflows.",
+    imageClass: "audience-image-one",
+  },
+  {
+    title: "For Farmers & Cooperatives",
+    body: "Unlock capital, improve yields, and access premium markets with real-time data.",
+    imageClass: "audience-image-two",
+  },
+  {
+    title: "For Investors & Partners",
+    body: "Drive impact and returns through transparent operations and performance reporting.",
+    imageClass: "audience-image-three",
+  },
+];
+
+const painPoints = [
+  {
+    title: "We've seen the harvest spoiled by a broken thread to the market.",
+    body: "We know the heartbreak of a farmer who has poured everything into their crop, only to see it sold at discount due to a lack of timely buyers or post-harvest access.",
+    tone: "deep",
+  },
+  {
+    title: "We've tried to build trust with nothing but a handshake.",
+    body: "We have watched partnerships collapse over vague terms, product quality disputes, and delayed payment cycles. It is no wonder that confidence drops when records disappear.",
+    tone: "bright",
+  },
+  {
+    title: "We've worked in the dark, wishing for a thread of clear insight.",
+    body: "From farm records to logistics checkpoints and market movement, teams are often forced to move on instinct because the right data never reaches the right people.",
+    tone: "bright",
+  },
+  {
+    title: "We've felt the frustration of a brilliant vision held back by a missing financial thread.",
+    body: "A great strategy is not enough when access to affordable credit, verified history, and market confidence remains fragmented.",
+    tone: "deep",
+  },
+];
+
+const faqs = [
+  "What does Agrolinking do in simple terms?",
+  "Do you only operate in Nigeria?",
+  "What makes Agrolinking different from other agtech companies?",
+  "How can my organization partner with Agrolinking?",
+  "Are you a non-profit organization?",
+];
 
 export default function Home() {
-  const { copy } = useLocalizedCopy();
-
   return (
-    <main className="grid gap-4">
-      <section className="card bg-gradient-to-br from-green-950 via-green-900 to-green-700 p-4 text-green-50">
-        <div className="flex items-center gap-3">
-          <Image src={dosLogo} alt="Dos AgroLink logo" width={54} height={54} className="rounded-lg border border-white/40" />
+    <main className="landing-page">
+      <section className="hero-block">
+        <p className="section-kicker">DO IT SMART</p>
+        <h1>The Operating System for African Agriculture</h1>
+        <div className="soil-line" aria-hidden="true" />
+
+        <article className="hero-highlight">
+          <p className="section-kicker">OUR VISION</p>
+          <h2>A connected, Sustainable African Agribusiness</h2>
+          <p>
+            AgroLinking delivers a vibrant African agribusiness ecosystem where every farmer, processor,
+            and stakeholder thrives. We connect through the right information, shorten uncertainty in production,
+            and foster transparent market access to amplify food security, economic empowerment, and environmental
+            balance across the continent.
+          </p>
+        </article>
+      </section>
+
+      <section className="audience-block">
+        <p className="section-kicker">VALUE</p>
+        <h2>From Data to Decisions, From Farm to Fork</h2>
+        <p className="section-intro">
+          AgroLinking transforms fragmented agriculture into connected outcomes for teams, processors, and investors.
+          One trusted flow from source to service.
+        </p>
+
+        <div className="audience-grid">
+          {audienceCards.map((card) => (
+            <article className="audience-card" key={card.title}>
+              <div className={`audience-image ${card.imageClass}`} aria-hidden="true">
+                <div className="portrait-mark" />
+              </div>
+              <h3>{card.title}</h3>
+              <p>{card.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="story-block">
+        <p className="section-kicker">REAL</p>
+        <h2>We built AgroLinking because we&apos;ve been in your shoes!</h2>
+        <p className="section-intro">
+          Our journey did not start with a business plan. It began with shared reality. We have stood in the fields,
+          walked the markets, and built in uncertainty. This is why our platform is designed around trust, visibility,
+          and financial access.
+        </p>
+
+        <div className="story-grid">
+          {painPoints.map((point) => (
+            <article className={`story-card ${point.tone}`} key={point.title}>
+              <h3>{point.title}</h3>
+              <p>{point.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="product-banner">
+        <div>
+          <h2>Access premium market with our product.</h2>
+          <p>
+            The process to set things up can feel complex and confusing. We simplify your path with tools that connect
+            finance, operations, and market visibility in one ecosystem.
+          </p>
+          <Link href="/marketplace" className="cta-link">
+            Explore Agtrail
+          </Link>
+        </div>
+        <p className="banner-mark">Agtrail...</p>
+      </section>
+
+      <section className="faq-block">
+        <p className="section-kicker">FAQs</p>
+        <h2>Frequently Asked Questions</h2>
+        <p className="section-intro">
+          AgroLinking welcomes inquiries from farmers, processors, agribusinesses, and institutions.
+        </p>
+
+        <div className="faq-grid">
+          {faqs.map((question, index) => (
+            <details className={`faq-item ${index === faqs.length - 1 ? "faq-item-wide" : ""}`} key={question}>
+              <summary>{question}</summary>
+              <p>
+                Our team will guide you through onboarding, product fit, and partnership models based on your goals.
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <footer className="landing-footer">
+        <div className="footer-brand">
+          <Image src={dosLogo} alt="Dos AgroLink logo" width={50} height={50} className="footer-logo" />
+          <h3>Bring Verifiable Truth to Your Chain?</h3>
+          <Link href="/contact" className="cta-link">
+            Talk to us
+          </Link>
+        </div>
+
+        <div className="footer-links">
+          <h4>Visit Us</h4>
+          <p>Home</p>
+          <p>About Us</p>
+          <p>Blog</p>
+          <p>Agtrail</p>
+          <p>Contact Us</p>
+        </div>
+
+        <div className="footer-contact">
+          <h4>Reach Out</h4>
+          <p>+234 806 1139 719</p>
+          <p>info@agrolinking.com</p>
+          <form className="newsletter-form" action="#">
+            <input type="email" placeholder="Enter your email address" aria-label="Email address" />
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+
+        <div className="footer-bottom">
+          <p>agrolinking</p>
           <div>
-            <h1 className="m-0 text-2xl font-bold">{copy.appName}</h1>
-            <p className="mb-0 mt-1 text-sm text-green-100">{copy.tagline}</p>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Refund Policy</a>
+            <a href="#">Terms and Conditions</a>
+          </div>
+          <div>
+            <a href="#">LinkedIn</a>
+            <a href="#">Instagram</a>
+            <a href="#">X</a>
+            <a href="#">Facebook</a>
           </div>
         </div>
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          <p className="m-0 rounded-lg bg-white/10 px-3 py-2 text-sm">{copy.weatherAlert}: Heavy rain by 4PM</p>
-          <p className="m-0 rounded-lg bg-white/10 px-3 py-2 text-sm">{copy.maizePrice}: NGN 54,500 / 100kg</p>
-          <a href="tel:+2348030001020" className="m-0 rounded-lg bg-white/10 px-3 py-2 text-sm no-underline">{copy.callAgent}</a>
-        </div>
-        <p className="mb-0 mt-2 text-xs text-green-100">{copy.networkLowData}</p>
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Link href="/marketplace" className="card p-4 font-semibold text-green-950 no-underline">{copy.marketHub}</Link>
-        <Link href="/farmer/upload" className="card p-4 font-semibold text-green-950 no-underline">{copy.inputShop}</Link>
-        <Link href="/dashboard" className="card p-4 font-semibold text-green-950 no-underline">{copy.myFarm}</Link>
-        <Link href="/orders" className="card p-4 font-semibold text-green-950 no-underline">{copy.finance}</Link>
-      </section>
-
-      <section className="card grid gap-2 p-4 sm:grid-cols-3">
-        <button className="btn-primary touch-target">{copy.callAgent}</button>
-        <button className="btn-secondary touch-target">{copy.listenNow}</button>
-        <button className="btn-secondary touch-target">{copy.syncOffline}</button>
-      </section>
+      </footer>
     </main>
   );
 }
