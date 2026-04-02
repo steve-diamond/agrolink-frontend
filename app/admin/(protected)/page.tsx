@@ -57,6 +57,10 @@ type AdminOrder = {
   quantity?: number;
 };
 
+const getAuthHeaders = () => ({
+  Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+});
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -67,11 +71,8 @@ export default function AdminDashboardPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [rangeDays, setRangeDays] = useState<DateRange>(90);
 
-  const getToken = () => localStorage.getItem("token") ?? "";
-  const authHeader = () => ({ Authorization: `Bearer ${getToken()}` });
-
   useEffect(() => {
-    const token = getToken();
+    const token = localStorage.getItem("token") ?? "";
 
     if (!token) {
       router.replace("/admin/login");
@@ -79,9 +80,9 @@ export default function AdminDashboardPage() {
     }
 
     Promise.all([
-      API.get("/api/admin/users", { headers: authHeader() }),
-      API.get("/api/admin/products", { headers: authHeader() }),
-      API.get("/api/admin/orders", { headers: authHeader() }),
+      API.get("/api/admin/users", { headers: getAuthHeaders() }),
+      API.get("/api/admin/products", { headers: getAuthHeaders() }),
+      API.get("/api/admin/orders", { headers: getAuthHeaders() }),
     ])
       .then(([usersRes, productsRes, ordersRes]) => {
         const usersPayload = usersRes.data as any;
@@ -120,7 +121,7 @@ export default function AdminDashboardPage() {
     if (!confirm(`Delete this ${type.slice(0, -1)}? This cannot be undone.`)) return;
     setDeleting(id);
     try {
-      await API.delete(`/api/admin/${type}/${id}`, { headers: authHeader() });
+      await API.delete(`/api/admin/${type}/${id}`, { headers: getAuthHeaders() });
       if (type === "users") setUsers((prev) => prev.filter((u) => u._id !== id));
       if (type === "products") setProducts((prev) => prev.filter((p) => p._id !== id));
       if (type === "orders") setOrders((prev) => prev.filter((o) => o._id !== id));
@@ -137,7 +138,7 @@ export default function AdminDashboardPage() {
   const approveProduct = async (id: string) => {
     try {
       await API.patch(`/api/admin/products/${id}/approve`, null, {
-        headers: authHeader(),
+        headers: getAuthHeaders(),
       });
       setProducts((prev) =>
         prev.map((p) => (p._id === id ? { ...p, approved: true } : p))
@@ -150,7 +151,7 @@ export default function AdminDashboardPage() {
   const approveFarmer = async (id: string) => {
     try {
       await API.patch(`/api/admin/users/${id}/approve`, null, {
-        headers: authHeader(),
+        headers: getAuthHeaders(),
       });
       setUsers((prev) =>
         prev.map((user) => (user._id === id ? { ...user, approved: true } : user))
@@ -361,73 +362,35 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <main
-      className="admin-board"
-      style={{
-        padding: "20px",
-        background: "radial-gradient(circle at top right, #fde68a 0%, #f8fafc 45%)",
-        minHeight: "100vh",
-      }}
-    >
-      <section
-        className="print-card"
-        style={{
-          background: "linear-gradient(120deg, #0f172a, #1e293b)",
-          color: "#f8fafc",
-          borderRadius: "16px",
-          padding: "20px",
-          marginBottom: "16px",
-          boxShadow: "0 12px 30px rgba(15, 23, 42, 0.25)",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+    <main className="admin-board min-h-screen bg-[radial-gradient(circle_at_top_right,_#fde68a_0%,_#f8fafc_45%)] p-5">
+      <section className="print-card mb-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 p-5 text-slate-50 shadow-[0_12px_30px_rgba(15,23,42,0.25)]">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p style={{ margin: 0, color: "#cbd5e1", letterSpacing: "0.08em", textTransform: "uppercase", fontSize: "12px" }}>
+            <p className="m-0 text-xs uppercase tracking-[0.08em] text-slate-300">
               Investor Control Room
             </p>
-            <h1 style={{ margin: "8px 0 0", fontSize: "30px" }}>AgroLink Executive Dashboard</h1>
-            <p style={{ margin: "8px 0 0", color: "#cbd5e1" }}>
+            <h1 className="mt-2 text-3xl font-semibold">AgroLink Executive Dashboard</h1>
+            <p className="mt-2 text-slate-300">
               Live market intelligence, operations, and approval performance.
             </p>
           </div>
 
-          <div className="no-print" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <div className="no-print flex flex-wrap gap-2">
             <button
               onClick={exportAnalyticsCsv}
-              style={{
-                border: "1px solid #22d3ee",
-                background: "#155e75",
-                color: "#ecfeff",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                cursor: "pointer",
-              }}
+              className="cursor-pointer rounded-lg border border-cyan-400 bg-cyan-800 px-3 py-2 text-cyan-50"
             >
               Export CSV
             </button>
             <button
               onClick={printInvestorReport}
-              style={{
-                border: "1px solid #facc15",
-                background: "#854d0e",
-                color: "#fef9c3",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                cursor: "pointer",
-              }}
+              className="cursor-pointer rounded-lg border border-yellow-400 bg-amber-800 px-3 py-2 text-yellow-100"
             >
               Print Report
             </button>
             <button
               onClick={handleLogout}
-              style={{
-                border: "1px solid #fca5a5",
-                background: "#7f1d1d",
-                color: "#fee2e2",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                cursor: "pointer",
-              }}
+              className="cursor-pointer rounded-lg border border-red-300 bg-red-900 px-3 py-2 text-red-100"
             >
               Logout
             </button>
@@ -435,14 +398,19 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      <div style={{
-        background: "#f1f5f9",
-        padding: "20px",
-        borderRadius: "10px",
-        marginBottom: "20px"
-      }}>
+      {loading ? (
+        <div className="mb-4 text-slate-700">Loading admin dashboard...</div>
+      ) : null}
+
+      {!loading && error ? (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+          {error}
+        </div>
+      ) : null}
+
+      <div className="mb-5 rounded-xl bg-slate-100 p-5">
         <h2>Platform Stats</h2>
-        <div style={{ display: "flex", gap: "20px" }}>
+        <div className="flex flex-wrap gap-5">
           <div>Total Users: {totalUsers}</div>
           <div>Total Products: {totalProducts}</div>
           <div>Total Orders: {totalOrders}</div>
@@ -450,49 +418,39 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <section className="print-card" style={{ marginTop: "20px" }}>
+      <section className="print-card mt-5">
         <h2>Investor Analytics</h2>
-        <div className="no-print" style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+        <div className="no-print mb-3 flex gap-2">
           {[30, 90, 365].map((value) => (
             <button
               key={value}
               onClick={() => setRangeDays(value as DateRange)}
-              style={{
-                border: "1px solid #cbd5e1",
-                background: rangeDays === value ? "#0f172a" : "#ffffff",
-                color: rangeDays === value ? "#ffffff" : "#0f172a",
-                borderRadius: "8px",
-                padding: "6px 10px",
-                cursor: "pointer",
-              }}
+              className={`cursor-pointer rounded-lg border px-3 py-1.5 ${
+                rangeDays === value
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "border-slate-300 bg-white text-slate-900"
+              }`}
             >
               Last {value} days
             </button>
           ))}
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "12px",
-            marginBottom: "16px",
-          }}
-        >
-          <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px" }}>
-            <p style={{ margin: 0, color: "#64748b" }}>Total Revenue</p>
-            <h3 style={{ margin: "8px 0 0" }}>{currencyFormatter.format(totalRevenue)}</h3>
+        <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3">
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="m-0 text-slate-500">Total Revenue</p>
+            <h3 className="mt-2">{currencyFormatter.format(totalRevenue)}</h3>
           </div>
-          <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px" }}>
-            <p style={{ margin: 0, color: "#64748b" }}>Average Order Value</p>
-            <h3 style={{ margin: "8px 0 0" }}>{currencyFormatter.format(averageOrderValue)}</h3>
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="m-0 text-slate-500">Average Order Value</p>
+            <h3 className="mt-2">{currencyFormatter.format(averageOrderValue)}</h3>
           </div>
-          <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px" }}>
-            <p style={{ margin: 0, color: "#64748b" }}>Farmer Approval Rate</p>
-            <h3 style={{ margin: "8px 0 0" }}>{approvalRate.toFixed(1)}%</h3>
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="m-0 text-slate-500">Farmer Approval Rate</p>
+            <h3 className="mt-2">{approvalRate.toFixed(1)}%</h3>
           </div>
-          <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px" }}>
-            <p style={{ margin: 0, color: "#64748b" }}>Approved Farmers</p>
-            <h3 style={{ margin: "8px 0 0" }}>{compactFormatter.format(approvedFarmerCount)} / {compactFormatter.format(farmerCount)}</h3>
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="m-0 text-slate-500">Approved Farmers</p>
+            <h3 className="mt-2">{compactFormatter.format(approvedFarmerCount)} / {compactFormatter.format(farmerCount)}</h3>
           </div>
         </div>
         <AdminCharts
@@ -526,56 +484,34 @@ export default function AdminDashboardPage() {
 
       <section>
         <h2>Products</h2>
-        {products.length === 0 && <p style={{ color: "#64748b" }}>No products found.</p>}
-        <div style={{ display: "grid", gap: "10px" }}>
+        {products.length === 0 && <p className="text-slate-500">No products found.</p>}
+        <div className="grid gap-2.5">
           {products.map((p) => (
             <div
               key={p._id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: "10px",
-                flexWrap: "wrap",
-                background: p.approved ? "#f0fdf4" : "#fffbeb",
-                border: `1px solid ${p.approved ? "#86efac" : "#fde68a"}`,
-                borderRadius: "8px",
-                padding: "10px 14px",
-              }}
+              className={`flex flex-wrap items-center justify-between gap-2.5 rounded-lg border px-3.5 py-2.5 ${
+                p.approved ? "border-green-300 bg-green-50" : "border-yellow-200 bg-amber-50"
+              }`}
             >
               <div>
                 <strong>{p.name}</strong>
-                <span style={{ marginLeft: "10px", color: "#475569" }}>₦{p.price}</span>
-                {p.category && <span style={{ marginLeft: "8px", color: "#94a3b8", fontSize: "12px" }}>{p.category}</span>}
-                {p.location && <span style={{ marginLeft: "8px", color: "#94a3b8", fontSize: "12px" }}>📍 {p.location}</span>}
+                <span className="ml-2.5 text-slate-600">₦{p.price}</span>
+                {p.category && <span className="ml-2 text-xs text-slate-400">{p.category}</span>}
+                {p.location && <span className="ml-2 text-xs text-slate-400">📍 {p.location}</span>}
                 <span
-                  style={{
-                    marginLeft: "10px",
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    color: p.approved ? "#16a34a" : "#854d0e",
-                    background: p.approved ? "#dcfce7" : "#fef9c3",
-                    padding: "2px 8px",
-                    borderRadius: "99px",
-                  }}
+                  className={`ml-2.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    p.approved ? "bg-green-100 text-green-700" : "bg-yellow-100 text-amber-800"
+                  }`}
                 >
                   {p.approved ? "Approved" : "Pending Approval"}
                 </span>
               </div>
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div className="flex gap-2">
                 {!p.approved && (
                   <button
                     onClick={() => approveProduct(p._id)}
                     disabled={deleting === p._id}
-                    style={{
-                      background: "#16a34a",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      padding: "6px 14px",
-                      cursor: "pointer",
-                      fontWeight: 600,
-                    }}
+                    className="cursor-pointer rounded-md bg-green-600 px-3.5 py-1.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Approve
                   </button>
@@ -583,14 +519,7 @@ export default function AdminDashboardPage() {
                 <button
                   onClick={() => deleteProduct(p._id)}
                   disabled={deleting === p._id}
-                  style={{
-                    background: "#dc2626",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                  }}
+                  className="cursor-pointer rounded-md bg-red-600 px-3 py-1.5 text-white disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {deleting === p._id ? "Deleting…" : "Delete"}
                 </button>
@@ -607,48 +536,36 @@ export default function AdminDashboardPage() {
         {orders.map((o: any) => (
           <div
             key={o._id}
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "12px",
-              background: "#fff",
-              marginBottom: "12px",
-            }}
+            className="mb-3 rounded-lg border border-slate-300 bg-white p-3"
           >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+            <div className="flex flex-wrap justify-between gap-3">
               <strong>{getOrderSummary(o)}</strong>
-              <span style={{ color: "#475569", textTransform: "capitalize" }}>
+              <span className="capitalize text-slate-600">
                 {o.status} / {o.paymentStatus || "pending"}
               </span>
             </div>
-            <div style={{ marginTop: "6px", color: "#475569" }}>
+            <div className="mt-1.5 text-slate-600">
               Buyer: {o.buyerId?.email || "Unknown"}
             </div>
-            <div style={{ marginTop: "6px", color: "#475569" }}>
+            <div className="mt-1.5 text-slate-600">
               Quantity: {getOrderQuantity(o)}
             </div>
-            <div style={{ marginTop: "6px", fontWeight: 600 }}>
+            <div className="mt-1.5 font-semibold">
               Total: {currencyFormatter.format(getOrderTotal(o))}
             </div>
-            <div style={{ marginTop: "10px", display: "grid", gap: "8px" }}>
+            <div className="mt-2.5 grid gap-2">
               {getOrderItems(o).map((item, index) => (
                 <div
                   key={`${o._id}-${index}`}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: "12px",
-                    paddingTop: "8px",
-                    borderTop: "1px solid #e5e7eb",
-                  }}
+                  className="flex justify-between gap-3 border-t border-slate-200 pt-2"
                 >
                   <div>
-                    <div style={{ fontWeight: 500 }}>{item.productId?.name || "Unknown Product"}</div>
-                    <div style={{ fontSize: "13px", color: "#64748b" }}>{item.productId?.location || "No location"}</div>
+                    <div className="font-medium">{item.productId?.name || "Unknown Product"}</div>
+                    <div className="text-[13px] text-slate-500">{item.productId?.location || "No location"}</div>
                   </div>
-                  <div style={{ textAlign: "right", whiteSpace: "nowrap", color: "#334155" }}>
+                  <div className="whitespace-nowrap text-right text-slate-700">
                     <div>Qty: {item.quantity}</div>
-                    <div style={{ fontSize: "13px" }}>{currencyFormatter.format(Number(item.productId?.price || 0))}</div>
+                    <div className="text-[13px]">{currencyFormatter.format(Number(item.productId?.price || 0))}</div>
                   </div>
                 </div>
               ))}

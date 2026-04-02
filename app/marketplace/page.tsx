@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getProducts, Product } from "@/services/productService";
 import API from "@/services/api";
@@ -97,9 +98,12 @@ export default function Marketplace() {
             className="overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
           >
             {product.imageUrl ? (
-              <img
+              <Image
                 src={product.imageUrl}
                 alt={product.name}
+                width={800}
+                height={480}
+                unoptimized
                 className="h-48 w-full object-cover"
               />
             ) : (

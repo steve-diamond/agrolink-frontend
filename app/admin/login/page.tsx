@@ -41,11 +41,11 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main style={{ padding: "20px", maxWidth: "420px", margin: "0 auto" }}>
-      <h1>Admin Login</h1>
-      <p style={{ color: "#666" }}>Sign in with an admin account to access the admin dashboard.</p>
+    <main className="mx-auto max-w-[420px] px-5 py-8">
+      <h1 className="text-3xl font-semibold text-slate-900">Admin Login</h1>
+      <p className="mt-2 text-slate-500">Sign in with an admin account to access the admin dashboard.</p>
 
-      <form onSubmit={handleSubmit} style={{ marginTop: "20px" }}>
+      <form onSubmit={handleSubmit} className="mt-5 space-y-3">
         <input
           name="email"
           type="email"
@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
           value={form.email}
           onChange={handleChange}
           required
-          style={{ width: "100%", padding: "10px", marginBottom: "12px", border: "1px solid #ccc", borderRadius: "6px" }}
+          className="w-full rounded-md border border-slate-300 px-3 py-2"
         />
         <input
           name="password"
@@ -62,23 +62,17 @@ export default function AdminLoginPage() {
           value={form.password}
           onChange={handleChange}
           required
-          style={{ width: "100%", padding: "10px", marginBottom: "12px", border: "1px solid #ccc", borderRadius: "6px" }}
+          className="w-full rounded-md border border-slate-300 px-3 py-2"
         />
 
-        {error ? <p style={{ color: "red", marginBottom: "12px" }}>{error}</p> : null}
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
         <button
           type="submit"
           disabled={isSubmitting}
-          style={{
-            width: "100%",
-            padding: "10px 14px",
-            border: "none",
-            borderRadius: "6px",
-            background: isSubmitting ? "#999" : "#111827",
-            color: "#fff",
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-          }}
+          className={`w-full rounded-md px-4 py-2 text-white ${
+            isSubmitting ? "cursor-not-allowed bg-slate-400" : "bg-slate-900 hover:bg-slate-800"
+          }`}
         >
           {isSubmitting ? "Signing in..." : "Login as Admin"}
         </button>

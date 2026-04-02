@@ -52,7 +52,7 @@ export default function OrdersPage() {
       .then((res) => setOrders(res.data))
       .catch((err) => setError(err?.response?.data?.message || "Failed to load orders."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [router]);
 
   const statusColor: Record<string, string> = {
     pending: "#f59e0b",
