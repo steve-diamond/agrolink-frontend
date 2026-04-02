@@ -1,7 +1,18 @@
 import axios from "axios";
 
+const getBaseUrl = () => {
+  if (typeof window !== "undefined") {
+    const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+    if (isLocalHost) {
+      return "http://localhost:5000";
+    }
+  }
+
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+};
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: getBaseUrl(),
 });
 
 api.interceptors.request.use((config) => {
