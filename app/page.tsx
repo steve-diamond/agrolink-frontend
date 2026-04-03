@@ -6,30 +6,37 @@ const strategicCapabilities = [
   {
     title: "Smart Produce Marketplace",
     body: "Farmers list maize, rice, cassava, and vegetables directly to verified buyers by location, volume, and fair pricing.",
+    image: "/agropro/images/service1.jpg",
   },
   {
     title: "AI Crop Price Intelligence",
     body: "Real-time demand and regional pricing signals guide farmers on when to sell, where to sell, and expected market direction.",
+    image: "/agropro/images/news2.jpg",
   },
   {
     title: "Cooperative Digital Wallet",
     body: "Instant payouts, savings tracking, and input payments keep cooperative cash cycles transparent and healthy.",
+    image: "/agropro/images/blog1.jpg",
   },
   {
     title: "Farmer Micro-Loan System",
     body: "Loan access is tied to sales history, farm profile, and cooperative performance so growth capital reaches active farmers.",
+    image: "/agropro/images/news1.jpg",
   },
   {
     title: "Logistics & Transport Network",
     body: "Farm-to-city movement is coordinated through pickup requests, driver assignment, transit tracking, and delivery confirmation.",
+    image: "/agropro/images/chose.jpg",
   },
   {
     title: "Warehouse & Storage System",
     body: "Capacity-aware booking, inventory records, and warehouse receipts reduce spoilage and forced low-price sales.",
+    image: "/agropro/images/about_img.jpg",
   },
   {
     title: "Advisory & Knowledge Hub",
     body: "Weather-aware crop guidance, pest alerts, and fertilizer recommendations support stronger decisions and better yields.",
+    image: "/agropro/images/service2.jpg",
   },
 ];
 
@@ -131,10 +138,16 @@ export default function Home() {
         <p className="section-kicker">OUR 7-POINT VISION</p>
         <h2>Built to Solve Real Farmer Problems Across Nigeria</h2>
         <div className="capabilities-grid">
-          {strategicCapabilities.map((item) => (
+          {strategicCapabilities.map((item, index) => (
             <article key={item.title} className="capability-card">
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
+              <div className="capability-card-media">
+                <Image src={item.image} alt={item.title} fill className="capability-card-image" sizes="(max-width: 980px) 100vw, 33vw" />
+                <span>{String(index + 1).padStart(2, "0")}</span>
+              </div>
+              <div className="capability-card-body">
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </div>
             </article>
           ))}
         </div>
@@ -148,6 +161,13 @@ export default function Home() {
             DOS AGROLINK NIGERIA combines direct produce transactions with secure payments and value-added logistics,
             storage, and financing rails for long-term agricultural growth.
           </p>
+          <div className="opportunity-visual">
+            <Image src="/agropro/images/service3.jpg" alt="Professional produce operation" fill className="opportunity-visual-image" sizes="(max-width: 980px) 100vw, 60vw" />
+            <div className="opportunity-visual-overlay">
+              <strong>Trusted Trade Rail</strong>
+              <span>Data, logistics, storage, finance</span>
+            </div>
+          </div>
         </div>
         <div className="opportunity-stats">
           {impactStats.map((item) => (
