@@ -67,6 +67,16 @@ export default function NavBar() {
     router.push("/login");
   };
 
+  const isPathActive = (href: string) => {
+    if (!pathname) {
+      return false;
+    }
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   const linkBase = "touch-target rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-white/10";
   const accentLink = `${linkBase} text-amber-100`;
   const adminLink = `${linkBase} text-amber-200`;
@@ -101,25 +111,29 @@ export default function NavBar() {
       </Link>
 
       {publicNavLinks.map((item) => (
-        <Link key={item.href} href={item.href} className={linkBase}>
+        <Link
+          key={item.href}
+          href={item.href}
+          className={`${linkBase}${isPathActive(item.href) ? " active-nav-link" : ""}`}
+        >
           {item.label}
         </Link>
       ))}
 
       {user ? (
         <>
-          <Link href="/dashboard" className={linkBase}>Dashboard</Link>
+          <Link href="/dashboard" className={`${linkBase}${isPathActive("/dashboard") ? " active-nav-link" : ""}`}>Dashboard</Link>
 
           {user.role === "farmer" && (
-            <Link href="/farmer/upload" className={accentLink}>Upload Product</Link>
+            <Link href="/farmer/upload" className={`${accentLink}${isPathActive("/farmer/upload") ? " active-nav-link" : ""}`}>Upload Product</Link>
           )}
 
           {user.role === "buyer" && (
-            <Link href="/orders" className={linkBase}>My Orders</Link>
+            <Link href="/orders" className={`${linkBase}${isPathActive("/orders") ? " active-nav-link" : ""}`}>My Orders</Link>
           )}
 
           {user.role === "admin" && (
-            <Link href="/admin" className={adminLink}>Admin Dashboard</Link>
+            <Link href="/admin" className={`${adminLink}${isPathActive("/admin") ? " active-nav-link" : ""}`}>Admin Dashboard</Link>
           )}
 
           <div className="ml-auto flex items-center gap-2">
@@ -170,11 +184,11 @@ export default function NavBar() {
               <option value="ig">IG</option>
               <option value="pcm">PC</option>
             </select>
-            <Link href="/login" className={linkBase}>Login</Link>
-            <Link href="/register" className={`${accentLink} border border-amber-400`}>
+            <Link href="/login" className={`${linkBase}${isPathActive("/login") ? " active-nav-link" : ""}`}>Login</Link>
+            <Link href="/register" className={`${accentLink} border border-amber-400${isPathActive("/register") ? " active-nav-link" : ""}`}>
               Register
             </Link>
-            <Link href="/admin/login" className={adminLink}>Admin Dashboard</Link>
+            <Link href="/admin/login" className={`${adminLink}${isPathActive("/admin/login") ? " active-nav-link" : ""}`}>Admin Dashboard</Link>
           </div>
         </>
       )}

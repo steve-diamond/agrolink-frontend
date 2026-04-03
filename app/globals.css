@@ -888,6 +888,18 @@ button {
   color: #1f4a2a;
 }
 
+.active-nav-link {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.38);
+  color: #fff6c7;
+}
+
+.site-footer-links a.active-footer-link {
+  border-color: #8ead86;
+  background: #dff0d6;
+  color: #1f4a2a;
+}
+
 .landing-footer {
   border-top: 1px solid #d6e0d0;
   padding-top: 2.1rem;
