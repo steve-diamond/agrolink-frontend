@@ -894,6 +894,18 @@ button {
   color: #fff6c7;
 }
 
+.active-utility-link {
+  background: rgba(255, 255, 255, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  color: #f4ffd3;
+}
+
+.active-main-link {
+  border: 1px solid #bdd7b6;
+  background: #e8f4e4;
+  color: #1c5a2d;
+}
+
 .site-footer-links a.active-footer-link {
   border-color: #8ead86;
   background: #dff0d6;

@@ -68,106 +68,93 @@ export default function NavBar() {
     router.push("/login");
   };
 
-  const linkBase = "touch-target rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-white/10";
-  const accentLink = `${linkBase} text-amber-100`;
-  const adminLink = `${linkBase} text-amber-200`;
-  const publicNavLinks = [
+  const topBarLinks = [
+    { href: "/marketplace", label: "Marketplace" },
+    { href: "/product-listing", label: "Product Listing" },
+    { href: "/loan-application", label: "Farmer Loans" },
+    { href: "/logistics", label: "Logistics" },
+    { href: "/warehouse", label: "Warehouse" },
+    { href: "/investor", label: "Investor Desk" },
+  ];
+
+  const mainNavLinks = [
     { href: "/", label: "Home" },
     { href: "/dashboard", label: "Farmer Dashboard" },
     { href: "/marketplace", label: "Marketplace" },
-    { href: "/product-listing", label: "Product Listing" },
+    { href: "/product-listing", label: "Categories" },
     { href: "/order-management", label: "Order Management" },
-    { href: "/loan-application", label: "Loan Application" },
-    { href: "/logistics", label: "Logistics" },
-    { href: "/warehouse", label: "Warehouse" },
-    { href: "/equipment-listing", label: "Equipment Listing" },
+    { href: "/equipment-listing", label: "Equipment" },
     { href: "/about-us", label: "About Us" },
-    { href: "/investor", label: "Investor" },
+    { href: "/investor", label: "Vision" },
   ];
 
   return (
-    <nav className="flex flex-wrap items-center gap-3 border-b-2 border-amber-500 bg-gradient-to-r from-green-950 via-green-900 to-green-800 px-4 py-2 text-white">
-      <Link
-        href="/"
-        className="touch-target mr-1 flex items-center gap-2 text-base font-extrabold tracking-tight"
-      >
-        <Image
-          src={dosLogo}
-          alt="DOS AGROLINK NIGERIA logo"
-          width={42}
-          height={42}
-          className="rounded-lg border border-white/55"
-        />
-        <span>DOS AGROLINK NIGERIA</span>
-      </Link>
-
-      {publicNavLinks.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={`${linkBase}${isRouteActive(pathname, item.href) ? " active-nav-link" : ""}`}
-        >
-          {item.label}
-        </Link>
-      ))}
-
-      {user ? (
-        <>
-          <Link href="/dashboard" className={`${linkBase}${isRouteActive(pathname, "/dashboard") ? " active-nav-link" : ""}`}>Dashboard</Link>
-
-          {user.role === "farmer" && (
-            <Link href="/farmer/upload" className={`${accentLink}${isRouteActive(pathname, "/farmer/upload") ? " active-nav-link" : ""}`}>Upload Product</Link>
-          )}
-
-          {user.role === "buyer" && (
-            <Link href="/orders" className={`${linkBase}${isRouteActive(pathname, "/orders") ? " active-nav-link" : ""}`}>My Orders</Link>
-          )}
-
-          {user.role === "admin" && (
-            <Link href="/admin" className={`${adminLink}${isRouteActive(pathname, "/admin") ? " active-nav-link" : ""}`}>Admin Dashboard</Link>
-          )}
-
-          <div className="ml-auto flex items-center gap-2">
-            <span className="rounded-full border border-white/25 bg-white/10 px-2 py-1 text-xs text-green-50">
-              {copy.syncStatus}: {isOnline ? copy.online : copy.offline} · {copy.queued} {pendingQueueCount}
-            </span>
-            <label htmlFor="language" className="text-xs text-green-100">Language</label>
-            <select
-              id="language"
-              value={language}
-              onChange={(e) => handleLanguageChange(e.target.value as UiLanguage)}
-              className="min-h-10 rounded-lg border border-white/35 bg-white/10 px-2 text-sm text-green-50"
-            >
-              <option value="en">English</option>
-              <option value="ha">Hausa</option>
-              <option value="yo">Yoruba</option>
-              <option value="ig">Igbo</option>
-              <option value="pcm">Pidgin</option>
-            </select>
+    <header className="border-b border-slate-200">
+      <div className="bg-green-800 text-green-50">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-2">
+          <div className="hidden items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.04em] lg:flex">
+            {topBarLinks.map((item, index) => (
+              <span key={item.href} className="flex items-center gap-2">
+                <Link
+                  href={item.href}
+                  className={`rounded px-1 py-0.5 transition hover:bg-white/15 ${isRouteActive(pathname, item.href) ? "active-utility-link" : ""}`}
+                >
+                  {item.label}
+                </Link>
+                {index < topBarLinks.length - 1 ? <span className="opacity-65">•</span> : null}
+              </span>
+            ))}
           </div>
 
-          <span className="text-xs text-green-100">
-            {user.name} · {user.role}
-          </span>
+          <div className="ml-auto flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.05em]">
+            <Link href="/about-us" className="rounded px-2 py-1 transition hover:bg-white/15">About Vision</Link>
+            <Link href="/investor" className="rounded px-2 py-1 transition hover:bg-white/15">Investor</Link>
+            <Link href="/admin/login" className="rounded bg-green-950/45 px-2 py-1 transition hover:bg-green-950/65">Admin</Link>
+          </div>
+        </div>
+      </div>
 
-          <button
-            onClick={handleLogout}
-            className="touch-target rounded-lg border border-white/35 px-3 py-2 text-sm text-slate-100 transition hover:bg-white/10"
+      <nav className="bg-white text-slate-900">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-3">
+          <Link
+            href="/"
+            className="mr-1 flex min-w-fit items-center gap-2"
           >
-            Logout
-          </button>
-        </>
-      ) : (
-        <>
-          <div className="ml-auto flex items-center gap-3">
-            <span className="rounded-full border border-white/25 bg-white/10 px-2 py-1 text-xs text-green-50">
+            <Image
+              src={dosLogo}
+              alt="DOS AGROLINK NIGERIA logo"
+              width={44}
+              height={44}
+              className="rounded-lg border border-green-200"
+            />
+            <div>
+              <p className="text-base font-extrabold leading-none tracking-tight text-green-900">DOS AGROLINK NIGERIA</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-green-700">From farm value to market strength</p>
+            </div>
+          </Link>
+
+          <div className="hidden items-center gap-1 lg:flex">
+            {mainNavLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`rounded-md px-2.5 py-2 text-[13px] font-bold uppercase tracking-[0.03em] transition hover:bg-green-50 hover:text-green-900 ${isRouteActive(pathname, item.href) ? "active-main-link" : "text-slate-700"}`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="ml-auto flex items-center gap-2">
+            <span className="hidden rounded-full border border-green-200 bg-green-50 px-2 py-1 text-[11px] font-semibold text-green-800 xl:inline-flex">
               {copy.syncStatus}: {isOnline ? copy.online : copy.offline} · {copy.queued} {pendingQueueCount}
             </span>
+
             <select
               value={language}
               onChange={(e) => handleLanguageChange(e.target.value as UiLanguage)}
               aria-label="Choose language"
-              className="min-h-10 rounded-lg border border-white/35 bg-white/10 px-2 text-sm text-green-50"
+              className="min-h-9 rounded-md border border-slate-300 bg-white px-2 text-xs font-semibold text-slate-700"
             >
               <option value="en">EN</option>
               <option value="ha">HA</option>
@@ -175,14 +162,63 @@ export default function NavBar() {
               <option value="ig">IG</option>
               <option value="pcm">PC</option>
             </select>
-            <Link href="/login" className={`${linkBase}${isRouteActive(pathname, "/login") ? " active-nav-link" : ""}`}>Login</Link>
-            <Link href="/register" className={`${accentLink} border border-amber-400${isRouteActive(pathname, "/register") ? " active-nav-link" : ""}`}>
-              Register
-            </Link>
-            <Link href="/admin/login" className={`${adminLink}${isRouteActive(pathname, "/admin/login") ? " active-nav-link" : ""}`}>Admin Dashboard</Link>
+
+            {user ? (
+              <>
+                {user.role === "farmer" && (
+                  <Link href="/farmer/upload" className={`hidden rounded-md border border-amber-300 px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] text-amber-700 transition hover:bg-amber-50 xl:inline-flex ${isRouteActive(pathname, "/farmer/upload") ? "active-main-link" : ""}`}>
+                    Upload
+                  </Link>
+                )}
+
+                {user.role === "buyer" && (
+                  <Link href="/orders" className={`hidden rounded-md px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] transition hover:bg-green-50 xl:inline-flex ${isRouteActive(pathname, "/orders") ? "active-main-link" : "text-slate-700"}`}>
+                    Orders
+                  </Link>
+                )}
+
+                {user.role === "admin" && (
+                  <Link href="/admin" className={`hidden rounded-md px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] transition hover:bg-green-50 xl:inline-flex ${isRouteActive(pathname, "/admin") ? "active-main-link" : "text-slate-700"}`}>
+                    Admin Dashboard
+                  </Link>
+                )}
+
+                <span className="hidden text-xs font-semibold text-slate-500 xl:inline">{user.name}</span>
+
+                <button
+                  onClick={handleLogout}
+                  className="touch-target rounded-md border border-slate-300 px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] text-slate-700 transition hover:bg-slate-100"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className={`touch-target rounded-md px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] transition hover:bg-green-50 ${isRouteActive(pathname, "/login") ? "active-main-link" : "text-slate-700"}`}>
+                  Sign In
+                </Link>
+                <Link href="/register" className={`touch-target rounded-md bg-green-700 px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] text-white transition hover:bg-green-800 ${isRouteActive(pathname, "/register") ? "ring-2 ring-green-200" : ""}`}>
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
-        </>
-      )}
-    </nav>
+        </div>
+
+        <div className="border-t border-slate-200 lg:hidden">
+          <div className="mx-auto flex w-full max-w-[1400px] gap-1 overflow-x-auto px-4 py-2">
+            {mainNavLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`whitespace-nowrap rounded-md px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.03em] transition ${isRouteActive(pathname, item.href) ? "active-main-link" : "text-slate-700 hover:bg-green-50 hover:text-green-900"}`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
+    </header>
   );
 }
