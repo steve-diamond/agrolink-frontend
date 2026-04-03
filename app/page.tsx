@@ -68,11 +68,25 @@ const impactStats = [
 
 const roadmap = ["MVP launch", "Growth phase", "Logistics expansion", "Finance + warehouse scaling"];
 
+const heroImages = [
+  "/agropro/images/banner.jpg",
+  "/agropro/images/chose.jpg",
+  "/agropro/images/about_img.jpg",
+  "/agropro/images/service1.jpg",
+  "/agropro/images/service2.jpg",
+];
+
 export default function Home() {
   return (
     <main className="agropro-page">
       <section className="agropro-hero">
-        <Image src="/agropro/images/banner.jpg" alt="Nigerian farmland" fill priority className="agropro-hero-image" sizes="100vw" />
+        <div className="agropro-hero-slides" aria-hidden="true">
+          {heroImages.map((src) => (
+            <div className="agropro-hero-slide" key={src}>
+              <Image src={src} alt="Nigerian farmland" fill priority={src === heroImages[0]} className="agropro-hero-image" sizes="100vw" />
+            </div>
+          ))}
+        </div>
         <div className="agropro-hero-overlay" />
         <div className="agropro-hero-content">
           <div className="agropro-brand-row">
