@@ -296,6 +296,48 @@ button {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.strategy-block h2 {
+  margin: 0.35rem 0 0;
+  font-family: "Sora", "Segoe UI", sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+.strategy-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.strategy-card {
+  border: 1px solid #d8e3d1;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(24, 54, 31, 0.08);
+}
+
+.strategy-card span {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+  background: #1f6013;
+  color: #f2ffe8;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.strategy-card h3 {
+  margin: 0.7rem 0 0;
+  font-family: "Sora", "Segoe UI", sans-serif;
+  font-size: 1.02rem;
+  line-height: 1.2;
+}
+
 .story-card {
   border-radius: 18px;
   padding: 1.7rem;
@@ -415,6 +457,34 @@ button {
   color: #52471f;
 }
 
+.capabilities-grid {
+  margin-top: 1.4rem;
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.capability-card {
+  border-radius: 14px;
+  border: 1px solid #d7e2d3;
+  background: linear-gradient(180deg, #ffffff 0%, #f5faef 100%);
+  padding: 1rem;
+}
+
+.capability-card h3 {
+  margin: 0;
+  font-family: "Sora", "Segoe UI", sans-serif;
+  line-height: 1.05;
+  font-size: 1.2rem;
+  color: #27431f;
+}
+
+.capability-card p {
+  margin: 0.65rem 0 0;
+  color: #4a5547;
+  font-size: 0.9rem;
+}
+
 .landing-footer {
   border-top: 1px solid #d6e0d0;
   padding-top: 2.1rem;
@@ -503,6 +573,7 @@ button {
 .story-block,
 .product-banner,
 .faq-block,
+.capabilities-block,
 .landing-footer {
   position: relative;
   z-index: 1;
@@ -525,8 +596,12 @@ button {
   animation-delay: 260ms;
 }
 
+.capabilities-block {
+  animation-delay: 300ms;
+}
+
 .landing-footer {
-  animation-delay: 320ms;
+  animation-delay: 340ms;
 }
 
 @keyframes reveal-up {
@@ -548,6 +623,7 @@ button {
 
   .audience-grid,
   .story-grid,
+  .capabilities-grid,
   .faq-grid,
   .landing-footer,
   .footer-bottom {

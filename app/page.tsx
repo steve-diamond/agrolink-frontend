@@ -51,6 +51,47 @@ const faqs = [
   "Are you a non-profit organization?",
 ];
 
+const strategicCapabilities = [
+  {
+    title: "Smart Produce Marketplace",
+    body: "Farmers list maize, rice, cassava, and vegetables while buyers source by location, volume, and price.",
+  },
+  {
+    title: "AI Crop Price Intelligence",
+    body: "Price and demand signals guide farmers on when to sell, where to sell, and what to expect next.",
+  },
+  {
+    title: "Cooperative Digital Wallet",
+    body: "Instant payout flows, savings visibility, and input payments keep cooperative cash cycles healthy.",
+  },
+  {
+    title: "Farmer Micro-Loan System",
+    body: "Loan access tied to sales behavior, farm profile, and cooperative performance expands growth capital.",
+  },
+  {
+    title: "Logistics & Transport Network",
+    body: "Farm-to-city movement is coordinated through request, assignment, transit tracking, and delivery proof.",
+  },
+  {
+    title: "Warehouse & Storage System",
+    body: "Booking, inventory records, cold-storage support, and warehouse receipts reduce forced low-price sales.",
+  },
+  {
+    title: "Advisory & Knowledge Hub",
+    body: "Weather-aware crop guidance, pest alerts, and fertilizer recommendations support better farm decisions.",
+  },
+];
+
+const strategicFeatures = [
+  "Smart Produce Marketplace",
+  "AI Crop Price Intelligence",
+  "Cooperative Digital Wallet",
+  "Farmer Micro-Loan System",
+  "Logistics & Produce Transport Network",
+  "Warehouse & Storage System",
+  "Agricultural Knowledge & Advisory Hub",
+];
+
 export default function Home() {
   return (
     <main className="landing-page">
@@ -111,6 +152,24 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="strategy-block">
+        <p className="section-kicker">CAPABILITIES</p>
+        <h2>Built to Solve Real Farmer Problems Across Nigeria</h2>
+        <p className="section-intro">
+          Our platform is designed as a full agricultural ecosystem where farmers sell produce, get fair prices,
+          access financing, move goods efficiently, reduce post-harvest losses, and make better decisions with trusted data.
+        </p>
+
+        <div className="strategy-grid">
+          {strategicFeatures.map((feature, index) => (
+            <article className="strategy-card" key={feature}>
+              <span>{index + 1}</span>
+              <h3>{feature}</h3>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="product-banner">
         <div>
           <h2>Access premium market with our product.</h2>
@@ -140,6 +199,24 @@ export default function Home() {
                 Our team will guide you through onboarding, product fit, and partnership models based on your goals.
               </p>
             </details>
+          ))}
+        </div>
+      </section>
+
+      <section className="capabilities-block">
+        <p className="section-kicker">STRATEGIC CAPABILITIES</p>
+        <h2>Built to Solve Real Farmer Problems Across Nigeria</h2>
+        <p className="section-intro">
+          DOS AGROLINK NIGERIA is built as a complete ecosystem connecting production, finance, logistics,
+          storage, and advisory intelligence in one trusted platform.
+        </p>
+
+        <div className="capabilities-grid">
+          {strategicCapabilities.map((item) => (
+            <article key={item.title} className="capability-card">
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
           ))}
         </div>
       </section>
