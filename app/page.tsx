@@ -76,21 +76,6 @@ const heroImages = [
   "/agropro/images/service2.jpg",
 ];
 
-const footerQuickLinks = [
-  { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Farmer Dashboard" },
-  { href: "/marketplace", label: "Marketplace" },
-  { href: "/product-listing", label: "Product Listing" },
-  { href: "/order-management", label: "Order Management" },
-  { href: "/loan-application", label: "Loan Application" },
-  { href: "/logistics", label: "Logistics" },
-  { href: "/warehouse", label: "Warehouse" },
-  { href: "/equipment-listing", label: "Equipment Listing" },
-  { href: "/about-us", label: "About Us" },
-  { href: "/investor", label: "Investor" },
-  { href: "/admin/login", label: "Admin Dashboard" },
-];
-
 export default function Home() {
   return (
     <main className="agropro-page">
@@ -191,37 +176,6 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="agropro-footer-vision">
-        <div className="slide-footer-grid">
-          <div className="vision-footer-strip">
-            <span>DOS AGROLINK NIGERIA</span>
-            <p>Direct to buyers. Better prices for farmers.</p>
-          </div>
-          <div className="vision-footer-strip">
-            <span>DOS AGROLINK NIGERIA</span>
-            <p>Secure payments, transparent records, and trusted transactions.</p>
-          </div>
-          <div className="vision-footer-strip">
-            <span>DOS AGROLINK NIGERIA</span>
-            <p>Logistics + storage + advisory intelligence to reduce losses and grow value.</p>
-          </div>
-          <div className="vision-footer-strip">
-            <span>DOS AGROLINK NIGERIA</span>
-            <p>Empowering Africa&apos;s agricultural future with data-driven trade infrastructure.</p>
-          </div>
-        </div>
-
-        <div className="footer-quick-links" aria-label="Homepage quick links">
-          <p>Quick Links</p>
-          <div>
-            {footerQuickLinks.map((item) => (
-              <Link key={item.href} href={item.href}>
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }
