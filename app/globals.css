@@ -906,6 +906,14 @@ button {
   color: #1c5a2d;
 }
 
+.dos-header-nav-scroll {
+  scrollbar-width: none;
+}
+
+.dos-header-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .site-footer-links a.active-footer-link {
   border-color: #8ead86;
   background: #dff0d6;

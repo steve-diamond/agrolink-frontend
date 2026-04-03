@@ -89,7 +89,7 @@ export default function NavBar() {
   ];
 
   return (
-    <header className="border-b border-slate-200">
+    <header className="border-b border-slate-200 shadow-[0_1px_0_rgba(15,23,42,0.04)]">
       <div className="bg-green-800 text-green-50">
         <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-2">
           <div className="hidden items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.04em] lg:flex">
@@ -115,7 +115,7 @@ export default function NavBar() {
       </div>
 
       <nav className="bg-white text-slate-900">
-        <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-3">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-3.5">
           <Link
             href="/"
             className="mr-1 flex min-w-fit items-center gap-2"
@@ -128,17 +128,17 @@ export default function NavBar() {
               className="rounded-lg border border-green-200"
             />
             <div>
-              <p className="text-base font-extrabold leading-none tracking-tight text-green-900">DOS AGROLINK NIGERIA</p>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-green-700">From farm value to market strength</p>
+              <p className="whitespace-nowrap text-base font-extrabold leading-none tracking-tight text-green-900">DOS AGROLINK NIGERIA</p>
+              <p className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.08em] text-green-700">From farm value to market strength</p>
             </div>
           </Link>
 
-          <div className="hidden items-center gap-1 lg:flex">
+          <div className="dos-header-nav-scroll hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:flex">
             {mainNavLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-md px-2.5 py-2 text-[13px] font-bold uppercase tracking-[0.03em] transition hover:bg-green-50 hover:text-green-900 ${isRouteActive(pathname, item.href) ? "active-main-link" : "text-slate-700"}`}
+                className={`whitespace-nowrap rounded-md px-2.5 py-2 text-[12px] font-bold uppercase tracking-[0.03em] transition hover:bg-green-50 hover:text-green-900 ${isRouteActive(pathname, item.href) ? "active-main-link" : "text-slate-700"}`}
               >
                 {item.label}
               </Link>
@@ -165,6 +165,10 @@ export default function NavBar() {
 
             {user ? (
               <>
+                <Link href="/marketplace" className="hidden rounded-md bg-green-700 px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] text-white transition hover:bg-green-800 xl:inline-flex">
+                  Explore Market
+                </Link>
+
                 {user.role === "farmer" && (
                   <Link href="/farmer/upload" className={`hidden rounded-md border border-amber-300 px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] text-amber-700 transition hover:bg-amber-50 xl:inline-flex ${isRouteActive(pathname, "/farmer/upload") ? "active-main-link" : ""}`}>
                     Upload
@@ -199,6 +203,9 @@ export default function NavBar() {
                 </Link>
                 <Link href="/register" className={`touch-target rounded-md bg-green-700 px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] text-white transition hover:bg-green-800 ${isRouteActive(pathname, "/register") ? "ring-2 ring-green-200" : ""}`}>
                   Sign Up
+                </Link>
+                <Link href="/marketplace" className="hidden rounded-md border border-green-300 bg-green-50 px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] text-green-800 transition hover:bg-green-100 xl:inline-flex">
+                  Explore
                 </Link>
               </>
             )}
