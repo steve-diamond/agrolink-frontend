@@ -843,6 +843,51 @@ button {
   color: #1f4a2a;
 }
 
+.site-footer {
+  border-top: 1px solid #d4dfcd;
+  background: linear-gradient(90deg, #f6faf2 0%, #edf5e8 50%, #f6faf2 100%);
+}
+
+.site-footer-inner {
+  width: min(1150px, 92vw);
+  margin: 0 auto;
+  padding: 1.2rem 0 1.1rem;
+}
+
+.site-footer-inner p {
+  margin: 0;
+  color: #254d2f;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.site-footer-links {
+  margin-top: 0.55rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.site-footer-links a {
+  border: 1px solid #d2decf;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #2e4f34;
+  text-decoration: none;
+  font-size: 0.79rem;
+  font-weight: 700;
+  padding: 0.4rem 0.68rem;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.site-footer-links a:hover {
+  border-color: #b7cbaf;
+  background: #eaf4e3;
+  color: #1f4a2a;
+}
+
 .landing-footer {
   border-top: 1px solid #d6e0d0;
   padding-top: 2.1rem;
@@ -1011,6 +1056,10 @@ button {
 
   .footer-quick-links div {
     gap: 0.45rem;
+  }
+
+  .site-footer-links {
+    gap: 0.42rem;
   }
 
   .product-banner {

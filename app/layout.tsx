@@ -1,5 +1,6 @@
 import "./globals.css";
 import NavBar from "@/components/NavBar";
+import SiteFooter from "@/components/SiteFooter";
 import ClientErrorBoundary from "@/components/ClientErrorBoundary";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import type { Metadata } from "next";
@@ -22,6 +23,7 @@ export default function RootLayout({
           <ServiceWorkerRegistration />
           <NavBar />
           <div className="app-shell">{children}</div>
+          <SiteFooter />
         </ClientErrorBoundary>
       </body>
     </html>
