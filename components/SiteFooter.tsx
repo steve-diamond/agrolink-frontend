@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { isRouteActive } from "@/lib/navigationActive";
 
 const footerLinks = [
   { href: "/", label: "Home" },
@@ -21,16 +22,6 @@ const footerLinks = [
 export default function SiteFooter() {
   const pathname = usePathname();
 
-  const isPathActive = (href: string) => {
-    if (!pathname) {
-      return false;
-    }
-    if (href === "/") {
-      return pathname === "/";
-    }
-    return pathname === href || pathname.startsWith(`${href}/`);
-  };
-
   if (pathname === "/") {
     return null;
   }
@@ -41,7 +32,7 @@ export default function SiteFooter() {
         <p>DOS AGROLINK NIGERIA</p>
         <div className="site-footer-links" aria-label="Platform quick links">
           {footerLinks.map((item) => (
-            <Link key={item.href} href={item.href} className={isPathActive(item.href) ? "active-footer-link" : undefined}>
+            <Link key={item.href} href={item.href} className={isRouteActive(pathname, item.href) ? "active-footer-link" : undefined}>
               {item.label}
             </Link>
           ))}
