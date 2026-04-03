@@ -33,30 +33,30 @@ const strategicCapabilities = [
   },
 ];
 
-const slideHeaders = [
+const recentNews = [
   {
-    title: "Title Slide",
-    subtitle: "DOS AGROLINK NIGERIA: Digital infrastructure for agricultural trade",
-    tone: "primary",
-    image: "/agropro/images/banner.jpg",
+    title: "DOS AGROLINK NIGERIA Launches Smarter Produce Exchange",
+    subtitle: "Farmers now list maize, rice, cassava, and vegetables directly to verified buyers for fairer pricing.",
+    image: "/agropro/images/news1.jpg",
+    tag: "Marketplace",
   },
   {
-    title: "Insight Slide",
-    subtitle: "Farmers do not lack production. They lack access to profitable markets.",
-    tone: "insight",
-    image: "/agropro/images/chose.jpg",
+    title: "Price Intelligence Signals Help Farmers Time the Market",
+    subtitle: "Regional demand tracking and crop price guidance are helping producers sell with stronger confidence.",
+    image: "/agropro/images/news2.jpg",
+    tag: "AI Intelligence",
   },
   {
-    title: "Problem Slide",
-    subtitle: "Low profits, middlemen, and post-harvest losses reduce farmer confidence.",
-    tone: "workflow",
-    image: "/agropro/images/service2.jpg",
+    title: "Logistics and Storage Expansion Cuts Post-Harvest Losses",
+    subtitle: "Pickup coordination, warehouse booking, and inventory visibility are reducing spoilage across supply chains.",
+    image: "/agropro/images/news3.jpg",
+    tag: "Logistics + Storage",
   },
   {
-    title: "Solution Slide",
-    subtitle: "Direct-to-buyer access, secure payments, and streamlined transactions.",
-    tone: "opportunity",
-    image: "/agropro/images/service3.jpg",
+    title: "Vision in Motion: Finance + Advisory for Stronger Farmer Growth",
+    subtitle: "Cooperative wallets, micro-loans, and practical farm advisory are building long-term rural resilience.",
+    image: "/agropro/images/blog1.jpg",
+    tag: "Finance + Advisory",
   },
 ];
 
@@ -105,17 +105,23 @@ export default function Home() {
       </section>
 
       <section className="slide-kit-block">
-        <p className="section-kicker">PITCH BANNERS</p>
-        <h2>Slide Header Banners for DOS AGROLINK NIGERIA</h2>
-        <div className="slide-header-grid">
-          {slideHeaders.map((item) => (
-            <article key={item.title} className={`slide-header-card ${item.tone}`}>
-              <Image src={item.image} alt={item.title} fill className="slide-header-bg" sizes="(max-width: 980px) 100vw, 50vw" />
-              <div className="slide-header-tint" />
-              <Image src={dosLogo} alt="DOS AGROLINK NIGERIA mark" width={40} height={40} className="slide-mark" />
-              <h3>{item.title}</h3>
-              <p>{item.subtitle}</p>
-              <div className="slide-gold-wave" aria-hidden="true" />
+        <p className="section-kicker">LATEST NEWS</p>
+        <h2>Recent News from DOS AGROLINK NIGERIA</h2>
+        <p className="section-intro">
+          Follow how our 7-point platform vision is translating into real progress for farmers, buyers,
+          cooperatives, and logistics partners across Nigeria.
+        </p>
+        <div className="latest-news-grid">
+          {recentNews.map((item) => (
+            <article key={item.title} className="latest-news-card">
+              <div className="latest-news-image-wrap">
+                <Image src={item.image} alt={item.title} fill className="latest-news-image" sizes="(max-width: 980px) 100vw, 50vw" />
+              </div>
+              <div className="latest-news-body">
+                <span>{item.tag}</span>
+                <h3>{item.title}</h3>
+                <p>{item.subtitle}</p>
+              </div>
             </article>
           ))}
         </div>
