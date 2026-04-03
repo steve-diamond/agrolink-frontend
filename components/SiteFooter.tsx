@@ -48,7 +48,7 @@ export default function SiteFooter() {
 
           <div>
             <h4>About</h4>
-            <div className="site-footer-links" aria-label="About links">
+            <div className="site-footer-links site-footer-links-about" aria-label="About links">
               <Link href="/about-us">Our Story</Link>
               <Link href="/investor">Our Vision</Link>
               <Link href="/loan-application">Farmer Growth</Link>
@@ -58,7 +58,7 @@ export default function SiteFooter() {
 
           <div>
             <h4>Platform</h4>
-            <div className="site-footer-links" aria-label="Platform links">
+            <div className="site-footer-links site-footer-links-platform" aria-label="Platform links">
               {footerLinks.map((item) => (
                 <Link key={item.href} href={item.href} className={isRouteActive(pathname, item.href) ? "active-footer-link" : undefined}>
                   {item.label}
