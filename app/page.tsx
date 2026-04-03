@@ -92,6 +92,36 @@ const strategicFeatures = [
   "Agricultural Knowledge & Advisory Hub",
 ];
 
+const slideHeaders = [
+  {
+    title: "DOS AGROLINK NIGERIA",
+    subtitle: "Digital infrastructure for agricultural trade",
+    tone: "primary",
+  },
+  {
+    title: "Farmers do not lack production",
+    subtitle: "They lack access to markets",
+    tone: "insight",
+  },
+  {
+    title: "How It Works",
+    subtitle: "List produce -> buyer purchases -> payment secured",
+    tone: "workflow",
+  },
+  {
+    title: "Market Opportunity",
+    subtitle: "30M+ farmers and a $400B+ African agriculture market",
+    tone: "opportunity",
+  },
+];
+
+const slideFooters = [
+  "Direct to buyers. Transparent value for farmers.",
+  "Secure payments with cooperative wallet rails.",
+  "Reduced post-harvest loss through logistics + storage.",
+  "Empowering Africa's agricultural future.",
+];
+
 export default function Home() {
   return (
     <main className="landing-page">
@@ -217,6 +247,35 @@ export default function Home() {
               <h3>{item.title}</h3>
               <p>{item.body}</p>
             </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="slide-kit-block">
+        <p className="section-kicker">SLIDE KIT</p>
+        <h2>Presentation Header Banners & Vision Footers</h2>
+        <p className="section-intro">
+          Ready-to-use banner and footer styles for your pitch deck, aligned to the DOS AGROLINK NIGERIA
+          visual identity and platform vision.
+        </p>
+
+        <div className="slide-header-grid">
+          {slideHeaders.map((item) => (
+            <article key={item.title} className={`slide-header-card ${item.tone}`}>
+              <Image src={dosLogo} alt="DOS AGROLINK NIGERIA mark" width={44} height={44} className="slide-mark" />
+              <h3>{item.title}</h3>
+              <p>{item.subtitle}</p>
+              <div className="slide-gold-wave" aria-hidden="true" />
+            </article>
+          ))}
+        </div>
+
+        <div className="slide-footer-grid">
+          {slideFooters.map((line) => (
+            <div key={line} className="vision-footer-strip">
+              <span>DOS AGROLINK NIGERIA</span>
+              <p>{line}</p>
+            </div>
           ))}
         </div>
       </section>
