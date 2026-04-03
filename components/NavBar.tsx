@@ -70,6 +70,19 @@ export default function NavBar() {
   const linkBase = "touch-target rounded-lg px-2.5 py-2 text-sm font-semibold text-emerald-50 transition hover:bg-white/10";
   const accentLink = `${linkBase} text-amber-100`;
   const adminLink = `${linkBase} text-amber-200`;
+  const publicNavLinks = [
+    { href: "/", label: "Home" },
+    { href: "/dashboard", label: "Farmer Dashboard" },
+    { href: "/marketplace", label: "Marketplace" },
+    { href: "/product-listing", label: "Product Listing" },
+    { href: "/order-management", label: "Order Management" },
+    { href: "/loan-application", label: "Loan Application" },
+    { href: "/logistics", label: "Logistics" },
+    { href: "/warehouse", label: "Warehouse" },
+    { href: "/equipment-listing", label: "Equipment Listing" },
+    { href: "/about-us", label: "About Us" },
+    { href: "/investor", label: "Investor" },
+  ];
 
   return (
     <nav className="flex flex-wrap items-center gap-3 border-b-2 border-amber-500 bg-gradient-to-r from-green-950 via-green-900 to-green-800 px-4 py-2 text-white">
@@ -87,7 +100,11 @@ export default function NavBar() {
         <span>DOS AGROLINK NIGERIA</span>
       </Link>
 
-      <Link href="/marketplace" className={linkBase}>Marketplace</Link>
+      {publicNavLinks.map((item) => (
+        <Link key={item.href} href={item.href} className={linkBase}>
+          {item.label}
+        </Link>
+      ))}
 
       {user ? (
         <>
@@ -102,7 +119,7 @@ export default function NavBar() {
           )}
 
           {user.role === "admin" && (
-            <Link href="/admin" className={adminLink}>Admin Panel</Link>
+            <Link href="/admin" className={adminLink}>Admin Dashboard</Link>
           )}
 
           <div className="ml-auto flex items-center gap-2">
@@ -157,7 +174,7 @@ export default function NavBar() {
             <Link href="/register" className={`${accentLink} border border-amber-400`}>
               Register
             </Link>
-            <Link href="/admin/login" className={adminLink}>Admin</Link>
+            <Link href="/admin/login" className={adminLink}>Admin Dashboard</Link>
           </div>
         </>
       )}
