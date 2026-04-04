@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import dosLogo from "../dos logo.jpg";
+import LiveAgriNews from "@/components/LiveAgriNews";
 
 const strategicCapabilities = [
   {
@@ -37,33 +38,6 @@ const strategicCapabilities = [
     title: "Advisory & Knowledge Hub",
     body: "Weather-aware crop guidance, pest alerts, and fertilizer recommendations support stronger decisions and better yields.",
     image: "/agropro/images/service2.jpg",
-  },
-];
-
-const recentNews = [
-  {
-    title: "DOS AGROLINK NIGERIA Launches Smarter Produce Exchange",
-    subtitle: "Farmers now list maize, rice, cassava, and vegetables directly to verified buyers for fairer pricing.",
-    image: "/agropro/images/news1.jpg",
-    tag: "Marketplace",
-  },
-  {
-    title: "Price Intelligence Signals Help Farmers Time the Market",
-    subtitle: "Regional demand tracking and crop price guidance are helping producers sell with stronger confidence.",
-    image: "/agropro/images/news2.jpg",
-    tag: "AI Intelligence",
-  },
-  {
-    title: "Logistics and Storage Expansion Cuts Post-Harvest Losses",
-    subtitle: "Pickup coordination, warehouse booking, and inventory visibility are reducing spoilage across supply chains.",
-    image: "/agropro/images/news3.jpg",
-    tag: "Logistics + Storage",
-  },
-  {
-    title: "Vision in Motion: Finance + Advisory for Stronger Farmer Growth",
-    subtitle: "Cooperative wallets, micro-loans, and practical farm advisory are building long-term rural resilience.",
-    image: "/agropro/images/blog1.jpg",
-    tag: "Finance + Advisory",
   },
 ];
 
@@ -112,26 +86,7 @@ export default function Home() {
       </section>
 
       <section className="slide-kit-block">
-        <p className="section-kicker">LATEST NEWS</p>
-        <h2>Recent News from DOS AGROLINK NIGERIA</h2>
-        <p className="section-intro">
-          Follow how our 7-point platform vision is translating into real progress for farmers, buyers,
-          cooperatives, and logistics partners across Nigeria.
-        </p>
-        <div className="latest-news-grid">
-          {recentNews.map((item) => (
-            <article key={item.title} className="latest-news-card">
-              <div className="latest-news-image-wrap">
-                <Image src={item.image} alt={item.title} fill className="latest-news-image" sizes="(max-width: 980px) 100vw, 50vw" />
-              </div>
-              <div className="latest-news-body">
-                <span>{item.tag}</span>
-                <h3>{item.title}</h3>
-                <p>{item.subtitle}</p>
-              </div>
-            </article>
-          ))}
-        </div>
+        <LiveAgriNews />
       </section>
 
       <section className="capabilities-block">

@@ -639,6 +639,27 @@ button {
   gap: 0.9rem;
 }
 
+.live-news-header {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.live-news-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.live-news-meta span {
+  border-radius: 999px;
+  border: 1px solid #c7dac0;
+  background: #f4faee;
+  color: #2e5b2e;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.24rem 0.62rem;
+}
+
 .latest-news-grid {
   margin-top: 0.55rem;
   display: grid;
@@ -654,13 +675,44 @@ button {
   box-shadow: 0 12px 24px rgba(18, 47, 24, 0.08);
 }
 
+.latest-news-live-card {
+  border: 1px solid #ccddc4;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbf5 100%);
+}
+
+.latest-news-loading {
+  display: grid;
+  place-items: center;
+  min-height: 230px;
+  color: #3f5b3f;
+  font-weight: 700;
+}
+
 .latest-news-image-wrap {
   position: relative;
   min-height: 185px;
 }
 
+.latest-news-live-image {
+  background-size: cover;
+  background-position: center;
+}
+
 .latest-news-image {
   object-fit: cover;
+}
+
+.latest-news-video-wrap {
+  position: relative;
+  min-height: 200px;
+  overflow: hidden;
+}
+
+.latest-news-video-wrap iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  border: 0;
 }
 
 .latest-news-body {
@@ -693,6 +745,32 @@ button {
   margin: 0;
   color: #4d584c;
   font-size: 0.9rem;
+}
+
+.latest-news-actions {
+  margin-top: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.latest-news-actions small {
+  color: #5c6b5c;
+  font-size: 0.73rem;
+  font-weight: 600;
+}
+
+.latest-news-actions a {
+  border-radius: 999px;
+  border: 1px solid #b7d1ac;
+  background: #e9f7df;
+  color: #2a5b2e;
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 0.35rem 0.64rem;
 }
 
 .agropro-opportunity {
@@ -1300,6 +1378,11 @@ button {
 
   .vision-footer-strip {
     border-radius: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .latest-news-actions {
     flex-direction: column;
     align-items: flex-start;
   }
