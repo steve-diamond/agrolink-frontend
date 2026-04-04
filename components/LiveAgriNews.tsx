@@ -90,6 +90,7 @@ export default function LiveAgriNews({
             <div className="ceo-welcome-content">
               <p className="ceo-welcome-kicker">Welcome Message from CEO</p>
               <h3>Welcome to Dos Agrolink Nigeria.</h3>
+              <p className="ceo-vision-line">Empowering farmers with the right tools, trusted intelligence, and market connections.</p>
               <p>
                 At Dos Agrolink, we believe the future of agriculture in Nigeria lies in empowering our farmers with the
                 right tools, the right information, and the right connections.

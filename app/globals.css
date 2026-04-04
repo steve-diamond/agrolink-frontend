@@ -718,71 +718,101 @@ button {
 }
 
 .ceo-welcome-card {
-  border-radius: 18px;
-  border: 1px solid #c9ddc0;
-  background: linear-gradient(130deg, #f6fcec 0%, #eef8e5 55%, #e5f2d8 100%);
-  padding: 0.9rem;
-  box-shadow: 0 12px 24px rgba(24, 70, 33, 0.07);
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid #9ec494;
+  background:
+    radial-gradient(circle at 85% 12%, rgba(110, 166, 90, 0.22) 0%, rgba(110, 166, 90, 0) 40%),
+    radial-gradient(circle at 6% 82%, rgba(59, 136, 84, 0.2) 0%, rgba(59, 136, 84, 0) 38%),
+    linear-gradient(128deg, #f5fcea 0%, #e9f5dd 46%, #ddeecf 100%);
+  padding: 1.05rem;
+  box-shadow: 0 20px 34px rgba(24, 70, 33, 0.11);
 }
 
 .ceo-welcome-layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 0.9rem;
+  grid-template-columns: 320px 1fr;
+  gap: 1rem;
   align-items: stretch;
 }
 
 .ceo-welcome-photo {
   position: relative;
   min-height: 100%;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid #b8d3ad;
+  border: 1px solid #8fb982;
+  background: linear-gradient(180deg, #eaf4df 0%, #dceccf 100%);
 }
 
 .ceo-welcome-photo-img {
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center bottom;
+  transform: scale(1.06);
 }
 
 .ceo-welcome-content {
+  position: relative;
+  z-index: 1;
+  border-radius: 16px;
+  border: 1px solid #bdd8b2;
+  background: rgba(246, 252, 238, 0.76);
+  padding: 0.9rem 1rem;
   display: grid;
-  gap: 0.55rem;
+  gap: 0.62rem;
 }
 
 .ceo-welcome-kicker {
   margin: 0;
-  color: #2c5f2d;
-  font-size: 0.72rem;
+  color: #285e2d;
+  font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .ceo-welcome-card h3 {
   margin: 0;
-  color: #1f4c23;
+  color: #1d4f29;
   font-family: "Sora", "Segoe UI", sans-serif;
-  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  font-size: clamp(1.45rem, 2.8vw, 2.05rem);
+  line-height: 1.07;
+}
+
+.ceo-vision-line {
+  margin: 0;
+  border-radius: 999px;
+  border: 1px solid #afd39f;
+  background: #edf9e2;
+  color: #1e5f2f;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  padding: 0.45rem 0.75rem;
 }
 
 .ceo-welcome-card p {
   margin: 0;
-  color: #3f583f;
-  line-height: 1.55;
+  color: #345439;
+  line-height: 1.6;
+  font-size: 1.03rem;
 }
 
 .ceo-welcome-card ul {
   margin: 0;
   padding-left: 1.1rem;
   display: grid;
-  gap: 0.2rem;
-  color: #2f5031;
-  font-weight: 600;
+  gap: 0.24rem;
+  color: #254f2f;
+  font-weight: 700;
 }
 
 .ceo-signature {
   color: #1c5e33;
   font-weight: 800;
+  padding-top: 0.2rem;
+  border-top: 1px dashed #b2cfab;
 }
 
 .latest-news-grid {
@@ -798,7 +828,11 @@ button {
   }
 
   .ceo-welcome-photo {
-    min-height: 220px;
+    min-height: 340px;
+  }
+
+  .ceo-welcome-content {
+    padding: 0.85rem;
   }
 }
 
