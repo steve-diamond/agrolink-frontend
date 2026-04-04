@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthShell from "../../(auth)/_components/AuthShell";
 import PasswordEyeIcon from "../../(auth)/_components/PasswordEyeIcon";
 import API from "@/services/api";
 
-export default function AdminResetPasswordPage() {
+function AdminResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
@@ -135,5 +135,13 @@ export default function AdminResetPasswordPage() {
         </p>
       </section>
     </AuthShell>
+  );
+}
+
+export default function AdminResetPasswordPage() {
+  return (
+    <Suspense>
+      <AdminResetPasswordForm />
+    </Suspense>
   );
 }
