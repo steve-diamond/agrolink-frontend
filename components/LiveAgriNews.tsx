@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 type AgriNewsItem = {
   title: string;
@@ -73,6 +74,47 @@ export default function LiveAgriNews({
 
   return (
     <>
+      {showWelcomeCard ? (
+        <article className="ceo-welcome-card">
+          <div className="ceo-welcome-layout">
+            <div className="ceo-welcome-photo">
+              <Image
+                src="/agropro/images/ceo.jpg"
+                alt="CEO of DOS AGROLINK NIGERIA"
+                fill
+                sizes="(max-width: 980px) 100vw, 260px"
+                className="ceo-welcome-photo-img"
+              />
+            </div>
+
+            <div className="ceo-welcome-content">
+              <p className="ceo-welcome-kicker">Welcome Message from CEO</p>
+              <h3>Welcome to Dos Agrolink Nigeria.</h3>
+              <p>
+                At Dos Agrolink, we believe the future of agriculture in Nigeria lies in empowering our farmers with the
+                right tools, the right information, and the right connections.
+              </p>
+              <p>
+                We understand daily challenges from unpredictable weather to fluctuating market prices and limited access
+                to quality inputs. Our platform is built to be simple, reliable, and accessible, even in low-connectivity
+                environments.
+              </p>
+              <ul>
+                <li>Access real-time market prices to sell smarter.</li>
+                <li>Get timely farm reminders and advisory support.</li>
+                <li>Purchase subsidized farm inputs with ease.</li>
+                <li>Connect directly with trusted agents and support services.</li>
+              </ul>
+              <p>
+                Our mission is to bridge the gap between farmers and opportunity, using technology for growth,
+                sustainability, and prosperity.
+              </p>
+              <p className="ceo-signature">Warm regards, CEO, Dos Agrolink Nigeria</p>
+            </div>
+          </div>
+        </article>
+      ) : null}
+
       <div className="live-news-header">
         <p className="section-kicker">LATEST FARM BUSINESS NEWS</p>
         <h2>Reliable updates on planting, pests, and market value chains</h2>
@@ -84,33 +126,6 @@ export default function LiveAgriNews({
           <span>Last update: {payload ? toReadableDate(payload.updatedAt) : "Fetching..."}</span>
         </div>
       </div>
-
-      {showWelcomeCard ? (
-        <article className="ceo-welcome-card">
-          <p className="ceo-welcome-kicker">Welcome Message from CEO</p>
-          <h3>Welcome to Dos Agrolink Nigeria.</h3>
-          <p>
-            At Dos Agrolink, we believe the future of agriculture in Nigeria lies in empowering our farmers with the
-            right tools, the right information, and the right connections.
-          </p>
-          <p>
-            We understand daily challenges from unpredictable weather to fluctuating market prices and limited access
-            to quality inputs. Our platform is built to be simple, reliable, and accessible, even in low-connectivity
-            environments.
-          </p>
-          <ul>
-            <li>Access real-time market prices to sell smarter.</li>
-            <li>Get timely farm reminders and advisory support.</li>
-            <li>Purchase subsidized farm inputs with ease.</li>
-            <li>Connect directly with trusted agents and support services.</li>
-          </ul>
-          <p>
-            Our mission is to bridge the gap between farmers and opportunity, using technology for growth,
-            sustainability, and prosperity.
-          </p>
-          <p className="ceo-signature">Warm regards, CEO, Dos Agrolink Nigeria</p>
-        </article>
-      ) : null}
 
       <div className="latest-news-grid">
         {loading && items.length === 0 ? (

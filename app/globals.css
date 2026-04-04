@@ -721,10 +721,32 @@ button {
   border-radius: 18px;
   border: 1px solid #c9ddc0;
   background: linear-gradient(130deg, #f6fcec 0%, #eef8e5 55%, #e5f2d8 100%);
-  padding: 1rem 1.05rem;
+  padding: 0.9rem;
+  box-shadow: 0 12px 24px rgba(24, 70, 33, 0.07);
+}
+
+.ceo-welcome-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 0.9rem;
+  align-items: stretch;
+}
+
+.ceo-welcome-photo {
+  position: relative;
+  min-height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #b8d3ad;
+}
+
+.ceo-welcome-photo-img {
+  object-fit: cover;
+}
+
+.ceo-welcome-content {
   display: grid;
   gap: 0.55rem;
-  box-shadow: 0 12px 24px rgba(24, 70, 33, 0.07);
 }
 
 .ceo-welcome-kicker {
@@ -768,6 +790,16 @@ button {
   display: grid;
   gap: 0.95rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 980px) {
+  .ceo-welcome-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ceo-welcome-photo {
+    min-height: 220px;
+  }
 }
 
 .latest-news-card {
