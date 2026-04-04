@@ -1,5 +1,7 @@
 import ResetPasswordClient from "./ResetPasswordClient";
 
+export const dynamic = "force-dynamic";
+
 type ResetPasswordPageProps = {
   searchParams?: Promise<{
     token?: string;
