@@ -41,6 +41,16 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  const normalizeOrdersResponse = (data: unknown): Order[] => {
+    const rawList = Array.isArray(data)
+      ? data
+      : Array.isArray((data as { orders?: unknown[] })?.orders)
+      ? (data as { orders: unknown[] }).orders
+      : [];
+  
+    return rawList.filter((item): item is Order => Boolean(item && typeof item === "object"));
+  };
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
@@ -48,8 +58,11 @@ export default function OrdersPage() {
       return;
     }
 
-    API.get<Order[]>("/api/orders")
-      .then((res) => setOrders(res.data))
+    API.get("/api/orders")
+      .then((res) => {
+        const normalized = normalizeOrdersResponse(res.data as unknown);
+        setOrders(normalized);
+      })
       .catch((err) => setError(err?.response?.data?.message || "Failed to load orders."))
       .finally(() => setLoading(false));
   }, [router]);
@@ -85,9 +98,9 @@ export default function OrdersPage() {
       )}
 
       <div style={{ display: "grid", gap: "16px", marginTop: "20px" }}>
-        {orders.map((order) => (
+        {orders.map((order, index) => (
           <div
-            key={order._id}
+            key={order?._id || `order-${index}`}
             style={{
               border: "1px solid #ccc",
               borderRadius: "8px",
