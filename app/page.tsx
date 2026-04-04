@@ -2,44 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import dosLogo from "../dos logo.jpg";
 import LiveAgriNews from "@/components/LiveAgriNews";
-
-const strategicCapabilities = [
-  {
-    title: "Smart Produce Marketplace",
-    body: "Farmers list maize, rice, cassava, and vegetables directly to verified buyers by location, volume, and fair pricing.",
-    image: "/agropro/images/service1.jpg",
-  },
-  {
-    title: "AI Crop Price Intelligence",
-    body: "Real-time demand and regional pricing signals guide farmers on when to sell, where to sell, and expected market direction.",
-    image: "/agropro/images/news2.jpg",
-  },
-  {
-    title: "Cooperative Digital Wallet",
-    body: "Instant payouts, savings tracking, and input payments keep cooperative cash cycles transparent and healthy.",
-    image: "/agropro/images/blog1.jpg",
-  },
-  {
-    title: "Farmer Micro-Loan System",
-    body: "Loan access is tied to sales history, farm profile, and cooperative performance so growth capital reaches active farmers.",
-    image: "/agropro/images/news1.jpg",
-  },
-  {
-    title: "Logistics & Transport Network",
-    body: "Farm-to-city movement is coordinated through pickup requests, driver assignment, transit tracking, and delivery confirmation.",
-    image: "/agropro/images/chose.jpg",
-  },
-  {
-    title: "Warehouse & Storage System",
-    body: "Capacity-aware booking, inventory records, and warehouse receipts reduce spoilage and forced low-price sales.",
-    image: "/agropro/images/about_img.jpg",
-  },
-  {
-    title: "Advisory & Knowledge Hub",
-    body: "Weather-aware crop guidance, pest alerts, and fertilizer recommendations support stronger decisions and better yields.",
-    image: "/agropro/images/service2.jpg",
-  },
-];
+import { visionPoints } from "@/lib/visionPoints";
 
 const impactStats = [
   { metric: "30M+", label: "Farmers in Nigeria" },
@@ -92,16 +55,26 @@ export default function Home() {
       <section className="capabilities-block">
         <p className="section-kicker">OUR 7-POINT VISION</p>
         <h2>Built to Solve Real Farmer Problems Across Nigeria</h2>
+        <div className="capability-section-actions">
+          <Link href="/vision" className="btn-primary inline-flex items-center px-4 py-2 no-underline">Read Full Vision</Link>
+          <Link href="/join-us" className="inline-flex items-center rounded-full border border-green-300 px-4 py-2 text-sm font-bold text-green-800 no-underline">
+            Join Us
+          </Link>
+        </div>
         <div className="capabilities-grid">
-          {strategicCapabilities.map((item, index) => (
-            <article key={item.title} className="capability-card">
+          {visionPoints.map((item, index) => (
+            <article key={item.slug} className="capability-card">
               <div className="capability-card-media">
                 <Image src={item.image} alt={item.title} fill className="capability-card-image" sizes="(max-width: 980px) 100vw, 33vw" />
                 <span>{String(index + 1).padStart(2, "0")}</span>
               </div>
               <div className="capability-card-body">
                 <h3>{item.title}</h3>
-                <p>{item.body}</p>
+                <p>{item.summary}</p>
+                <div className="capability-card-actions">
+                  <Link href={`/vision/${item.slug}`}>Read More</Link>
+                  <Link href="/join-us">Join Us</Link>
+                </div>
               </div>
             </article>
           ))}
