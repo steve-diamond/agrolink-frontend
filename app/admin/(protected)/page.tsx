@@ -524,8 +524,9 @@ export default function AdminDashboardPage() {
                   <p className="m-0 mt-1 text-emerald-300">{currencyFormatter.format(Number(product.price || 0))}</p>
                   <div className="mt-3 h-2 rounded-full bg-slate-700">
                     <div
-                      className="h-2 rounded-full bg-gradient-to-r from-emerald-400 to-green-500"
-                      style={{ width: `${Math.min(100, 30 + index * 20)}%` }}
+                      className={`h-2 rounded-full bg-gradient-to-r from-emerald-400 to-green-500 ${
+                        index === 0 ? "w-[35%]" : index === 1 ? "w-[55%]" : "w-[75%]"
+                      }`}
                     />
                   </div>
                 </article>

@@ -47,9 +47,17 @@ export default function AdminCharts({
   orderStatusTrendData,
   currencyFormatter,
 }: Props) {
+  const chartCardClass = "h-80 rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4";
+  const tooltipStyle = {
+    background: "#0f172a",
+    border: "1px solid #334155",
+    borderRadius: 10,
+    color: "#e2e8f0",
+  } as const;
+
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4">
-      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+      <div className={chartCardClass}>
         <h3 className="m-0 text-sm font-semibold text-slate-200">User Role Distribution</h3>
         <ResponsiveContainer width="100%" height="85%">
           <PieChart>
@@ -61,15 +69,13 @@ export default function AdminCharts({
                 />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
-            />
+            <Tooltip contentStyle={tooltipStyle} />
             <Legend wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+      <div className={chartCardClass}>
         <h3 className="m-0 text-sm font-semibold text-slate-200">Farmer Approval Status</h3>
         <ResponsiveContainer width="100%" height="85%">
           <PieChart>
@@ -81,30 +87,26 @@ export default function AdminCharts({
                 />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
-            />
+            <Tooltip contentStyle={tooltipStyle} />
             <Legend wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+      <div className={chartCardClass}>
         <h3 className="m-0 text-sm font-semibold text-slate-200">Order Status Volume</h3>
         <ResponsiveContainer width="100%" height="85%">
           <BarChart data={orderStatusData}>
             <CartesianGrid stroke="#334155" strokeDasharray="3 3" />
             <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} />
             <YAxis allowDecimals={false} stroke="#94a3b8" tick={{ fontSize: 12 }} />
-            <Tooltip
-              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
-            />
+            <Tooltip contentStyle={tooltipStyle} />
             <Bar dataKey="count" fill="#38bdf8" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+      <div className={chartCardClass}>
         <h3 className="m-0 text-sm font-semibold text-slate-200">Top Product Prices</h3>
         <ResponsiveContainer width="100%" height="85%">
           <BarChart data={topProductPriceData}>
@@ -113,14 +115,14 @@ export default function AdminCharts({
             <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
             <Tooltip
               formatter={(value) => [`₦${value ?? 0}`, "Price"]}
-              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
+              contentStyle={tooltipStyle}
             />
             <Bar dataKey="price" fill="#fb923c" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+      <div className={chartCardClass}>
         <h3 className="m-0 text-sm font-semibold text-slate-200">Revenue Trend (Last 6 Months)</h3>
         <ResponsiveContainer width="100%" height="85%">
           <LineChart data={revenueTrendData}>
@@ -132,23 +134,21 @@ export default function AdminCharts({
                 currencyFormatter.format(Number(value ?? 0)),
                 "Revenue",
               ]}
-              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
+              contentStyle={tooltipStyle}
             />
             <Line type="monotone" dataKey="revenue" stroke="#22d3ee" strokeWidth={3} dot={{ r: 4 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+      <div className={chartCardClass}>
         <h3 className="m-0 text-sm font-semibold text-slate-200">Status Trend (Last 6 Months)</h3>
         <ResponsiveContainer width="100%" height="85%">
           <BarChart data={orderStatusTrendData}>
             <CartesianGrid stroke="#334155" strokeDasharray="3 3" />
             <XAxis dataKey="label" stroke="#94a3b8" tick={{ fontSize: 12 }} />
             <YAxis allowDecimals={false} stroke="#94a3b8" tick={{ fontSize: 12 }} />
-            <Tooltip
-              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
-            />
+            <Tooltip contentStyle={tooltipStyle} />
             <Legend wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }} />
             <Bar dataKey="pending" stackId="status" fill="#f59e0b" />
             <Bar dataKey="paid" stackId="status" fill="#0ea5e9" />
