@@ -717,6 +717,52 @@ button {
   padding: 0.24rem 0.62rem;
 }
 
+.ceo-welcome-card {
+  border-radius: 18px;
+  border: 1px solid #c9ddc0;
+  background: linear-gradient(130deg, #f6fcec 0%, #eef8e5 55%, #e5f2d8 100%);
+  padding: 1rem 1.05rem;
+  display: grid;
+  gap: 0.55rem;
+  box-shadow: 0 12px 24px rgba(24, 70, 33, 0.07);
+}
+
+.ceo-welcome-kicker {
+  margin: 0;
+  color: #2c5f2d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ceo-welcome-card h3 {
+  margin: 0;
+  color: #1f4c23;
+  font-family: "Sora", "Segoe UI", sans-serif;
+  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+}
+
+.ceo-welcome-card p {
+  margin: 0;
+  color: #3f583f;
+  line-height: 1.55;
+}
+
+.ceo-welcome-card ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.2rem;
+  color: #2f5031;
+  font-weight: 600;
+}
+
+.ceo-signature {
+  color: #1c5e33;
+  font-weight: 800;
+}
+
 .latest-news-grid {
   margin-top: 0.55rem;
   display: grid;
@@ -828,6 +874,31 @@ button {
   font-weight: 800;
   letter-spacing: 0.03em;
   padding: 0.35rem 0.64rem;
+}
+
+.live-news-cta-row {
+  margin-top: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.live-news-cta-row a {
+  border-radius: 999px;
+  border: 1px solid #b9d2af;
+  background: #f1f9ea;
+  color: #29592d;
+  text-decoration: none;
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 0.42rem 0.8rem;
+}
+
+.live-news-cta-row a:first-child {
+  border-color: #1f8a45;
+  background: #228e43;
+  color: #f5fff5;
 }
 
 .agropro-opportunity {

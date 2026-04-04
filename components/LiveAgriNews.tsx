@@ -19,6 +19,12 @@ type AgriNewsResponse = {
   items: AgriNewsItem[];
 };
 
+type LiveAgriNewsProps = {
+  limit?: number;
+  showSeeMoreLink?: boolean;
+  showWelcomeCard?: boolean;
+};
+
 const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 
 const toReadableDate = (iso: string) => {
@@ -33,7 +39,11 @@ const toReadableDate = (iso: string) => {
       }).format(date);
 };
 
-export default function LiveAgriNews() {
+export default function LiveAgriNews({
+  limit = 3,
+  showSeeMoreLink = true,
+  showWelcomeCard = true,
+}: LiveAgriNewsProps) {
   const [payload, setPayload] = useState<AgriNewsResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +69,7 @@ export default function LiveAgriNews() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const items = useMemo(() => payload?.items ?? [], [payload]);
+  const items = useMemo(() => (payload?.items ?? []).slice(0, limit), [payload, limit]);
 
   return (
     <>
@@ -74,6 +84,33 @@ export default function LiveAgriNews() {
           <span>Last update: {payload ? toReadableDate(payload.updatedAt) : "Fetching..."}</span>
         </div>
       </div>
+
+      {showWelcomeCard ? (
+        <article className="ceo-welcome-card">
+          <p className="ceo-welcome-kicker">Welcome Message from CEO</p>
+          <h3>Welcome to Dos Agrolink Nigeria.</h3>
+          <p>
+            At Dos Agrolink, we believe the future of agriculture in Nigeria lies in empowering our farmers with the
+            right tools, the right information, and the right connections.
+          </p>
+          <p>
+            We understand daily challenges from unpredictable weather to fluctuating market prices and limited access
+            to quality inputs. Our platform is built to be simple, reliable, and accessible, even in low-connectivity
+            environments.
+          </p>
+          <ul>
+            <li>Access real-time market prices to sell smarter.</li>
+            <li>Get timely farm reminders and advisory support.</li>
+            <li>Purchase subsidized farm inputs with ease.</li>
+            <li>Connect directly with trusted agents and support services.</li>
+          </ul>
+          <p>
+            Our mission is to bridge the gap between farmers and opportunity, using technology for growth,
+            sustainability, and prosperity.
+          </p>
+          <p className="ceo-signature">Warm regards, CEO, Dos Agrolink Nigeria</p>
+        </article>
+      ) : null}
 
       <div className="latest-news-grid">
         {loading && items.length === 0 ? (
@@ -115,6 +152,13 @@ export default function LiveAgriNews() {
           </article>
         ))}
       </div>
+
+      {showSeeMoreLink ? (
+        <div className="live-news-cta-row">
+          <Link href="/news">See More Recent News</Link>
+          <Link href="/join-us">Join Us</Link>
+        </div>
+      ) : null}
     </>
   );
 }
