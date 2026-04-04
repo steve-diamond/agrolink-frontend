@@ -202,6 +202,114 @@ function ControlRoomSidebar({
   );
 }
 
+function OperationsUsersCard({
+  users,
+  onApproveFarmer,
+}: {
+  users: AdminUser[];
+  onApproveFarmer: (id: string) => void;
+}) {
+  return (
+    <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
+      <h3 className="m-0 text-sm font-semibold text-slate-200">Users</h3>
+      <div className="mt-2 grid gap-1 text-sm text-slate-300">
+        {users.slice(0, 5).map((u) => (
+          <div key={u._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
+            <div className="font-medium">{u.email}</div>
+            <div className="text-xs text-slate-400">
+              {u.role} {u.role === "farmer" ? `• ${u.approved ? "Approved" : "Pending"}` : ""}
+            </div>
+            {u.role === "farmer" && !u.approved ? (
+              <button
+                onClick={() => onApproveFarmer(u._id)}
+                className="mt-1 cursor-pointer rounded-md border border-emerald-400/60 bg-emerald-700/30 px-2 py-1 text-xs text-emerald-100"
+              >
+                Approve
+              </button>
+            ) : null}
+          </div>
+        ))}
+        {users.length === 0 ? <p className="m-0 text-xs text-slate-500">No users match your search.</p> : null}
+      </div>
+    </article>
+  );
+}
+
+function OperationsProductsCard({
+  products,
+  deleting,
+  currencyFormatter,
+  onApproveProduct,
+  onDeleteProduct,
+}: {
+  products: AdminProduct[];
+  deleting: string | null;
+  currencyFormatter: Intl.NumberFormat;
+  onApproveProduct: (id: string) => void;
+  onDeleteProduct: (id: string) => void;
+}) {
+  return (
+    <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
+      <h3 className="m-0 text-sm font-semibold text-slate-200">Products</h3>
+      <div className="mt-2 grid gap-1 text-sm text-slate-300">
+        {products.slice(0, 5).map((p) => (
+          <div key={p._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
+            <div className="font-medium">{p.name}</div>
+            <div className="text-xs text-slate-400">{currencyFormatter.format(Number(p.price || 0))}</div>
+            <div className="mt-1 flex gap-1">
+              {!p.approved ? (
+                <button
+                  onClick={() => onApproveProduct(p._id)}
+                  disabled={deleting === p._id}
+                  className="cursor-pointer rounded-md border border-emerald-400/60 bg-emerald-700/30 px-2 py-1 text-xs text-emerald-100 disabled:opacity-60"
+                >
+                  Approve
+                </button>
+              ) : null}
+              <button
+                onClick={() => onDeleteProduct(p._id)}
+                disabled={deleting === p._id}
+                className="cursor-pointer rounded-md border border-rose-400/60 bg-rose-700/30 px-2 py-1 text-xs text-rose-100 disabled:opacity-60"
+              >
+                {deleting === p._id ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        ))}
+        {products.length === 0 ? <p className="m-0 text-xs text-slate-500">No products match your search.</p> : null}
+      </div>
+    </article>
+  );
+}
+
+function OperationsOrdersCard({
+  orders,
+  currencyFormatter,
+  getOrderSummary,
+  getOrderTotal,
+}: {
+  orders: AdminOrder[];
+  currencyFormatter: Intl.NumberFormat;
+  getOrderSummary: (order: AdminOrder) => string;
+  getOrderTotal: (order: AdminOrder) => number;
+}) {
+  return (
+    <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
+      <h3 className="m-0 text-sm font-semibold text-slate-200">Orders</h3>
+      <div className="mt-2 grid gap-1 text-sm text-slate-300">
+        {orders.slice(0, 5).map((o) => (
+          <div key={o._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
+            <div className="font-medium">{getOrderSummary(o)}</div>
+            <div className="text-xs text-slate-400 capitalize">{o.status || "unknown"} / {o.paymentStatus || "pending"}</div>
+            <div className="text-xs text-emerald-200">{currencyFormatter.format(getOrderTotal(o))}</div>
+          </div>
+        ))}
+        {orders.length === 0 ? <p className="m-0 text-xs text-slate-500">No orders match your search.</p> : null}
+      </div>
+    </article>
+  );
+}
+
 const getAuthHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
 });
@@ -646,73 +754,20 @@ export default function AdminDashboardPage() {
           <section className="rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4">
             <h2 className="m-0 text-lg font-semibold">Operations Feed</h2>
             <div className="mt-3 grid gap-4 lg:grid-cols-3">
-              <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
-                <h3 className="m-0 text-sm font-semibold text-slate-200">Users</h3>
-                <div className="mt-2 grid gap-1 text-sm text-slate-300">
-                  {searchableUsers.slice(0, 5).map((u) => (
-                    <div key={u._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
-                      <div className="font-medium">{u.email}</div>
-                      <div className="text-xs text-slate-400">
-                        {u.role} {u.role === "farmer" ? `• ${u.approved ? "Approved" : "Pending"}` : ""}
-                      </div>
-                      {u.role === "farmer" && !u.approved ? (
-                        <button
-                          onClick={() => approveFarmer(u._id)}
-                          className="mt-1 cursor-pointer rounded-md border border-emerald-400/60 bg-emerald-700/30 px-2 py-1 text-xs text-emerald-100"
-                        >
-                          Approve
-                        </button>
-                      ) : null}
-                    </div>
-                  ))}
-                  {searchableUsers.length === 0 ? <p className="m-0 text-xs text-slate-500">No users match your search.</p> : null}
-                </div>
-              </article>
-
-              <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
-                <h3 className="m-0 text-sm font-semibold text-slate-200">Products</h3>
-                <div className="mt-2 grid gap-1 text-sm text-slate-300">
-                  {searchableProducts.slice(0, 5).map((p) => (
-                    <div key={p._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
-                      <div className="font-medium">{p.name}</div>
-                      <div className="text-xs text-slate-400">{currencyFormatter.format(Number(p.price || 0))}</div>
-                      <div className="mt-1 flex gap-1">
-                        {!p.approved ? (
-                          <button
-                            onClick={() => approveProduct(p._id)}
-                            disabled={deleting === p._id}
-                            className="cursor-pointer rounded-md border border-emerald-400/60 bg-emerald-700/30 px-2 py-1 text-xs text-emerald-100 disabled:opacity-60"
-                          >
-                            Approve
-                          </button>
-                        ) : null}
-                        <button
-                          onClick={() => deleteProduct(p._id)}
-                          disabled={deleting === p._id}
-                          className="cursor-pointer rounded-md border border-rose-400/60 bg-rose-700/30 px-2 py-1 text-xs text-rose-100 disabled:opacity-60"
-                        >
-                          {deleting === p._id ? "Deleting..." : "Delete"}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  {searchableProducts.length === 0 ? <p className="m-0 text-xs text-slate-500">No products match your search.</p> : null}
-                </div>
-              </article>
-
-              <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
-                <h3 className="m-0 text-sm font-semibold text-slate-200">Orders</h3>
-                <div className="mt-2 grid gap-1 text-sm text-slate-300">
-                  {searchableOrders.slice(0, 5).map((o) => (
-                    <div key={o._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
-                      <div className="font-medium">{getOrderSummary(o)}</div>
-                      <div className="text-xs text-slate-400 capitalize">{o.status || "unknown"} / {o.paymentStatus || "pending"}</div>
-                      <div className="text-xs text-emerald-200">{currencyFormatter.format(getOrderTotal(o))}</div>
-                    </div>
-                  ))}
-                  {searchableOrders.length === 0 ? <p className="m-0 text-xs text-slate-500">No orders match your search.</p> : null}
-                </div>
-              </article>
+              <OperationsUsersCard users={searchableUsers} onApproveFarmer={approveFarmer} />
+              <OperationsProductsCard
+                products={searchableProducts}
+                deleting={deleting}
+                currencyFormatter={currencyFormatter}
+                onApproveProduct={approveProduct}
+                onDeleteProduct={deleteProduct}
+              />
+              <OperationsOrdersCard
+                orders={searchableOrders}
+                currencyFormatter={currencyFormatter}
+                getOrderSummary={getOrderSummary}
+                getOrderTotal={getOrderTotal}
+              />
             </div>
           </section>
         </div>
