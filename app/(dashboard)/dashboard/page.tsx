@@ -1073,7 +1073,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
 
       <section className="card p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="m-0 text-base font-bold text-green-950">Today's Objectives</h2>
+          <h2 className="m-0 text-base font-bold text-green-950">Today&apos;s Objectives</h2>
           <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-800">
             {completedObjectiveCount}/{dailyObjectives.length} complete
           </span>
@@ -1152,7 +1152,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
 
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
           <article className="rounded-xl border border-amber-200 bg-amber-50 p-3">
-            <p className="m-0 text-xs font-semibold uppercase tracking-[0.08em] text-amber-700">Today's Challenges</p>
+            <p className="m-0 text-xs font-semibold uppercase tracking-[0.08em] text-amber-700">Today&apos;s Challenges</p>
             <div className="mt-2 grid gap-2">
               {dailyChallenges.map((challenge) => (
                 <label key={challenge.id} className="flex items-center gap-2 rounded-md bg-white px-2 py-1.5 text-sm text-slate-700">
