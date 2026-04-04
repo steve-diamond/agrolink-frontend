@@ -70,6 +70,7 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
   const [rangeDays, setRangeDays] = useState<DateRange>(90);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token") ?? "";
@@ -360,6 +361,28 @@ export default function AdminDashboardPage() {
   const pendingFarmerCount = Math.max(0, farmerCount - approvedFarmerCount);
   const pendingProductCount = products.filter((p) => !p.approved).length;
   const rangeLabel = `Last ${rangeDays} days`;
+  const latestUpdateLabel = new Date().toLocaleTimeString("en-NG", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+
+  const searchableUsers = users.filter((u) => {
+    if (!normalizedSearch) return true;
+    return [u.name, u.email, u.role].join(" ").toLowerCase().includes(normalizedSearch);
+  });
+
+  const searchableProducts = products.filter((p) => {
+    if (!normalizedSearch) return true;
+    return [p.name, p.category, p.location].join(" ").toLowerCase().includes(normalizedSearch);
+  });
+
+  const searchableOrders = filteredOrders.filter((o) => {
+    if (!normalizedSearch) return true;
+    const summary = getOrderSummary(o);
+    return [summary, o.status, o.paymentStatus, o.buyerId?.email].join(" ").toLowerCase().includes(normalizedSearch);
+  });
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_#1e293b_0%,_#0b1220_45%,_#060b14_100%)] p-4 text-slate-100 md:p-6">
@@ -434,6 +457,20 @@ export default function AdminDashboardPage() {
 
         <div className="grid gap-4">
           <section className="rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="relative min-w-[220px] flex-1">
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search users, products, orders..."
+                  className="w-full rounded-xl border border-slate-600 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500"
+                />
+              </div>
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+                Live Updated: {latestUpdateLabel}
+              </div>
+            </div>
+
             <div className="no-print mb-3 flex flex-wrap gap-2">
               {[30, 90, 365].map((value) => (
                 <button
@@ -478,6 +515,22 @@ export default function AdminDashboardPage() {
               orderStatusTrendData={orderStatusTrendData}
               currencyFormatter={currencyFormatter}
             />
+
+            <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3">
+              {topProductPriceData.slice(0, 3).map((product, index) => (
+                <article key={product.name} className="rounded-xl border border-slate-700 bg-slate-800/80 p-3">
+                  <p className="m-0 text-[11px] uppercase tracking-[0.08em] text-slate-400">Top Commodity {index + 1}</p>
+                  <h3 className="m-0 mt-2 text-base font-semibold text-slate-100">{product.name}</h3>
+                  <p className="m-0 mt-1 text-emerald-300">{currencyFormatter.format(Number(product.price || 0))}</p>
+                  <div className="mt-3 h-2 rounded-full bg-slate-700">
+                    <div
+                      className="h-2 rounded-full bg-gradient-to-r from-emerald-400 to-green-500"
+                      style={{ width: `${Math.min(100, 30 + index * 20)}%` }}
+                    />
+                  </div>
+                </article>
+              ))}
+            </div>
           </section>
 
           <section className="rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4">
@@ -486,7 +539,7 @@ export default function AdminDashboardPage() {
               <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
                 <h3 className="m-0 text-sm font-semibold text-slate-200">Users</h3>
                 <div className="mt-2 grid gap-1 text-sm text-slate-300">
-                  {users.slice(0, 5).map((u) => (
+                  {searchableUsers.slice(0, 5).map((u) => (
                     <div key={u._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
                       <div className="font-medium">{u.email}</div>
                       <div className="text-xs text-slate-400">
@@ -502,13 +555,14 @@ export default function AdminDashboardPage() {
                       ) : null}
                     </div>
                   ))}
+                  {searchableUsers.length === 0 ? <p className="m-0 text-xs text-slate-500">No users match your search.</p> : null}
                 </div>
               </article>
 
               <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
                 <h3 className="m-0 text-sm font-semibold text-slate-200">Products</h3>
                 <div className="mt-2 grid gap-1 text-sm text-slate-300">
-                  {products.slice(0, 5).map((p) => (
+                  {searchableProducts.slice(0, 5).map((p) => (
                     <div key={p._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
                       <div className="font-medium">{p.name}</div>
                       <div className="text-xs text-slate-400">{currencyFormatter.format(Number(p.price || 0))}</div>
@@ -532,19 +586,21 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                   ))}
+                  {searchableProducts.length === 0 ? <p className="m-0 text-xs text-slate-500">No products match your search.</p> : null}
                 </div>
               </article>
 
               <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
                 <h3 className="m-0 text-sm font-semibold text-slate-200">Orders</h3>
                 <div className="mt-2 grid gap-1 text-sm text-slate-300">
-                  {filteredOrders.slice(0, 5).map((o) => (
+                  {searchableOrders.slice(0, 5).map((o) => (
                     <div key={o._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
                       <div className="font-medium">{getOrderSummary(o)}</div>
                       <div className="text-xs text-slate-400 capitalize">{o.status || "unknown"} / {o.paymentStatus || "pending"}</div>
                       <div className="text-xs text-emerald-200">{currencyFormatter.format(getOrderTotal(o))}</div>
                     </div>
                   ))}
+                  {searchableOrders.length === 0 ? <p className="m-0 text-xs text-slate-500">No orders match your search.</p> : null}
                 </div>
               </article>
             </div>
@@ -570,8 +626,31 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-800/60 p-4">
-            <h3 className="m-0 text-sm font-semibold text-slate-200">Support Assistant</h3>
-            <p className="mt-2 text-sm text-slate-300">Need investor-ready data exports, approvals, or logistics signal checks? Use this dashboard to act instantly.</p>
+            <h3 className="m-0 text-sm font-semibold text-slate-200">Operational Alerts</h3>
+            <ul className="m-0 mt-3 grid list-none gap-2 p-0 text-sm text-slate-300">
+              <li className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2">
+                {pendingFarmerCount} farmers pending approval review.
+              </li>
+              <li className="rounded-lg border border-cyan-400/30 bg-cyan-500/10 px-3 py-2">
+                {pendingProductCount} product listings awaiting action.
+              </li>
+              <li className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2">
+                Revenue window: {currencyFormatter.format(totalRevenue)} in {rangeLabel.toLowerCase()}.
+              </li>
+            </ul>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-800/60 p-4">
+            <h3 className="m-0 text-sm font-semibold text-slate-200">DOS Vision Assistant</h3>
+            <p className="mt-2 text-sm text-slate-300">Ask operational questions and align daily actions with DOS AGROLINK vision outcomes.</p>
+            <div className="mt-3 grid gap-2">
+              <button className="cursor-pointer rounded-xl border border-slate-600 bg-slate-900/60 px-3 py-2 text-left text-xs text-slate-200">
+                Which approvals block marketplace growth this week?
+              </button>
+              <button className="cursor-pointer rounded-xl border border-slate-600 bg-slate-900/60 px-3 py-2 text-left text-xs text-slate-200">
+                Show top value-chain opportunities by order demand.
+              </button>
+            </div>
             <button className="mt-3 w-full cursor-pointer rounded-xl border border-emerald-400/70 bg-emerald-700/30 px-3 py-2 text-sm font-semibold text-emerald-100">
               Run Quick Review
             </button>
