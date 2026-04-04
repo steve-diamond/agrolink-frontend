@@ -42,14 +42,101 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   
+  const normalizeProduct = (value: unknown): OrderProduct => {
+    if (!value || typeof value !== "object") {
+      return {
+        _id: "unknown-product",
+        name: "Unknown Product",
+        price: 0,
+        location: "No location",
+      };
+    }
+
+    const raw = value as Partial<OrderProduct>;
+    return {
+      _id: String(raw._id ?? "unknown-product"),
+      name: String(raw.name ?? "Unknown Product"),
+      price: Number(raw.price ?? 0),
+      location: String(raw.location ?? "No location"),
+      farmer: raw.farmer ? String(raw.farmer) : undefined,
+    };
+  };
+
+  const normalizeBuyer = (value: unknown): OrderBuyer => {
+    if (!value || typeof value !== "object") {
+      return {
+        _id: "unknown-buyer",
+        name: "Unknown Buyer",
+        email: "Unknown email",
+      };
+    }
+
+    const raw = value as Partial<OrderBuyer>;
+    return {
+      _id: String(raw._id ?? "unknown-buyer"),
+      name: String(raw.name ?? "Unknown Buyer"),
+      email: String(raw.email ?? "Unknown email"),
+    };
+  };
+
+  const normalizeOrderLineItem = (value: unknown): OrderLineItem | null => {
+    if (!value || typeof value !== "object") {
+      return null;
+    }
+
+    const raw = value as Partial<OrderLineItem>;
+    return {
+      productId: normalizeProduct(raw.productId),
+      quantity: Number(raw.quantity ?? 0),
+    };
+  };
+
+  const normalizeOrder = (value: unknown, index: number): Order | null => {
+    if (!value || typeof value !== "object") {
+      return null;
+    }
+
+    const raw = value as Partial<Order>;
+    const lineItems = Array.isArray(raw.products)
+      ? raw.products
+          .map((item) => normalizeOrderLineItem(item))
+          .filter((item): item is OrderLineItem => Boolean(item))
+      : undefined;
+
+    const normalizedStatus: Order["status"] =
+      raw.status === "paid" || raw.status === "delivered" || raw.status === "pending"
+        ? raw.status
+        : "pending";
+
+    const normalizedPayment: Order["paymentStatus"] =
+      raw.paymentStatus === "paid" || raw.paymentStatus === "pending" ? raw.paymentStatus : "pending";
+
+    return {
+      _id: String(raw._id ?? `order-${index}`),
+      productId: normalizeProduct(raw.productId),
+      buyerId: normalizeBuyer(raw.buyerId),
+      products: lineItems,
+      quantity: Number(raw.quantity ?? lineItems?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) ?? 0),
+      totalPrice: Number(raw.totalPrice ?? raw.totalAmount ?? 0),
+      totalAmount: raw.totalAmount == null ? undefined : Number(raw.totalAmount),
+      paymentStatus: normalizedPayment,
+      status: normalizedStatus,
+      createdAt: typeof raw.createdAt === "string" ? raw.createdAt : new Date().toISOString(),
+    };
+  };
+
   const normalizeOrdersResponse = (data: unknown): Order[] => {
     const rawList = Array.isArray(data)
       ? data
       : Array.isArray((data as { orders?: unknown[] })?.orders)
       ? (data as { orders: unknown[] }).orders
+      : Array.isArray((data as { data?: unknown[] })?.data)
+      ? (data as { data: unknown[] }).data
       : [];
-  
-    return rawList.filter((item): item is Order => Boolean(item && typeof item === "object"));
+
+    return rawList
+      .map((item, index) => normalizeOrder(item, index))
+      .filter((item): item is Order => Boolean(item));
   };
 
   useEffect(() => {
