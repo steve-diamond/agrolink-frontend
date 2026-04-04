@@ -48,150 +48,108 @@ export default function AdminCharts({
   currencyFormatter,
 }: Props) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-        gap: "16px",
-      }}
-    >
-      <div
-        style={{
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "14px",
-          height: "320px",
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>User Role Distribution</h3>
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4">
+      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+        <h3 className="m-0 text-sm font-semibold text-slate-200">User Role Distribution</h3>
         <ResponsiveContainer width="100%" height="85%">
           <PieChart>
             <Pie data={roleDistributionData} dataKey="value" nameKey="name" outerRadius={90}>
               {roleDistributionData.map((entry, index) => (
                 <Cell
                   key={`role-${entry.name}-${index}`}
-                  fill={["#2563eb", "#0f766e", "#7c3aed"][index % 3]}
+                  fill={["#4f46e5", "#14b8a6", "#8b5cf6"][index % 3]}
                 />
               ))}
             </Pie>
-            <Tooltip />
-            <Legend />
+            <Tooltip
+              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
+            />
+            <Legend wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      <div
-        style={{
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "14px",
-          height: "320px",
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Farmer Approval Status</h3>
+      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+        <h3 className="m-0 text-sm font-semibold text-slate-200">Farmer Approval Status</h3>
         <ResponsiveContainer width="100%" height="85%">
           <PieChart>
             <Pie data={approvalData} dataKey="value" nameKey="name" outerRadius={90}>
               {approvalData.map((entry, index) => (
                 <Cell
                   key={`approval-${entry.name}-${index}`}
-                  fill={["#16a34a", "#dc2626"][index % 2]}
+                  fill={["#22c55e", "#ef4444"][index % 2]}
                 />
               ))}
             </Pie>
-            <Tooltip />
-            <Legend />
+            <Tooltip
+              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
+            />
+            <Legend wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      <div
-        style={{
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "14px",
-          height: "320px",
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Order Status Volume</h3>
+      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+        <h3 className="m-0 text-sm font-semibold text-slate-200">Order Status Volume</h3>
         <ResponsiveContainer width="100%" height="85%">
           <BarChart data={orderStatusData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis allowDecimals={false} />
-            <Tooltip />
-            <Bar dataKey="count" fill="#0ea5e9" />
+            <CartesianGrid stroke="#334155" strokeDasharray="3 3" />
+            <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} />
+            <YAxis allowDecimals={false} stroke="#94a3b8" tick={{ fontSize: 12 }} />
+            <Tooltip
+              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
+            />
+            <Bar dataKey="count" fill="#38bdf8" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div
-        style={{
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "14px",
-          height: "320px",
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Top Product Prices</h3>
+      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+        <h3 className="m-0 text-sm font-semibold text-slate-200">Top Product Prices</h3>
         <ResponsiveContainer width="100%" height="85%">
           <BarChart data={topProductPriceData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip formatter={(value) => [`₦${value ?? 0}`, "Price"]} />
-            <Bar dataKey="price" fill="#f97316" />
+            <CartesianGrid stroke="#334155" strokeDasharray="3 3" />
+            <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 12 }} />
+            <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
+            <Tooltip
+              formatter={(value) => [`₦${value ?? 0}`, "Price"]}
+              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
+            />
+            <Bar dataKey="price" fill="#fb923c" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div
-        style={{
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "14px",
-          height: "320px",
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Revenue Trend (Last 6 Months)</h3>
+      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+        <h3 className="m-0 text-sm font-semibold text-slate-200">Revenue Trend (Last 6 Months)</h3>
         <ResponsiveContainer width="100%" height="85%">
           <LineChart data={revenueTrendData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
+            <CartesianGrid stroke="#334155" strokeDasharray="3 3" />
+            <XAxis dataKey="month" stroke="#94a3b8" tick={{ fontSize: 12 }} />
+            <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
             <Tooltip
               formatter={(value) => [
                 currencyFormatter.format(Number(value ?? 0)),
                 "Revenue",
               ]}
+              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
             />
-            <Line type="monotone" dataKey="revenue" stroke="#0891b2" strokeWidth={3} dot />
+            <Line type="monotone" dataKey="revenue" stroke="#22d3ee" strokeWidth={3} dot={{ r: 4 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div
-        style={{
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "12px",
-          padding: "14px",
-          height: "320px",
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Status Trend (Last 6 Months)</h3>
+      <div className="h-[320px] rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4">
+        <h3 className="m-0 text-sm font-semibold text-slate-200">Status Trend (Last 6 Months)</h3>
         <ResponsiveContainer width="100%" height="85%">
           <BarChart data={orderStatusTrendData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="label" />
-            <YAxis allowDecimals={false} />
-            <Tooltip />
-            <Legend />
+            <CartesianGrid stroke="#334155" strokeDasharray="3 3" />
+            <XAxis dataKey="label" stroke="#94a3b8" tick={{ fontSize: 12 }} />
+            <YAxis allowDecimals={false} stroke="#94a3b8" tick={{ fontSize: 12 }} />
+            <Tooltip
+              contentStyle={{ background: "#0f172a", border: "1px solid #334155", borderRadius: 10, color: "#e2e8f0" }}
+            />
+            <Legend wrapperStyle={{ color: "#cbd5e1", fontSize: 12 }} />
             <Bar dataKey="pending" stackId="status" fill="#f59e0b" />
             <Bar dataKey="paid" stackId="status" fill="#0ea5e9" />
             <Bar dataKey="delivered" stackId="status" fill="#22c55e" />

@@ -132,7 +132,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const deleteUser = (id: string) => handleDelete("users", id);
   const deleteProduct = (id: string) => handleDelete("products", id);
 
   const approveProduct = async (id: string) => {
@@ -184,9 +183,6 @@ export default function AdminDashboardPage() {
   };
 
   const getOrderTotal = (order: AdminOrder) => Number(order.totalAmount ?? order.totalPrice ?? 0);
-
-  const getOrderQuantity = (order: AdminOrder) =>
-    getOrderItems(order).reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
   const getOrderSummary = (order: AdminOrder) => {
     const items = getOrderItems(order);
@@ -361,36 +357,38 @@ export default function AdminDashboardPage() {
     router.push("/admin/login");
   };
 
+  const pendingFarmerCount = Math.max(0, farmerCount - approvedFarmerCount);
+  const pendingProductCount = products.filter((p) => !p.approved).length;
+  const rangeLabel = `Last ${rangeDays} days`;
+
   return (
-    <main className="admin-board min-h-screen bg-[radial-gradient(circle_at_top_right,_#fde68a_0%,_#f8fafc_45%)] p-5">
-      <section className="print-card mb-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 p-5 text-slate-50 shadow-[0_12px_30px_rgba(15,23,42,0.25)]">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_#1e293b_0%,_#0b1220_45%,_#060b14_100%)] p-4 text-slate-100 md:p-6">
+      <section className="mb-4 rounded-3xl border border-emerald-400/20 bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/80 p-5 shadow-[0_22px_40px_rgba(2,6,23,0.45)]">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="m-0 text-xs uppercase tracking-[0.08em] text-slate-300">
-              Investor Control Room
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold">DOS AGROLINK NIGERIA Executive Dashboard</h1>
-            <p className="mt-2 text-slate-300">
-              Live market intelligence, operations, and approval performance.
+            <p className="m-0 text-xs uppercase tracking-[0.13em] text-emerald-300">DOS AGROLINK Investor Control Room</p>
+            <h1 className="mt-2 text-2xl font-semibold md:text-3xl">Executive Dashboard</h1>
+            <p className="mt-2 max-w-2xl text-sm text-slate-300">
+              Live market intelligence, operations, approvals, and commerce performance for the DOS AGROLINK ecosystem.
             </p>
           </div>
 
           <div className="no-print flex flex-wrap gap-2">
             <button
               onClick={exportAnalyticsCsv}
-              className="cursor-pointer rounded-lg border border-cyan-400 bg-cyan-800 px-3 py-2 text-cyan-50"
+              className="cursor-pointer rounded-xl border border-cyan-400/70 bg-cyan-900/70 px-3 py-2 text-sm font-semibold text-cyan-100"
             >
               Export CSV
             </button>
             <button
               onClick={printInvestorReport}
-              className="cursor-pointer rounded-lg border border-yellow-400 bg-amber-800 px-3 py-2 text-yellow-100"
+              className="cursor-pointer rounded-xl border border-amber-400/80 bg-amber-900/70 px-3 py-2 text-sm font-semibold text-amber-100"
             >
               Print Report
             </button>
             <button
               onClick={handleLogout}
-              className="cursor-pointer rounded-lg border border-red-300 bg-red-900 px-3 py-2 text-red-100"
+              className="cursor-pointer rounded-xl border border-rose-400/70 bg-rose-900/70 px-3 py-2 text-sm font-semibold text-rose-100"
             >
               Logout
             </button>
@@ -398,180 +396,187 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      {loading ? (
-        <div className="mb-4 text-slate-700">Loading admin dashboard...</div>
-      ) : null}
+      {loading ? <div className="mb-4 text-slate-300">Loading admin dashboard...</div> : null}
 
       {!loading && error ? (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+        <div className="mb-4 rounded-xl border border-rose-400/40 bg-rose-900/30 px-4 py-3 text-rose-100">
           {error}
         </div>
       ) : null}
 
-      <div className="mb-5 rounded-xl bg-slate-100 p-5">
-        <h2>Platform Stats</h2>
-        <div className="flex flex-wrap gap-5">
-          <div>Total Users: {totalUsers}</div>
-          <div>Total Products: {totalProducts}</div>
-          <div>Total Orders: {totalOrders}</div>
-          <div>Total Revenue: ₦{totalRevenue}</div>
-        </div>
-      </div>
-
-      <section className="print-card mt-5">
-        <h2>Investor Analytics</h2>
-        <div className="no-print mb-3 flex gap-2">
-          {[30, 90, 365].map((value) => (
-            <button
-              key={value}
-              onClick={() => setRangeDays(value as DateRange)}
-              className={`cursor-pointer rounded-lg border px-3 py-1.5 ${
-                rangeDays === value
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-300 bg-white text-slate-900"
-              }`}
-            >
-              Last {value} days
-            </button>
-          ))}
-        </div>
-        <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3">
-          <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="m-0 text-slate-500">Total Revenue</p>
-            <h3 className="mt-2">{currencyFormatter.format(totalRevenue)}</h3>
+      <section className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_320px]">
+        <aside className="rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4">
+          <p className="text-xs uppercase tracking-[0.1em] text-slate-400">Overview</p>
+          <div className="mt-3 grid gap-2 text-sm">
+            <div className="rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2">
+              <p className="m-0 text-xs text-slate-400">Active Range</p>
+              <p className="m-0 mt-1 font-semibold text-emerald-200">{rangeLabel}</p>
+            </div>
+            <div className="rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2">
+              <p className="m-0 text-xs text-slate-400">Pending Approvals</p>
+              <p className="m-0 mt-1 font-semibold text-amber-200">{pendingFarmerCount} farmers</p>
+            </div>
+            <div className="rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2">
+              <p className="m-0 text-xs text-slate-400">Pending Products</p>
+              <p className="m-0 mt-1 font-semibold text-sky-200">{pendingProductCount} listings</p>
+            </div>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="m-0 text-slate-500">Average Order Value</p>
-            <h3 className="mt-2">{currencyFormatter.format(averageOrderValue)}</h3>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="m-0 text-slate-500">Farmer Approval Rate</p>
-            <h3 className="mt-2">{approvalRate.toFixed(1)}%</h3>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="m-0 text-slate-500">Approved Farmers</p>
-            <h3 className="mt-2">{compactFormatter.format(approvedFarmerCount)} / {compactFormatter.format(farmerCount)}</h3>
-          </div>
-        </div>
-        <AdminCharts
-            roleDistributionData={roleDistributionData}
-            approvalData={approvalData}
-            orderStatusData={orderStatusData}
-            topProductPriceData={topProductPriceData}
-            revenueTrendData={revenueTrendData}
-            orderStatusTrendData={orderStatusTrendData}
-            currencyFormatter={currencyFormatter}
-          />
-      </section>
 
-      <hr />
+          <p className="mt-6 text-xs uppercase tracking-[0.1em] text-slate-400">Quick Menu</p>
+          <ul className="m-0 mt-2 grid list-none gap-1 p-0 text-sm text-slate-300">
+            <li className="rounded-lg bg-emerald-700/20 px-3 py-2 text-emerald-200">Dashboard</li>
+            <li className="rounded-lg px-3 py-2">Approvals</li>
+            <li className="rounded-lg px-3 py-2">Commerce</li>
+            <li className="rounded-lg px-3 py-2">Reports</li>
+            <li className="rounded-lg px-3 py-2">Insights</li>
+          </ul>
+        </aside>
 
-      <section>
-        <h2>Users</h2>
-        {users.map((u: any) => (
-          <div key={u._id}>
-            {u.email} - {u.role}
-            {u.role === "farmer" ? ` - ${u.approved ? "Approved" : "Pending"}` : ""}
-            {u.role === "farmer" && !u.approved ? (
-              <button onClick={() => approveFarmer(u._id)}>Approve</button>
-            ) : null}
-            <button onClick={() => deleteUser(u._id)}>Delete</button>
-          </div>
-        ))}
-      </section>
-
-      <hr />
-
-      <section>
-        <h2>Products</h2>
-        {products.length === 0 && <p className="text-slate-500">No products found.</p>}
-        <div className="grid gap-2.5">
-          {products.map((p) => (
-            <div
-              key={p._id}
-              className={`flex flex-wrap items-center justify-between gap-2.5 rounded-lg border px-3.5 py-2.5 ${
-                p.approved ? "border-green-300 bg-green-50" : "border-yellow-200 bg-amber-50"
-              }`}
-            >
-              <div>
-                <strong>{p.name}</strong>
-                <span className="ml-2.5 text-slate-600">₦{p.price}</span>
-                {p.category && <span className="ml-2 text-xs text-slate-400">{p.category}</span>}
-                {p.location && <span className="ml-2 text-xs text-slate-400">📍 {p.location}</span>}
-                <span
-                  className={`ml-2.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                    p.approved ? "bg-green-100 text-green-700" : "bg-yellow-100 text-amber-800"
+        <div className="grid gap-4">
+          <section className="rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4">
+            <div className="no-print mb-3 flex flex-wrap gap-2">
+              {[30, 90, 365].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => setRangeDays(value as DateRange)}
+                  className={`cursor-pointer rounded-lg border px-3 py-1.5 text-sm ${
+                    rangeDays === value
+                      ? "border-emerald-400 bg-emerald-500/20 text-emerald-100"
+                      : "border-slate-600 bg-slate-800 text-slate-200"
                   }`}
                 >
-                  {p.approved ? "Approved" : "Pending Approval"}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                {!p.approved && (
-                  <button
-                    onClick={() => approveProduct(p._id)}
-                    disabled={deleting === p._id}
-                    className="cursor-pointer rounded-md bg-green-600 px-3.5 py-1.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Approve
-                  </button>
-                )}
-                <button
-                  onClick={() => deleteProduct(p._id)}
-                  disabled={deleting === p._id}
-                  className="cursor-pointer rounded-md bg-red-600 px-3 py-1.5 text-white disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {deleting === p._id ? "Deleting…" : "Delete"}
+                  Last {value} days
                 </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <hr />
-
-      <section>
-        <h2>Orders</h2>
-        {orders.map((o: any) => (
-          <div
-            key={o._id}
-            className="mb-3 rounded-lg border border-slate-300 bg-white p-3"
-          >
-            <div className="flex flex-wrap justify-between gap-3">
-              <strong>{getOrderSummary(o)}</strong>
-              <span className="capitalize text-slate-600">
-                {o.status} / {o.paymentStatus || "pending"}
-              </span>
-            </div>
-            <div className="mt-1.5 text-slate-600">
-              Buyer: {o.buyerId?.email || "Unknown"}
-            </div>
-            <div className="mt-1.5 text-slate-600">
-              Quantity: {getOrderQuantity(o)}
-            </div>
-            <div className="mt-1.5 font-semibold">
-              Total: {currencyFormatter.format(getOrderTotal(o))}
-            </div>
-            <div className="mt-2.5 grid gap-2">
-              {getOrderItems(o).map((item, index) => (
-                <div
-                  key={`${o._id}-${index}`}
-                  className="flex justify-between gap-3 border-t border-slate-200 pt-2"
-                >
-                  <div>
-                    <div className="font-medium">{item.productId?.name || "Unknown Product"}</div>
-                    <div className="text-[13px] text-slate-500">{item.productId?.location || "No location"}</div>
-                  </div>
-                  <div className="whitespace-nowrap text-right text-slate-700">
-                    <div>Qty: {item.quantity}</div>
-                    <div className="text-[13px]">{currencyFormatter.format(Number(item.productId?.price || 0))}</div>
-                  </div>
-                </div>
               ))}
             </div>
+
+            <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
+              <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3">
+                <p className="m-0 text-xs text-emerald-200/80">Total Revenue</p>
+                <h3 className="mt-2 text-xl font-semibold text-emerald-100">{currencyFormatter.format(totalRevenue)}</h3>
+              </div>
+              <div className="rounded-xl border border-cyan-400/30 bg-cyan-500/10 p-3">
+                <p className="m-0 text-xs text-cyan-200/80">Average Order Value</p>
+                <h3 className="mt-2 text-xl font-semibold text-cyan-100">{currencyFormatter.format(averageOrderValue)}</h3>
+              </div>
+              <div className="rounded-xl border border-violet-400/30 bg-violet-500/10 p-3">
+                <p className="m-0 text-xs text-violet-200/80">Farmer Approval Rate</p>
+                <h3 className="mt-2 text-xl font-semibold text-violet-100">{approvalRate.toFixed(1)}%</h3>
+              </div>
+              <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 p-3">
+                <p className="m-0 text-xs text-amber-200/80">Approved Farmers</p>
+                <h3 className="mt-2 text-xl font-semibold text-amber-100">{compactFormatter.format(approvedFarmerCount)} / {compactFormatter.format(farmerCount)}</h3>
+              </div>
+            </div>
+
+            <AdminCharts
+              roleDistributionData={roleDistributionData}
+              approvalData={approvalData}
+              orderStatusData={orderStatusData}
+              topProductPriceData={topProductPriceData}
+              revenueTrendData={revenueTrendData}
+              orderStatusTrendData={orderStatusTrendData}
+              currencyFormatter={currencyFormatter}
+            />
+          </section>
+
+          <section className="rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4">
+            <h2 className="m-0 text-lg font-semibold">Operations Feed</h2>
+            <div className="mt-3 grid gap-4 lg:grid-cols-3">
+              <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
+                <h3 className="m-0 text-sm font-semibold text-slate-200">Users</h3>
+                <div className="mt-2 grid gap-1 text-sm text-slate-300">
+                  {users.slice(0, 5).map((u) => (
+                    <div key={u._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
+                      <div className="font-medium">{u.email}</div>
+                      <div className="text-xs text-slate-400">
+                        {u.role} {u.role === "farmer" ? `• ${u.approved ? "Approved" : "Pending"}` : ""}
+                      </div>
+                      {u.role === "farmer" && !u.approved ? (
+                        <button
+                          onClick={() => approveFarmer(u._id)}
+                          className="mt-1 cursor-pointer rounded-md border border-emerald-400/60 bg-emerald-700/30 px-2 py-1 text-xs text-emerald-100"
+                        >
+                          Approve
+                        </button>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
+                <h3 className="m-0 text-sm font-semibold text-slate-200">Products</h3>
+                <div className="mt-2 grid gap-1 text-sm text-slate-300">
+                  {products.slice(0, 5).map((p) => (
+                    <div key={p._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
+                      <div className="font-medium">{p.name}</div>
+                      <div className="text-xs text-slate-400">{currencyFormatter.format(Number(p.price || 0))}</div>
+                      <div className="mt-1 flex gap-1">
+                        {!p.approved ? (
+                          <button
+                            onClick={() => approveProduct(p._id)}
+                            disabled={deleting === p._id}
+                            className="cursor-pointer rounded-md border border-emerald-400/60 bg-emerald-700/30 px-2 py-1 text-xs text-emerald-100 disabled:opacity-60"
+                          >
+                            Approve
+                          </button>
+                        ) : null}
+                        <button
+                          onClick={() => deleteProduct(p._id)}
+                          disabled={deleting === p._id}
+                          className="cursor-pointer rounded-md border border-rose-400/60 bg-rose-700/30 px-2 py-1 text-xs text-rose-100 disabled:opacity-60"
+                        >
+                          {deleting === p._id ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <article className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
+                <h3 className="m-0 text-sm font-semibold text-slate-200">Orders</h3>
+                <div className="mt-2 grid gap-1 text-sm text-slate-300">
+                  {filteredOrders.slice(0, 5).map((o) => (
+                    <div key={o._id} className="rounded-lg border border-slate-700 bg-slate-900/70 px-2 py-1">
+                      <div className="font-medium">{getOrderSummary(o)}</div>
+                      <div className="text-xs text-slate-400 capitalize">{o.status || "unknown"} / {o.paymentStatus || "pending"}</div>
+                      <div className="text-xs text-emerald-200">{currencyFormatter.format(getOrderTotal(o))}</div>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <aside className="rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4">
+          <p className="text-xs uppercase tracking-[0.1em] text-slate-400">Plan</p>
+          <div className="mt-2 rounded-2xl border border-fuchsia-400/40 bg-gradient-to-br from-fuchsia-500/15 to-indigo-500/10 p-4">
+            <p className="m-0 text-xs text-fuchsia-200">DOS AGROLINK Intelligence</p>
+            <h3 className="m-0 mt-2 text-lg font-semibold text-white">Operational Analysis</h3>
+            <p className="mt-2 text-sm text-slate-300">Track approvals, market activity, and revenue momentum from one executive panel.</p>
           </div>
-        ))}
+
+          <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-800/60 p-4">
+            <h3 className="m-0 text-sm font-semibold text-slate-200">Live Snapshot</h3>
+            <ul className="m-0 mt-3 grid list-none gap-2 p-0 text-sm">
+              <li className="flex items-center justify-between"><span className="text-slate-400">Users</span><strong>{totalUsers}</strong></li>
+              <li className="flex items-center justify-between"><span className="text-slate-400">Products</span><strong>{totalProducts}</strong></li>
+              <li className="flex items-center justify-between"><span className="text-slate-400">Orders</span><strong>{totalOrders}</strong></li>
+              <li className="flex items-center justify-between"><span className="text-slate-400">Pending Farmers</span><strong>{pendingFarmerCount}</strong></li>
+            </ul>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-800/60 p-4">
+            <h3 className="m-0 text-sm font-semibold text-slate-200">Support Assistant</h3>
+            <p className="mt-2 text-sm text-slate-300">Need investor-ready data exports, approvals, or logistics signal checks? Use this dashboard to act instantly.</p>
+            <button className="mt-3 w-full cursor-pointer rounded-xl border border-emerald-400/70 bg-emerald-700/30 px-3 py-2 text-sm font-semibold text-emerald-100">
+              Run Quick Review
+            </button>
+          </div>
+        </aside>
       </section>
     </main>
   );
