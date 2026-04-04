@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import API from "@/services/api";
@@ -98,6 +98,39 @@ type WeeklySummary = {
   buyerEvents: number;
 };
 
+const INSIGHT_BANK = [
+  "Tomato demand often spikes 48 hours before major market days.",
+  "Grouped transport with nearby farmers can cut logistics cost by up to 20%.",
+  "Buyers respond faster to listings with clear harvest dates and quantity ranges.",
+  "Early morning listing refresh can improve product visibility for same-day buyers.",
+  "Short product descriptions with origin + freshness details convert better.",
+];
+
+const SEASON_END_DATE = new Date("2026-06-30T23:59:59");
+
+const REWARD_CATALOG: RewardItem[] = [
+  {
+    id: "reward-theme-sunrise",
+    title: "Sunrise Dashboard Theme",
+    description: "Warm golden layout for early-morning planning.",
+    xpRequired: 80,
+    unlocksTheme: "sunrise",
+  },
+  {
+    id: "reward-theme-forest",
+    title: "Forest Pro Dashboard Theme",
+    description: "Deep green premium look for seasoned farmers.",
+    xpRequired: 140,
+    unlocksTheme: "forest",
+  },
+  {
+    id: "reward-nameplate",
+    title: "Founder Nameplate",
+    description: "Adds founder prestige to your profile progression journey.",
+    xpRequired: 200,
+  },
+];
+
 function FarmerDashboard({ user }: { user: AuthUser }) {
   const { copy } = useLocalizedCopy();
   const [products, setProducts] = useState<Product[]>([]);
@@ -154,38 +187,41 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
   const currentWeekKey = `${currentWeek.getFullYear()}-W${Math.ceil(dayOfYear / 7)}`;
   const coopTarget = 120;
 
-  const insightBank = [
-    "Tomato demand often spikes 48 hours before major market days.",
-    "Grouped transport with nearby farmers can cut logistics cost by up to 20%.",
-    "Buyers respond faster to listings with clear harvest dates and quantity ranges.",
-    "Early morning listing refresh can improve product visibility for same-day buyers.",
-    "Short product descriptions with origin + freshness details convert better.",
-  ];
-
-  const seasonEndDate = new Date("2026-06-30T23:59:59");
-
-  const rewardCatalog: RewardItem[] = [
-    {
-      id: "reward-theme-sunrise",
-      title: "Sunrise Dashboard Theme",
-      description: "Warm golden layout for early-morning planning.",
-      xpRequired: 80,
-      unlocksTheme: "sunrise",
-    },
-    {
-      id: "reward-theme-forest",
-      title: "Forest Pro Dashboard Theme",
-      description: "Deep green premium look for seasoned farmers.",
-      xpRequired: 140,
-      unlocksTheme: "forest",
-    },
-    {
-      id: "reward-nameplate",
-      title: "Founder Nameplate",
-      description: "Adds founder prestige to your profile progression journey.",
-      xpRequired: 200,
-    },
-  ];
+  const persistEngagement = useCallback((partial: Partial<{
+    streakDays: number;
+    lastCheckInDate: string;
+    xpPoints: number;
+    challengeDate: string;
+    completedChallengeIds: string[];
+    marketMoodVoteDate: string;
+    marketMoodVote: string;
+    marketMoodCounts: { rising: number; stable: number; needBuyers: number };
+    insightDate: string;
+    claimedRewardIds: string[];
+    selectedTheme: ThemeChoice;
+    spinPlayedDate: string;
+    weatherGuessDate: string;
+    negotiationQuestDate: string;
+    negotiationWins: number;
+    buyerEventDate: string;
+    bossMonthKey: string;
+    bossProgress: number;
+    weekSummaryKey: string;
+    weeklySummary: WeeklySummary;
+    lastWeekSummary: WeeklySummary;
+    activityLog: ActivityEntry[];
+    coopProgress: number;
+    coopWeekKey: string;
+  }>) => {
+    try {
+      const raw = localStorage.getItem(engagementStorageKey);
+      const previous = raw ? JSON.parse(raw) : {};
+      const next = { ...previous, ...partial };
+      localStorage.setItem(engagementStorageKey, JSON.stringify(next));
+    } catch {
+      // Ignore storage errors to avoid blocking dashboard interactions.
+    }
+  }, [engagementStorageKey]);
 
   useEffect(() => {
     API.get("/api/products", { params: { farmer: user._id } })
@@ -225,7 +261,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
     ];
 
     const daySeed = Number(todayKey.replace(/-/g, ""));
-    const insight = insightBank[daySeed % insightBank.length];
+    const insight = INSIGHT_BANK[daySeed % INSIGHT_BANK.length];
     setDailyInsight(insight);
 
     try {
@@ -367,11 +403,11 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
     } catch {
       setDailyChallenges(baseChallenges);
     }
-  }, [currentMonthKey, currentWeekKey, engagementStorageKey, todayKey]);
+  }, [currentMonthKey, currentWeekKey, engagementStorageKey, persistEngagement, todayKey]);
 
   useEffect(() => {
     const updateClock = () => {
-      const diff = seasonEndDate.getTime() - Date.now();
+      const diff = SEASON_END_DATE.getTime() - Date.now();
       if (diff <= 0) {
         setCountdownClock("00:00:00");
         return;
@@ -388,42 +424,6 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
     const timer = window.setInterval(updateClock, 1000);
     return () => window.clearInterval(timer);
   }, []);
-
-  const persistEngagement = (partial: Partial<{
-    streakDays: number;
-    lastCheckInDate: string;
-    xpPoints: number;
-    challengeDate: string;
-    completedChallengeIds: string[];
-    marketMoodVoteDate: string;
-    marketMoodVote: string;
-    marketMoodCounts: { rising: number; stable: number; needBuyers: number };
-    insightDate: string;
-    claimedRewardIds: string[];
-    selectedTheme: ThemeChoice;
-    spinPlayedDate: string;
-    weatherGuessDate: string;
-    negotiationQuestDate: string;
-    negotiationWins: number;
-    buyerEventDate: string;
-    bossMonthKey: string;
-    bossProgress: number;
-    weekSummaryKey: string;
-    weeklySummary: WeeklySummary;
-    lastWeekSummary: WeeklySummary;
-    activityLog: ActivityEntry[];
-    coopProgress: number;
-    coopWeekKey: string;
-  }>) => {
-    try {
-      const raw = localStorage.getItem(engagementStorageKey);
-      const previous = raw ? JSON.parse(raw) : {};
-      const next = { ...previous, ...partial };
-      localStorage.setItem(engagementStorageKey, JSON.stringify(next));
-    } catch {
-      // Ignore storage errors to avoid blocking dashboard interactions.
-    }
-  };
 
   const appendActivity = (label: string) => {
     const next = [
@@ -1271,7 +1271,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
             <p className="m-0 mt-1 text-xs text-teal-900">Claim milestone rewards when your XP meets each threshold.</p>
 
             <div className="mt-2 grid gap-2">
-              {rewardCatalog.map((reward) => {
+              {REWARD_CATALOG.map((reward) => {
                 const claimed = claimedRewardIds.includes(reward.id);
                 const eligible = xpPoints >= reward.xpRequired;
 
