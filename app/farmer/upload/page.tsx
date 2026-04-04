@@ -32,6 +32,7 @@ export default function FarmerUploadPage() {
   const router = useRouter();
   const { copy } = useLocalizedCopy();
   const [form, setForm] = useState<ProductForm>(initialForm);
+  const [imagePreview, setImagePreview] = useState("");
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -91,6 +92,41 @@ export default function FarmerUploadPage() {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "imageUrl") {
+      setImagePreview(value.trim());
+    }
+  };
+
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please select a valid image file.");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError("Image file is too large. Please select an image under 2MB.");
+      return;
+    }
+
+    setError("");
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === "string" ? reader.result : "";
+      setForm((prev) => ({ ...prev, imageUrl: result }));
+      setImagePreview(result);
+      setSuccess("Image selected successfully. You can now upload the product.");
+    };
+    reader.onerror = () => {
+      setError("Could not read the selected image. Please try another file.");
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -110,9 +146,15 @@ export default function FarmerUploadPage() {
         imageUrl: form.imageUrl.trim(),
       };
 
+      if (!payload.imageUrl) {
+        setError("Please provide an image URL or upload an image file.");
+        return;
+      }
+
       if (!navigator.onLine) {
         enqueueCreateProduct(payload);
         setForm(initialForm);
+        setImagePreview("");
         setPendingOffline(getPendingQueueCount());
         setSuccess(copy.offlineSaved);
         return;
@@ -121,6 +163,7 @@ export default function FarmerUploadPage() {
       await createProduct(payload);
 
       setForm(initialForm);
+      setImagePreview("");
       setSuccess("Product uploaded successfully and is now pending admin approval.");
     } catch (requestError: any) {
       const details = requestError?.response?.data?.details;
@@ -261,9 +304,33 @@ export default function FarmerUploadPage() {
               type="url"
               placeholder="https://example.com/product-image.jpg"
               className="rounded-lg border border-slate-300 px-3 py-2 outline-none ring-emerald-200 focus:ring"
-              required
             />
+            <p className="m-0 text-xs text-slate-500">You can paste an image URL or upload an image file below.</p>
           </div>
+
+          <div className="grid gap-2">
+            <label htmlFor="imageFile" className="font-medium text-emerald-900">Upload Image File</label>
+            <input
+              id="imageFile"
+              name="imageFile"
+              type="file"
+              accept="image/*"
+              onChange={handleImageFileChange}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none ring-emerald-200 file:mr-3 file:rounded-md file:border-0 file:bg-emerald-50 file:px-3 file:py-2 file:text-emerald-800 hover:file:bg-emerald-100 focus:ring"
+            />
+            <p className="m-0 text-xs text-slate-500">Max file size: 2MB. Supported: common image formats.</p>
+          </div>
+
+          {imagePreview ? (
+            <div className="grid gap-2">
+              <p className="m-0 font-medium text-emerald-900">Image Preview</p>
+              <img
+                src={imagePreview}
+                alt="Selected product preview"
+                className="h-44 w-full rounded-lg border border-emerald-100 object-cover sm:h-56"
+              />
+            </div>
+          ) : null}
 
           {error ? (
             <div className="rounded-xl bg-red-50 px-3 py-2 text-red-700">
