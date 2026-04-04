@@ -1,16 +1,15 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import AuthShell from "../../(auth)/_components/AuthShell";
 import PasswordEyeIcon from "../../(auth)/_components/PasswordEyeIcon";
 import API from "@/services/api";
 
-function AdminResetPasswordForm() {
+export default function AdminResetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") || "";
+  const [token, setToken] = useState("");
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,6 +18,11 @@ function AdminResetPasswordForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const value = new URLSearchParams(window.location.search).get("token") || "";
+    setToken(value);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -135,13 +139,5 @@ function AdminResetPasswordForm() {
         </p>
       </section>
     </AuthShell>
-  );
-}
-
-export default function AdminResetPasswordPage() {
-  return (
-    <Suspense>
-      <AdminResetPasswordForm />
-    </Suspense>
   );
 }
