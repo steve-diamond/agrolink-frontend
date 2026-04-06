@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createProduct } from "@/services/productService";
 import { enqueueCreateProduct, flushOfflineQueue, getPendingQueueCount } from "@/services/offlineQueue";
 import { useLocalizedCopy } from "@/services/useLocalizedCopy";
@@ -185,7 +186,7 @@ export default function FarmerUploadPage() {
 
   return (
     <main className="mx-auto max-w-3xl p-6 sm:p-8">
-      <section className="rounded-2xl bg-gradient-to-br from-green-800 to-green-600 p-6 text-green-50 shadow-xl shadow-green-900/20">
+      <section className="rounded-2xl bg-linear-to-br from-green-800 to-green-600 p-6 text-green-50 shadow-xl shadow-green-900/20">
         <p className="m-0 text-xs uppercase tracking-widest text-green-200">
           {copy.myFarm}
         </p>
@@ -324,9 +325,12 @@ export default function FarmerUploadPage() {
           {imagePreview ? (
             <div className="grid gap-2">
               <p className="m-0 font-medium text-emerald-900">Image Preview</p>
-              <img
+              <Image
                 src={imagePreview}
                 alt="Selected product preview"
+                width={1200}
+                height={800}
+                unoptimized
                 className="h-44 w-full rounded-lg border border-emerald-100 object-cover sm:h-56"
               />
             </div>

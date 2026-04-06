@@ -572,6 +572,34 @@ export default function RegisterPage() {
     };
   };
 
+  const handleAccountNameVoiceInput = () => {
+    if (typeof window === "undefined") return;
+
+    const speechApi =
+      (window as Window & { SpeechRecognition?: any }).SpeechRecognition ||
+      (window as Window & { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+
+    if (!speechApi) {
+      setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
+      return;
+    }
+
+    setVoiceError("");
+    const recognition = new speechApi();
+    recognition.lang = language === "en" ? "en-NG" : "en-NG";
+    recognition.start();
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results?.[0]?.[0]?.transcript?.trim() ?? "";
+      if (!transcript) return;
+      setAccountForm((prev) => ({ ...prev, name: transcript }));
+    };
+
+    recognition.onerror = () => {
+      setVoiceError(getText("Voice input failed. Please type instead.", "Voice input fail. Abeg type am."));
+    };
+  };
+
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -1646,13 +1674,13 @@ export default function RegisterPage() {
               <input
                 name="name"
                 type="text"
-                placeholder="Amina Bello"
+                placeholder="Enter your full name"
                 value={accountForm.name}
                 onChange={handleAccountChange}
                 required
                 className="min-h-12 flex-1 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
               />
-              <button type="button" onClick={() => handleVoiceInput("signature")} className="min-h-12 rounded-lg border border-green-300 px-3 text-sm font-semibold text-green-700">
+              <button type="button" onClick={handleAccountNameVoiceInput} className="min-h-12 rounded-lg border border-green-300 px-3 text-sm font-semibold text-green-700">
                 Mic
               </button>
             </div>
