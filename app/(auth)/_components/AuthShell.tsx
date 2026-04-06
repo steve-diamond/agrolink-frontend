@@ -7,6 +7,9 @@ type AuthShellProps = {
   title: string;
   subtitle: string;
   bullets: string[];
+  vision?: string;
+  mission?: string;
+  impactPoints?: string[];
   imageA: {
     src: string;
     alt: string;
@@ -18,7 +21,20 @@ type AuthShellProps = {
   children: ReactNode;
 };
 
-export default function AuthShell({ eyebrow, title, subtitle, bullets, imageA, imageB, children }: AuthShellProps) {
+export default function AuthShell({
+  eyebrow,
+  title,
+  subtitle,
+  bullets,
+  vision,
+  mission,
+  impactPoints,
+  imageA,
+  imageB,
+  children,
+}: AuthShellProps) {
+  const brandPoints = impactPoints ?? [];
+
   return (
     <main className="auth-shell-root mx-auto min-h-[calc(100vh-6rem)] w-full max-w-5xl py-6 sm:py-10">
       <div className="auth-shell-backdrop" aria-hidden="true" />
@@ -38,6 +54,34 @@ export default function AuthShell({ eyebrow, title, subtitle, bullets, imageA, i
               <h1 className="m-0 mt-2 text-3xl font-extrabold leading-tight sm:text-4xl">{title}</h1>
               <p className="mb-0 mt-2 max-w-md text-sm text-emerald-100/95">{subtitle}</p>
             </div>
+
+            {vision || mission || brandPoints.length ? (
+              <div className="grid gap-3 rounded-xl border border-white/20 bg-emerald-950/20 p-4 text-sm text-emerald-50">
+                {vision ? (
+                  <div>
+                    <p className="m-0 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-100/85">Vision</p>
+                    <p className="m-0 mt-1 leading-relaxed">{vision}</p>
+                  </div>
+                ) : null}
+
+                {mission ? (
+                  <div>
+                    <p className="m-0 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-100/85">Mission</p>
+                    <p className="m-0 mt-1 leading-relaxed">{mission}</p>
+                  </div>
+                ) : null}
+
+                {brandPoints.length ? (
+                  <div className="grid gap-1.5 text-emerald-100/95">
+                    {brandPoints.map((point) => (
+                      <p key={point} className="m-0 text-xs leading-relaxed">
+                        {point}
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="grid gap-3 rounded-xl border border-white/20 bg-black/10 p-4 text-sm text-emerald-100">
               {bullets.map((bullet) => (

@@ -1606,10 +1606,17 @@ export default function RegisterPage() {
       eyebrow="Create Account"
       title={copy.createAccount}
       subtitle="Join DOS AGROLINK NIGERIA to buy or sell verified agricultural produce across trusted local supply chains."
+      vision="To build Nigeria's most trusted farm-to-market network where every harvest finds a verified buyer at fair value."
+      mission="We connect farmers, buyers, and logistics through secure digital onboarding, transparent pricing, and reliable fulfillment from village to city."
+      impactPoints={[
+        "Empower smallholder farmers with direct market access and digital identity.",
+        "Help buyers source traceable produce with consistent quality and delivery.",
+        "Strengthen local food systems through trusted payments and logistics coordination.",
+      ]}
       bullets={[
         "Buyer and farmer account types",
-        "Farmer-friendly guided onboarding",
-        "Auto-save with offline queue",
+        "Guided onboarding with verification steps",
+        "Auto-save with offline queue for weak networks",
       ]}
       imageA={{ src: "/agropro/images/about_img.jpg", alt: "Farmer inspecting fresh crops" }}
       imageB={{ src: "/agropro/images/chose.jpg", alt: "Harvested produce in curated baskets" }}
