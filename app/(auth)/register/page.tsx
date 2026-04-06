@@ -7,6 +7,7 @@ import API from "@/services/api";
 import { useLocalizedCopy } from "@/services/useLocalizedCopy";
 import AuthShell from "../_components/AuthShell";
 import PasswordEyeIcon from "../_components/PasswordEyeIcon";
+import BuyerOnboardingPanel from "./_components/BuyerOnboardingPanel";
 
 type UserRole = "buyer" | "farmer";
 type YesNo = "yes" | "no";
@@ -856,39 +857,6 @@ export default function RegisterPage() {
     }
   };
 
-  const handleBuyerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-
-    const accountError = validateAccountStep();
-    if (accountError) {
-      setError(accountError);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await API.post("/api/auth/register", {
-        name: accountForm.name.trim(),
-        email: accountForm.email.trim().toLowerCase(),
-        password: accountForm.password,
-        role: "buyer",
-      });
-
-      router.push("/login?registered=1");
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err?.response?.data?.error ||
-          getText("Registration failed. Please try again.", "Registration fail. Try again.")
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleFarmerNext = () => {
     setError("");
     setSuccess("");
@@ -1667,7 +1635,12 @@ export default function RegisterPage() {
           <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">{voiceError}</div>
         ) : null}
 
-        <form onSubmit={handleBuyerSubmit} className="grid gap-3">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+          className="grid gap-3"
+        >
           <label className="grid gap-1 text-sm font-semibold text-green-950">
             {copy.fullName} <span className="text-red-500">*</span>
             <div className="flex gap-2">
@@ -1764,13 +1737,14 @@ export default function RegisterPage() {
           </label>
 
           {accountForm.role === "buyer" ? (
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary touch-target disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {loading ? "Creating account..." : copy.createAccount}
-            </button>
+            <BuyerOnboardingPanel
+              accountForm={{
+                name: accountForm.name,
+                email: accountForm.email,
+                password: accountForm.password,
+              }}
+              language={language}
+            />
           ) : (
             <>
               {renderFarmerProgress}
