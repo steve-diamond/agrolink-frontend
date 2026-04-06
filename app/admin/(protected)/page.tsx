@@ -12,6 +12,7 @@ import {
   OverviewSidebar,
   TopCommodityCards,
 } from "./AdminSections";
+import AdminUnifiedCommandCenter from "./AdminUnifiedCommandCenter";
 
 const AdminCharts = dynamic(() => import("./AdminCharts"), { ssr: false });
 
@@ -538,6 +539,12 @@ export default function AdminDashboardPage() {
           currencyFormatter={currencyFormatter}
         />
       </section>
+
+      <AdminUnifiedCommandCenter
+        users={users}
+        orders={orders}
+        currencyFormatter={currencyFormatter}
+      />
     </main>
   );
 }
