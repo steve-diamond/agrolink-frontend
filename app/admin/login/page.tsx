@@ -48,7 +48,12 @@ export default function AdminLoginPage() {
       localStorage.setItem("user", JSON.stringify(user));
       router.push("/admin");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Admin login failed");
+      setError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err?.message ||
+          "Admin login failed"
+      );
     } finally {
       setIsSubmitting(false);
     }
