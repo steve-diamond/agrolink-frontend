@@ -271,6 +271,8 @@ export default function RegisterPage() {
   const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
   const [otpExpiresUntil, setOtpExpiresUntil] = useState(0);
   const [otpExpiresSeconds, setOtpExpiresSeconds] = useState(0);
+  const [otpVerifyLockUntil, setOtpVerifyLockUntil] = useState(0);
+  const [otpVerifyLockSeconds, setOtpVerifyLockSeconds] = useState(0);
   const [lastAutoOtpAttempt, setLastAutoOtpAttempt] = useState("");
   const [banks, setBanks] = useState<string[]>([...BANKS]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
@@ -492,6 +494,25 @@ export default function RegisterPage() {
   }, [otpExpiresUntil]);
 
   useEffect(() => {
+    if (!otpVerifyLockUntil) {
+      setOtpVerifyLockSeconds(0);
+      return;
+    }
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((otpVerifyLockUntil - Date.now()) / 1000));
+      setOtpVerifyLockSeconds(remaining);
+      if (remaining === 0) {
+        setOtpVerifyLockUntil(0);
+      }
+    };
+
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, [otpVerifyLockUntil]);
+
+  useEffect(() => {
     if (!otpSent || otpVerified) return;
     const timer = window.setTimeout(() => otpInputRef.current?.focus(), 50);
     return () => window.clearTimeout(timer);
@@ -691,6 +712,16 @@ export default function RegisterPage() {
     }
   };
 
+  const parseRetryAfterSeconds = useCallback((err: any): number => {
+    const payloadValue = Number(err?.response?.data?.retryAfterSeconds);
+    if (Number.isFinite(payloadValue) && payloadValue > 0) return Math.ceil(payloadValue);
+
+    const headerValue = Number(err?.response?.headers?.["retry-after"]);
+    if (Number.isFinite(headerValue) && headerValue > 0) return Math.ceil(headerValue);
+
+    return 0;
+  }, []);
+
   const resetOtpSession = useCallback(() => {
     setOtpSent(false);
     setOtpVerified(false);
@@ -699,6 +730,7 @@ export default function RegisterPage() {
     setOtpPhone("");
     setOtpCooldownUntil(0);
     setOtpExpiresUntil(0);
+    setOtpVerifyLockUntil(0);
     setLastAutoOtpAttempt("");
   }, []);
 
@@ -754,6 +786,7 @@ export default function RegisterPage() {
       setOtpRef(String(res?.data?.otpRef || ""));
       setOtpCooldownUntil(Date.now() + 30 * 1000);
       setOtpExpiresUntil(Date.now() + 300 * 1000);
+      setOtpVerifyLockUntil(0);
       const debugOtp = res?.data?.otp;
       if (debugOtp) {
         setSuccess(getText(`OTP sent. Demo code: ${debugOtp}`, `OTP don send. Demo code na ${debugOtp}`));
@@ -761,7 +794,19 @@ export default function RegisterPage() {
         setSuccess(getText("OTP sent successfully.", "OTP don send successfully."));
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || getText("Unable to send OTP now.", "We no fit send OTP now."));
+      const retryAfterSeconds = parseRetryAfterSeconds(err);
+      if (err?.response?.status === 429 && retryAfterSeconds > 0) {
+        setOtpCooldownUntil(Date.now() + retryAfterSeconds * 1000);
+      }
+      setError(
+        err?.response?.data?.message ||
+          (retryAfterSeconds > 0
+            ? getText(
+                `Too many OTP requests. Try again in ${retryAfterSeconds}s.`,
+                `Too many OTP requests. Try again in ${retryAfterSeconds}s.`
+              )
+            : getText("Unable to send OTP now.", "We no fit send OTP now."))
+      );
     } finally {
       setSendingOtp(false);
     }
@@ -779,6 +824,16 @@ export default function RegisterPage() {
       return;
     }
 
+    if (otpVerifyLockSeconds > 0) {
+      setError(
+        getText(
+          `Too many failed attempts. Try again in ${otpVerifyLockSeconds}s.`,
+          `Too many failed attempts. Try again in ${otpVerifyLockSeconds}s.`
+        )
+      );
+      return;
+    }
+
     setVerifyingOtp(true);
     try {
       await API.post("/api/onboarding/otp/verify", {
@@ -788,11 +843,16 @@ export default function RegisterPage() {
       });
       setOtpVerified(true);
       setOtpExpiresUntil(0);
+      setOtpVerifyLockUntil(0);
       setError("");
       setSuccess(getText("Phone verified successfully.", "Phone don verify successfully."));
     } catch (err: any) {
       setOtpVerified(false);
       const message = String(err?.response?.data?.message || "");
+      const retryAfterSeconds = parseRetryAfterSeconds(err);
+      if (err?.response?.status === 429 && retryAfterSeconds > 0) {
+        setOtpVerifyLockUntil(Date.now() + retryAfterSeconds * 1000);
+      }
       if (/expired|invalid|not found/i.test(message)) {
         setOtpRef("");
         setOtpSent(false);
@@ -801,6 +861,12 @@ export default function RegisterPage() {
       }
       setError(
         message ||
+          (retryAfterSeconds > 0
+            ? getText(
+                `Too many failed attempts. Try again in ${retryAfterSeconds}s.`,
+                `Too many failed attempts. Try again in ${retryAfterSeconds}s.`
+              )
+            : "") ||
           getText(
             "Incorrect OTP. Please try again or request a new code.",
             "OTP no correct. Try again or request new code."
@@ -810,7 +876,7 @@ export default function RegisterPage() {
     } finally {
       setVerifyingOtp(false);
     }
-  }, [otpSent, otpInput, otpRef, farmerForm.phone, getText]);
+  }, [otpSent, otpInput, otpRef, otpVerifyLockSeconds, farmerForm.phone, getText, parseRetryAfterSeconds]);
 
   useEffect(() => {
     const code = otpInput.trim();
@@ -1127,10 +1193,14 @@ export default function RegisterPage() {
           <button
             type="button"
             onClick={verifyOtp}
-            disabled={verifyingOtp || !otpSent}
+            disabled={verifyingOtp || !otpSent || otpVerifyLockSeconds > 0}
             className="rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-bold text-green-800 disabled:opacity-60"
           >
-            {verifyingOtp ? getText("Verifying...", "Verifying...") : getText("Verify OTP", "Verify OTP")}
+            {verifyingOtp
+              ? getText("Verifying...", "Verifying...")
+              : otpVerifyLockSeconds > 0
+                ? getText(`Locked ${otpVerifyLockSeconds}s`, `Locked ${otpVerifyLockSeconds}s`)
+                : getText("Verify OTP", "Verify OTP")}
           </button>
         </div>
         <p className={`m-0 text-xs ${otpVerified ? "text-emerald-700" : "text-slate-600"}`}>
