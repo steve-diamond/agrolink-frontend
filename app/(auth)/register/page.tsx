@@ -268,6 +268,8 @@ export default function RegisterPage() {
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
   const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
+  const [otpExpiresUntil, setOtpExpiresUntil] = useState(0);
+  const [otpExpiresSeconds, setOtpExpiresSeconds] = useState(0);
   const [banks, setBanks] = useState<string[]>([...BANKS]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [resolvingAccount, setResolvingAccount] = useState(false);
@@ -466,6 +468,25 @@ export default function RegisterPage() {
     const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
   }, [otpCooldownUntil]);
+
+  useEffect(() => {
+    if (!otpExpiresUntil) {
+      setOtpExpiresSeconds(0);
+      return;
+    }
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((otpExpiresUntil - Date.now()) / 1000));
+      setOtpExpiresSeconds(remaining);
+      if (remaining === 0) {
+        setOtpExpiresUntil(0);
+      }
+    };
+
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, [otpExpiresUntil]);
 
   const validateAccountStep = (): string => {
     if (!accountForm.name.trim()) return getText("Full name is required.", "Abeg put your full name.");
@@ -689,6 +710,7 @@ export default function RegisterPage() {
       setOtpVerified(false);
       setOtpRef(String(res?.data?.otpRef || ""));
       setOtpCooldownUntil(Date.now() + 30 * 1000);
+      setOtpExpiresUntil(Date.now() + 300 * 1000);
       const debugOtp = res?.data?.otp;
       if (debugOtp) {
         setSuccess(getText(`OTP sent. Demo code: ${debugOtp}`, `OTP don send. Demo code na ${debugOtp}`));
@@ -722,6 +744,7 @@ export default function RegisterPage() {
         otpRef,
       });
       setOtpVerified(true);
+      setOtpExpiresUntil(0);
       setError("");
       setSuccess(getText("Phone verified successfully.", "Phone don verify successfully."));
     } catch (err: any) {
@@ -730,6 +753,7 @@ export default function RegisterPage() {
       if (/expired|invalid|not found/i.test(message)) {
         setOtpRef("");
         setOtpSent(false);
+        setOtpExpiresUntil(0);
       }
       setError(
         message ||
@@ -1045,6 +1069,20 @@ export default function RegisterPage() {
             ? getText("Phone verified.", "Phone don verify.")
             : getText("Please verify your phone before moving to next step.", "Abeg verify your phone before next step.")}
         </p>
+        {otpSent && !otpVerified ? (
+          <p className="m-0 text-xs text-amber-700">
+            {otpExpiresSeconds > 0
+              ? getText(
+                  `OTP expires in ${String(Math.floor(otpExpiresSeconds / 60)).padStart(2, "0")}:${String(
+                    otpExpiresSeconds % 60
+                  ).padStart(2, "0")}.`,
+                  `OTP go expire in ${String(Math.floor(otpExpiresSeconds / 60)).padStart(2, "0")}:${String(
+                    otpExpiresSeconds % 60
+                  ).padStart(2, "0")}.`
+                )
+              : getText("OTP expired. Request a new code.", "OTP don expire. Request new code.")}
+          </p>
+        ) : null}
       </div>
 
       <label className="grid gap-1 text-sm font-semibold text-green-950">

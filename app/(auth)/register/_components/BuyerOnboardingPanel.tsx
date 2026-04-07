@@ -249,6 +249,8 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   const [verifyingOtpState, setVerifyingOtpState] = useState(false);
   const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
   const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
+  const [otpExpiresUntil, setOtpExpiresUntil] = useState(0);
+  const [otpExpiresSeconds, setOtpExpiresSeconds] = useState(0);
   const [loading, setLoading] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [resolvingAccount, setResolvingAccount] = useState(false);
@@ -427,6 +429,25 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
     return () => window.clearInterval(timer);
   }, [otpCooldownUntil]);
 
+  useEffect(() => {
+    if (!otpExpiresUntil) {
+      setOtpExpiresSeconds(0);
+      return;
+    }
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((otpExpiresUntil - Date.now()) / 1000));
+      setOtpExpiresSeconds(remaining);
+      if (remaining === 0) {
+        setOtpExpiresUntil(0);
+      }
+    };
+
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, [otpExpiresUntil]);
+
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -580,6 +601,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       setOtpVerified(false);
       setOtpRef(String(res?.data?.otpRef || ""));
       setOtpCooldownUntil(Date.now() + 30 * 1000);
+      setOtpExpiresUntil(Date.now() + 300 * 1000);
       const devOtp = res?.data?.otp;
       setSuccess(devOtp ? t(`OTP sent. Demo code: ${devOtp}`, `OTP don send. Demo code na ${devOtp}`) : t("OTP sent successfully.", "OTP don send successfully."));
     } catch (err: any) {
@@ -609,6 +631,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         otpRef,
       });
       setOtpVerified(true);
+      setOtpExpiresUntil(0);
       setError("");
       setSuccess(t("Phone verified successfully.", "Phone don verify successfully."));
     } catch (err: any) {
@@ -617,6 +640,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       if (/expired|invalid|not found/i.test(message)) {
         setOtpRef("");
         setOtpSent(false);
+        setOtpExpiresUntil(0);
       }
       setError(
         message ||
@@ -873,6 +897,13 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
                 </button>
               </div>
               <p className={`m-0 text-xs ${otpVerified ? "text-emerald-700" : "text-slate-600"}`}>{otpVerified ? "Phone verified." : "Please verify phone before next step."}</p>
+              {otpSent && !otpVerified ? (
+                <p className="m-0 text-xs text-amber-700">
+                  {otpExpiresSeconds > 0
+                    ? `OTP expires in ${String(Math.floor(otpExpiresSeconds / 60)).padStart(2, "0")}:${String(otpExpiresSeconds % 60).padStart(2, "0")}.`
+                    : "OTP expired. Request a new code."}
+                </p>
+              ) : null}
             </div>
             <label className="grid gap-1 text-sm font-semibold text-green-950">Alternative phone (optional)
               <input value={form.repAltPhone} onChange={(e) => setField("repAltPhone", e.target.value)} className="min-h-12 rounded-lg border border-green-200 px-3" />
