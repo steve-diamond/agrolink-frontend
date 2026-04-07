@@ -13,6 +13,7 @@ export default function AdminLoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [errorDetails, setErrorDetails] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { rememberEmail, setRememberEmail, rememberedEmail, persistRememberedEmail } = useRememberedEmail("agrolink-admin-remembered-email");
 
@@ -29,30 +30,59 @@ export default function AdminLoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+    setErrorDetails("");
     setIsSubmitting(true);
 
+    const normalizedEmail = form.email.trim().toLowerCase();
+    const aliases = ["admin@agrolink.com", "admin@agrolink.ng", "admin@dosagrolink.ng"];
+    const emailAttempts = aliases.includes(normalizedEmail)
+      ? Array.from(new Set([normalizedEmail, ...aliases]))
+      : [normalizedEmail];
+
     try {
-      const res = await API.post("/api/auth/login", form);
-      const user = res.data.user;
+      let lastError: any = null;
 
-      persistRememberedEmail(form.email);
+      for (const attemptEmail of emailAttempts) {
+        try {
+          const res = await API.post("/api/auth/login", {
+            email: attemptEmail,
+            password: form.password,
+          });
+          const user = res.data.user;
 
-      if (user?.role !== "admin") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setError("Access denied. Admin account required.");
-        return;
+          if (user?.role !== "admin") {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setError("Access denied. Admin account required.");
+            setErrorDetails(`Account role is '${user?.role || "unknown"}'.`);
+            setIsSubmitting(false);
+            return;
+          }
+
+          persistRememberedEmail(attemptEmail);
+          localStorage.setItem("token", res.data.token);
+          localStorage.setItem("user", JSON.stringify(user));
+          router.push("/admin");
+          return;
+        } catch (attemptErr: any) {
+          lastError = attemptErr;
+        }
       }
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(user));
-      router.push("/admin");
+      throw lastError || new Error("All admin login attempts failed.");
     } catch (err: any) {
-      setError(
+      const message =
         err?.response?.data?.message ||
-          err?.response?.data?.error ||
-          err?.message ||
-          "Admin login failed"
+        err?.response?.data?.error ||
+        err?.message ||
+        "Admin login failed";
+
+      const statusCode = err?.response?.status;
+      const target = API?.defaults?.baseURL || "unknown-api-base";
+
+      setError(message);
+      setErrorDetails(
+        `Tried: ${emailAttempts.join(", ")} | API: ${target} | Status: ${statusCode || "n/a"}`
       );
     } finally {
       setIsSubmitting(false);
@@ -132,7 +162,12 @@ export default function AdminLoginPage() {
             </Link>
           </div>
 
-          {error ? <p className="m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p> : null}
+          {error ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+              <p className="m-0 text-sm text-red-600">{error}</p>
+              {errorDetails ? <p className="m-0 mt-1 text-xs text-red-500">{errorDetails}</p> : null}
+            </div>
+          ) : null}
 
           <button
             type="submit"
