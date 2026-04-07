@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import API from "@/services/api";
 
@@ -251,12 +251,14 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
   const [otpExpiresUntil, setOtpExpiresUntil] = useState(0);
   const [otpExpiresSeconds, setOtpExpiresSeconds] = useState(0);
+  const [lastAutoOtpAttempt, setLastAutoOtpAttempt] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [resolvingAccount, setResolvingAccount] = useState(false);
   const [verifyingBvn, setVerifyingBvn] = useState(false);
   const [networkOnline, setNetworkOnline] = useState(true);
   const [banks, setBanks] = useState<string[]>([]);
+  const otpInputRef = useRef<HTMLInputElement | null>(null);
 
   const isPidgin = language === "pidgin";
 
@@ -448,6 +450,12 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
     return () => window.clearInterval(timer);
   }, [otpExpiresUntil]);
 
+  useEffect(() => {
+    if (!otpSent || otpVerified) return;
+    const timer = window.setTimeout(() => otpInputRef.current?.focus(), 50);
+    return () => window.clearTimeout(timer);
+  }, [otpSent, otpVerified]);
+
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -599,6 +607,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       setOtpInput("");
       setOtpSent(true);
       setOtpVerified(false);
+      setLastAutoOtpAttempt("");
       setOtpRef(String(res?.data?.otpRef || ""));
       setOtpCooldownUntil(Date.now() + 30 * 1000);
       setOtpExpiresUntil(Date.now() + 300 * 1000);
@@ -611,7 +620,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
     }
   };
 
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = useCallback(async () => {
     if (!otpSent) return;
     if (!/^\d{6}$/.test(otpInput.trim())) {
       setError(t("OTP must be exactly 6 digits.", "OTP must complete 6 digits."));
@@ -649,10 +658,21 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
             "OTP verification fail. Try again or request new code."
           )
       );
+      setLastAutoOtpAttempt("");
     } finally {
       setVerifyingOtpState(false);
     }
-  };
+  }, [otpSent, otpInput, otpRef, form.repPhone, t]);
+
+  useEffect(() => {
+    const code = otpInput.trim();
+    if (!otpSent || otpVerified || verifyingOtpState) return;
+    if (code.length !== 6) return;
+    if (code === lastAutoOtpAttempt) return;
+
+    setLastAutoOtpAttempt(code);
+    void handleVerifyOtp();
+  }, [otpInput, otpSent, otpVerified, verifyingOtpState, lastAutoOtpAttempt, handleVerifyOtp]);
 
   const resolveBankAccount = async () => {
     if (form.hasBankAccount !== "yes") return;
@@ -886,7 +906,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
                       ? `Resend in ${otpCooldownSeconds}s`
                       : "Send OTP"}
                 </button>
-                <input value={otpInput} onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))} placeholder="Enter OTP" maxLength={6} className="min-h-11 flex-1 rounded-lg border border-green-200 px-3" />
+                <input ref={otpInputRef} value={otpInput} onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))} placeholder="Enter OTP" maxLength={6} className="min-h-11 flex-1 rounded-lg border border-green-200 px-3" />
                 <button
                   type="button"
                   onClick={handleVerifyOtp}

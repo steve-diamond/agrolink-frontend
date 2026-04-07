@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import API from "@/services/api";
@@ -270,12 +270,14 @@ export default function RegisterPage() {
   const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
   const [otpExpiresUntil, setOtpExpiresUntil] = useState(0);
   const [otpExpiresSeconds, setOtpExpiresSeconds] = useState(0);
+  const [lastAutoOtpAttempt, setLastAutoOtpAttempt] = useState("");
   const [banks, setBanks] = useState<string[]>([...BANKS]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [resolvingAccount, setResolvingAccount] = useState(false);
   const [verifyingBvn, setVerifyingBvn] = useState(false);
   const [networkOnline, setNetworkOnline] = useState<boolean>(true);
   const [voiceError, setVoiceError] = useState("");
+  const otpInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -487,6 +489,12 @@ export default function RegisterPage() {
     const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
   }, [otpExpiresUntil]);
+
+  useEffect(() => {
+    if (!otpSent || otpVerified) return;
+    const timer = window.setTimeout(() => otpInputRef.current?.focus(), 50);
+    return () => window.clearTimeout(timer);
+  }, [otpSent, otpVerified]);
 
   const validateAccountStep = (): string => {
     if (!accountForm.name.trim()) return getText("Full name is required.", "Abeg put your full name.");
@@ -708,6 +716,7 @@ export default function RegisterPage() {
       setOtpInput("");
       setOtpSent(true);
       setOtpVerified(false);
+      setLastAutoOtpAttempt("");
       setOtpRef(String(res?.data?.otpRef || ""));
       setOtpCooldownUntil(Date.now() + 30 * 1000);
       setOtpExpiresUntil(Date.now() + 300 * 1000);
@@ -724,7 +733,7 @@ export default function RegisterPage() {
     }
   };
 
-  const verifyOtp = async () => {
+  const verifyOtp = useCallback(async () => {
     if (!otpSent) return;
     if (!/^\d{6}$/.test(otpInput.trim())) {
       setError(getText("OTP must be exactly 6 digits.", "OTP must complete 6 digits."));
@@ -762,10 +771,21 @@ export default function RegisterPage() {
             "OTP no correct. Try again or request new code."
           )
       );
+      setLastAutoOtpAttempt("");
     } finally {
       setVerifyingOtp(false);
     }
-  };
+  }, [otpSent, otpInput, otpRef, farmerForm.phone, getText]);
+
+  useEffect(() => {
+    const code = otpInput.trim();
+    if (!otpSent || otpVerified || verifyingOtp) return;
+    if (code.length !== 6) return;
+    if (code === lastAutoOtpAttempt) return;
+
+    setLastAutoOtpAttempt(code);
+    void verifyOtp();
+  }, [otpInput, otpSent, otpVerified, verifyingOtp, lastAutoOtpAttempt, verifyOtp]);
 
   const resolveBankAccount = async () => {
     if (farmerForm.hasBankAccount !== "yes") return;
@@ -1047,6 +1067,7 @@ export default function RegisterPage() {
                 : getText("Send OTP", "Send OTP")}
           </button>
           <input
+            ref={otpInputRef}
             type="text"
             inputMode="numeric"
             value={otpInput}
