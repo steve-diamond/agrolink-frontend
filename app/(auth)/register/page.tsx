@@ -264,6 +264,10 @@ export default function RegisterPage() {
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpInput, setOtpInput] = useState("");
   const [otpRef, setOtpRef] = useState("");
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
+  const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
   const [banks, setBanks] = useState<string[]>([...BANKS]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [resolvingAccount, setResolvingAccount] = useState(false);
@@ -443,6 +447,25 @@ export default function RegisterPage() {
 
     void loadBanks();
   }, []);
+
+  useEffect(() => {
+    if (!otpCooldownUntil) {
+      setOtpCooldownSeconds(0);
+      return;
+    }
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((otpCooldownUntil - Date.now()) / 1000));
+      setOtpCooldownSeconds(remaining);
+      if (remaining === 0) {
+        setOtpCooldownUntil(0);
+      }
+    };
+
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, [otpCooldownUntil]);
 
   const validateAccountStep = (): string => {
     if (!accountForm.name.trim()) return getText("Full name is required.", "Abeg put your full name.");
@@ -644,8 +667,19 @@ export default function RegisterPage() {
       return;
     }
 
+    if (otpCooldownSeconds > 0) {
+      setError(
+        getText(
+          `Please wait ${otpCooldownSeconds}s before requesting another OTP.`,
+          `Wait ${otpCooldownSeconds}s before you request another OTP.`
+        )
+      );
+      return;
+    }
+
     setError("");
     setSuccess("");
+    setSendingOtp(true);
     try {
       const res = await API.post("/api/onboarding/otp/send", {
         phone: normalizePhone(farmerForm.phone),
@@ -654,6 +688,7 @@ export default function RegisterPage() {
       setOtpSent(true);
       setOtpVerified(false);
       setOtpRef(String(res?.data?.otpRef || ""));
+      setOtpCooldownUntil(Date.now() + 30 * 1000);
       const debugOtp = res?.data?.otp;
       if (debugOtp) {
         setSuccess(getText(`OTP sent. Demo code: ${debugOtp}`, `OTP don send. Demo code na ${debugOtp}`));
@@ -662,11 +697,24 @@ export default function RegisterPage() {
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || getText("Unable to send OTP now.", "We no fit send OTP now."));
+    } finally {
+      setSendingOtp(false);
     }
   };
 
   const verifyOtp = async () => {
     if (!otpSent) return;
+    if (!/^\d{6}$/.test(otpInput.trim())) {
+      setError(getText("OTP must be exactly 6 digits.", "OTP must complete 6 digits."));
+      return;
+    }
+
+    if (!otpRef) {
+      setError(getText("OTP session expired. Please request a new OTP.", "OTP don expire. Request new OTP."));
+      return;
+    }
+
+    setVerifyingOtp(true);
     try {
       await API.post("/api/onboarding/otp/verify", {
         phone: normalizePhone(farmerForm.phone),
@@ -678,7 +726,20 @@ export default function RegisterPage() {
       setSuccess(getText("Phone verified successfully.", "Phone don verify successfully."));
     } catch (err: any) {
       setOtpVerified(false);
-      setError(err?.response?.data?.message || getText("Incorrect OTP. Please try again.", "OTP no correct. Try again."));
+      const message = String(err?.response?.data?.message || "");
+      if (/expired|invalid|not found/i.test(message)) {
+        setOtpRef("");
+        setOtpSent(false);
+      }
+      setError(
+        message ||
+          getText(
+            "Incorrect OTP. Please try again or request a new code.",
+            "OTP no correct. Try again or request new code."
+          )
+      );
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
@@ -949,8 +1010,17 @@ export default function RegisterPage() {
 
       <div className="grid gap-2 rounded-lg border border-green-100 bg-green-50 p-3">
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={sendOtp} className="rounded-lg bg-green-700 px-3 py-2 text-xs font-bold text-white">
-            Send OTP
+          <button
+            type="button"
+            onClick={sendOtp}
+            disabled={sendingOtp || otpCooldownSeconds > 0}
+            className="rounded-lg bg-green-700 px-3 py-2 text-xs font-bold text-white disabled:opacity-60"
+          >
+            {sendingOtp
+              ? getText("Sending...", "Sending...")
+              : otpCooldownSeconds > 0
+                ? getText(`Resend in ${otpCooldownSeconds}s`, `Resend in ${otpCooldownSeconds}s`)
+                : getText("Send OTP", "Send OTP")}
           </button>
           <input
             type="text"
@@ -958,10 +1028,16 @@ export default function RegisterPage() {
             value={otpInput}
             onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))}
             placeholder="Enter OTP"
+            maxLength={6}
             className="min-h-11 flex-1 rounded-lg border border-green-200 px-3 outline-none"
           />
-          <button type="button" onClick={verifyOtp} className="rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-bold text-green-800">
-            Verify OTP
+          <button
+            type="button"
+            onClick={verifyOtp}
+            disabled={verifyingOtp || !otpSent}
+            className="rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-bold text-green-800 disabled:opacity-60"
+          >
+            {verifyingOtp ? getText("Verifying...", "Verifying...") : getText("Verify OTP", "Verify OTP")}
           </button>
         </div>
         <p className={`m-0 text-xs ${otpVerified ? "text-emerald-700" : "text-slate-600"}`}>

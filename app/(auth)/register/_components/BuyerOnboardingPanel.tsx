@@ -245,6 +245,10 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpInput, setOtpInput] = useState("");
   const [otpRef, setOtpRef] = useState("");
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtpState, setVerifyingOtpState] = useState(false);
+  const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
+  const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
   const [loading, setLoading] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [resolvingAccount, setResolvingAccount] = useState(false);
@@ -404,6 +408,25 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
     void loadBanks();
   }, []);
 
+  useEffect(() => {
+    if (!otpCooldownUntil) {
+      setOtpCooldownSeconds(0);
+      return;
+    }
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((otpCooldownUntil - Date.now()) / 1000));
+      setOtpCooldownSeconds(remaining);
+      if (remaining === 0) {
+        setOtpCooldownUntil(0);
+      }
+    };
+
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
+  }, [otpCooldownUntil]);
+
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -538,22 +561,47 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       return;
     }
 
+    if (otpCooldownSeconds > 0) {
+      setError(
+        t(
+          `Please wait ${otpCooldownSeconds}s before requesting another OTP.`,
+          `Wait ${otpCooldownSeconds}s before you request another OTP.`
+        )
+      );
+      return;
+    }
+
     setError("");
+    setSendingOtp(true);
     try {
       const res = await API.post("/api/onboarding/otp/send", { phone: normalizePhone(form.repPhone) });
       setOtpInput("");
       setOtpSent(true);
       setOtpVerified(false);
       setOtpRef(String(res?.data?.otpRef || ""));
+      setOtpCooldownUntil(Date.now() + 30 * 1000);
       const devOtp = res?.data?.otp;
       setSuccess(devOtp ? t(`OTP sent. Demo code: ${devOtp}`, `OTP don send. Demo code na ${devOtp}`) : t("OTP sent successfully.", "OTP don send successfully."));
     } catch (err: any) {
       setError(err?.response?.data?.message || t("Unable to send OTP now.", "We no fit send OTP now."));
+    } finally {
+      setSendingOtp(false);
     }
   };
 
   const handleVerifyOtp = async () => {
     if (!otpSent) return;
+    if (!/^\d{6}$/.test(otpInput.trim())) {
+      setError(t("OTP must be exactly 6 digits.", "OTP must complete 6 digits."));
+      return;
+    }
+
+    if (!otpRef) {
+      setError(t("OTP session expired. Please request a new OTP.", "OTP don expire. Request new OTP."));
+      return;
+    }
+
+    setVerifyingOtpState(true);
     try {
       await API.post("/api/onboarding/otp/verify", {
         phone: normalizePhone(form.repPhone),
@@ -565,7 +613,20 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       setSuccess(t("Phone verified successfully.", "Phone don verify successfully."));
     } catch (err: any) {
       setOtpVerified(false);
-      setError(err?.response?.data?.message || t("OTP verification failed.", "OTP verification fail."));
+      const message = String(err?.response?.data?.message || "");
+      if (/expired|invalid|not found/i.test(message)) {
+        setOtpRef("");
+        setOtpSent(false);
+      }
+      setError(
+        message ||
+          t(
+            "OTP verification failed. Please try again or request a new code.",
+            "OTP verification fail. Try again or request new code."
+          )
+      );
+    } finally {
+      setVerifyingOtpState(false);
     }
   };
 
@@ -789,9 +850,27 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
             </label>
             <div className="grid gap-2 rounded-lg border border-green-100 bg-green-50 p-3">
               <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={handleSendOtp} className="rounded-lg bg-green-700 px-3 py-2 text-xs font-bold text-white">Send OTP</button>
-                <input value={otpInput} onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))} placeholder="Enter OTP" className="min-h-11 flex-1 rounded-lg border border-green-200 px-3" />
-                <button type="button" onClick={handleVerifyOtp} className="rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-bold text-green-800">Verify OTP</button>
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={sendingOtp || otpCooldownSeconds > 0}
+                  className="rounded-lg bg-green-700 px-3 py-2 text-xs font-bold text-white disabled:opacity-60"
+                >
+                  {sendingOtp
+                    ? "Sending..."
+                    : otpCooldownSeconds > 0
+                      ? `Resend in ${otpCooldownSeconds}s`
+                      : "Send OTP"}
+                </button>
+                <input value={otpInput} onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))} placeholder="Enter OTP" maxLength={6} className="min-h-11 flex-1 rounded-lg border border-green-200 px-3" />
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  disabled={verifyingOtpState || !otpSent}
+                  className="rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-bold text-green-800 disabled:opacity-60"
+                >
+                  {verifyingOtpState ? "Verifying..." : "Verify OTP"}
+                </button>
               </div>
               <p className={`m-0 text-xs ${otpVerified ? "text-emerald-700" : "text-slate-600"}`}>{otpVerified ? "Phone verified." : "Please verify phone before next step."}</p>
             </div>
