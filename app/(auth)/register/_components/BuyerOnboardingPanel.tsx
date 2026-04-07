@@ -244,6 +244,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpInput, setOtpInput] = useState("");
+  const [otpRef, setOtpRef] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [resolvingAccount, setResolvingAccount] = useState(false);
@@ -292,9 +293,10 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         step,
         otpSent,
         otpVerified,
+        otpRef,
       })
     );
-  }, [form, step, otpSent, otpVerified]);
+  }, [form, step, otpSent, otpVerified, otpRef]);
 
   useEffect(() => {
     saveDraft();
@@ -312,11 +314,13 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
           step?: number;
           otpSent?: boolean;
           otpVerified?: boolean;
+          otpRef?: string;
         };
         if (parsed.form) setForm((prev) => ({ ...prev, ...parsed.form }));
         if (parsed.step && parsed.step >= 1 && parsed.step <= 7) setStep(parsed.step);
         setOtpSent(Boolean(parsed.otpSent));
         setOtpVerified(Boolean(parsed.otpVerified));
+        setOtpRef(typeof parsed.otpRef === "string" ? parsed.otpRef : "");
       } catch {
         localStorage.removeItem(DRAFT_KEY);
       }
@@ -540,6 +544,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       setOtpInput("");
       setOtpSent(true);
       setOtpVerified(false);
+      setOtpRef(String(res?.data?.otpRef || ""));
       const devOtp = res?.data?.otp;
       setSuccess(devOtp ? t(`OTP sent. Demo code: ${devOtp}`, `OTP don send. Demo code na ${devOtp}`) : t("OTP sent successfully.", "OTP don send successfully."));
     } catch (err: any) {
@@ -553,6 +558,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       await API.post("/api/onboarding/otp/verify", {
         phone: normalizePhone(form.repPhone),
         otp: otpInput.trim(),
+        otpRef,
       });
       setOtpVerified(true);
       setError("");

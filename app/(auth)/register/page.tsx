@@ -263,6 +263,7 @@ export default function RegisterPage() {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpInput, setOtpInput] = useState("");
+  const [otpRef, setOtpRef] = useState("");
   const [banks, setBanks] = useState<string[]>([...BANKS]);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [resolvingAccount, setResolvingAccount] = useState(false);
@@ -327,11 +328,12 @@ export default function RegisterPage() {
       currentFarmerStep,
       otpSent,
       otpVerified,
+      otpRef,
       language,
       savedAt: new Date().toISOString(),
     };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
-  }, [accountForm, farmerForm, currentFarmerStep, otpSent, otpVerified, language]);
+  }, [accountForm, farmerForm, currentFarmerStep, otpSent, otpVerified, otpRef, language]);
 
   useEffect(() => {
     if (accountForm.role === "farmer") {
@@ -351,6 +353,7 @@ export default function RegisterPage() {
         currentFarmerStep?: number;
         otpSent?: boolean;
         otpVerified?: boolean;
+        otpRef?: string;
         language?: Language;
       };
 
@@ -365,6 +368,7 @@ export default function RegisterPage() {
       }
       setOtpSent(Boolean(parsed.otpSent));
       setOtpVerified(Boolean(parsed.otpVerified));
+      setOtpRef(typeof parsed.otpRef === "string" ? parsed.otpRef : "");
       if (parsed.language) {
         setLanguage(parsed.language);
       }
@@ -649,6 +653,7 @@ export default function RegisterPage() {
       setOtpInput("");
       setOtpSent(true);
       setOtpVerified(false);
+      setOtpRef(String(res?.data?.otpRef || ""));
       const debugOtp = res?.data?.otp;
       if (debugOtp) {
         setSuccess(getText(`OTP sent. Demo code: ${debugOtp}`, `OTP don send. Demo code na ${debugOtp}`));
@@ -666,6 +671,7 @@ export default function RegisterPage() {
       await API.post("/api/onboarding/otp/verify", {
         phone: normalizePhone(farmerForm.phone),
         otp: otpInput.trim(),
+        otpRef,
       });
       setOtpVerified(true);
       setError("");
