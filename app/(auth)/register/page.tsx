@@ -264,6 +264,7 @@ export default function RegisterPage() {
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpInput, setOtpInput] = useState("");
   const [otpRef, setOtpRef] = useState("");
+  const [otpPhone, setOtpPhone] = useState("");
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
@@ -690,6 +691,38 @@ export default function RegisterPage() {
     }
   };
 
+  const resetOtpSession = useCallback(() => {
+    setOtpSent(false);
+    setOtpVerified(false);
+    setOtpInput("");
+    setOtpRef("");
+    setOtpPhone("");
+    setOtpCooldownUntil(0);
+    setOtpExpiresUntil(0);
+    setLastAutoOtpAttempt("");
+  }, []);
+
+  const handleFarmerPhoneChange = useCallback(
+    (value: string) => {
+      setFarmerField("phone", value);
+
+      if (!(otpSent || otpVerified || otpRef)) return;
+      const nextPhone = normalizePhone(value);
+      const verifiedPhone = normalizePhone(otpPhone);
+      if (!verifiedPhone || nextPhone === verifiedPhone) return;
+
+      resetOtpSession();
+      setSuccess(
+        getText(
+          "Phone number updated. Request a new OTP to verify this number.",
+          "Phone don change. Request new OTP make we verify this number."
+        )
+      );
+      setError("");
+    },
+    [otpSent, otpVerified, otpRef, otpPhone, resetOtpSession, getText]
+  );
+
   const sendOtp = async () => {
     if (!isValidNigerianPhone(farmerForm.phone)) {
       setError(getText("Enter a valid Nigerian phone number before OTP.", "Put correct phone number before OTP."));
@@ -717,6 +750,7 @@ export default function RegisterPage() {
       setOtpSent(true);
       setOtpVerified(false);
       setLastAutoOtpAttempt("");
+      setOtpPhone(normalizePhone(farmerForm.phone));
       setOtpRef(String(res?.data?.otpRef || ""));
       setOtpCooldownUntil(Date.now() + 30 * 1000);
       setOtpExpiresUntil(Date.now() + 300 * 1000);
@@ -763,6 +797,7 @@ export default function RegisterPage() {
         setOtpRef("");
         setOtpSent(false);
         setOtpExpiresUntil(0);
+        setOtpPhone("");
       }
       setError(
         message ||
@@ -1046,13 +1081,26 @@ export default function RegisterPage() {
         <input
           type="tel"
           value={farmerForm.phone}
-          onChange={(e) => setFarmerField("phone", e.target.value)}
+          onChange={(e) => handleFarmerPhoneChange(e.target.value)}
           placeholder="+234 801 234 5678"
           className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
         />
       </label>
 
       <div className="grid gap-2 rounded-lg border border-green-100 bg-green-50 p-3">
+        {otpSent || otpVerified ? (
+          <button
+            type="button"
+            onClick={() => {
+              resetOtpSession();
+              setSuccess(getText("Use the phone field above and request a new OTP.", "Use phone field above, request new OTP."));
+              setError("");
+            }}
+            className="w-fit rounded-md border border-green-300 bg-white px-2 py-1 text-[11px] font-semibold text-green-800"
+          >
+            {getText("Use a different phone number", "Use another phone number")}
+          </button>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           <button
             type="button"

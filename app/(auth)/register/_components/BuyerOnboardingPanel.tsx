@@ -245,6 +245,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpInput, setOtpInput] = useState("");
   const [otpRef, setOtpRef] = useState("");
+  const [otpPhone, setOtpPhone] = useState("");
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtpState, setVerifyingOtpState] = useState(false);
   const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
@@ -493,6 +494,33 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
     }
   };
 
+  const resetOtpSession = useCallback(() => {
+    setOtpSent(false);
+    setOtpVerified(false);
+    setOtpInput("");
+    setOtpRef("");
+    setOtpPhone("");
+    setOtpCooldownUntil(0);
+    setOtpExpiresUntil(0);
+    setLastAutoOtpAttempt("");
+  }, []);
+
+  const handleRepPhoneChange = useCallback(
+    (value: string) => {
+      setField("repPhone", value);
+
+      if (!(otpSent || otpVerified || otpRef)) return;
+      const nextPhone = normalizePhone(value);
+      const verifiedPhone = normalizePhone(otpPhone);
+      if (!verifiedPhone || nextPhone === verifiedPhone) return;
+
+      resetOtpSession();
+      setSuccess(t("Phone number updated. Request a new OTP to verify this number.", "Phone don change. Request new OTP make we verify this number."));
+      setError("");
+    },
+    [otpSent, otpVerified, otpRef, otpPhone, resetOtpSession, t]
+  );
+
   const validateAccount = (): string => {
     if (!accountForm.name.trim()) return t("Full name is required.", "Full name no fit empty.");
     if (!accountForm.email.trim()) return t("Email is required.", "Email no fit empty.");
@@ -608,6 +636,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       setOtpSent(true);
       setOtpVerified(false);
       setLastAutoOtpAttempt("");
+      setOtpPhone(normalizePhone(form.repPhone));
       setOtpRef(String(res?.data?.otpRef || ""));
       setOtpCooldownUntil(Date.now() + 30 * 1000);
       setOtpExpiresUntil(Date.now() + 300 * 1000);
@@ -650,6 +679,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         setOtpRef("");
         setOtpSent(false);
         setOtpExpiresUntil(0);
+        setOtpPhone("");
       }
       setError(
         message ||
@@ -890,9 +920,22 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
               <input value={form.repTitle} onChange={(e) => setField("repTitle", e.target.value)} className="min-h-12 rounded-lg border border-green-200 px-3" />
             </label>
             <label className="grid gap-1 text-sm font-semibold text-green-950">Phone number (+234) <span className="text-red-500">*</span>
-              <input value={form.repPhone} onChange={(e) => setField("repPhone", e.target.value)} className="min-h-12 rounded-lg border border-green-200 px-3" />
+              <input value={form.repPhone} onChange={(e) => handleRepPhoneChange(e.target.value)} className="min-h-12 rounded-lg border border-green-200 px-3" />
             </label>
             <div className="grid gap-2 rounded-lg border border-green-100 bg-green-50 p-3">
+              {otpSent || otpVerified ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetOtpSession();
+                    setSuccess(t("Use the phone field above and request a new OTP.", "Use phone field above, request new OTP."));
+                    setError("");
+                  }}
+                  className="w-fit rounded-md border border-green-300 bg-white px-2 py-1 text-[11px] font-semibold text-green-800"
+                >
+                  Use a different phone number
+                </button>
+              ) : null}
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
