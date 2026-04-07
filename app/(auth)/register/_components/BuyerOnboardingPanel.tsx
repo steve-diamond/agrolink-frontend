@@ -74,6 +74,7 @@ type BuyerForm = {
   signatureDate: string;
   referred: YesNo | "";
   referrerCodeOrPhone: string;
+  preferredVerification: "email" | "whatsapp" | "";
 };
 
 type QueuePayload = {
@@ -153,7 +154,7 @@ const stepLabels = [
   "Financial & Payment",
   "Logistics & Quality",
   "Consent & Compliance",
-  "Referral",
+  "Referral & Verification",
 ] as const;
 
 const defaultForm: BuyerForm = {
@@ -218,6 +219,7 @@ const defaultForm: BuyerForm = {
   signatureDate: "",
   referred: "",
   referrerCodeOrPhone: "",
+  preferredVerification: "",
 };
 
 const uid = (): string => `AGR-BUY-${Math.floor(Math.random() * 90000 + 10000)}`;
@@ -246,12 +248,11 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   const [otpInput, setOtpInput] = useState("");
   const [otpRef, setOtpRef] = useState("");
   const [otpPhone, setOtpPhone] = useState("");
-  const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtpState, setVerifyingOtpState] = useState(false);
   const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
-  const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
+  const [, setOtpCooldownSeconds] = useState(0);
   const [otpExpiresUntil, setOtpExpiresUntil] = useState(0);
-  const [otpExpiresSeconds, setOtpExpiresSeconds] = useState(0);
+  const [, setOtpExpiresSeconds] = useState(0);
   const [otpVerifyLockUntil, setOtpVerifyLockUntil] = useState(0);
   const [otpVerifyLockSeconds, setOtpVerifyLockSeconds] = useState(0);
   const [lastAutoOtpAttempt, setLastAutoOtpAttempt] = useState("");
@@ -580,7 +581,6 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       if (!form.repFullName.trim()) return t("Authorized representative name is required.", "Representative name no fit empty.");
       if (!form.repTitle.trim()) return t("Position/Title is required.", "Position no fit empty.");
       if (!isValidNigerianPhone(form.repPhone)) return t("Phone number must be valid (+234...).", "Your phone number must be 11 digits.");
-      if (!otpVerified) return t("Please verify phone with OTP.", "Verify your phone with OTP.");
       if (!form.repEmail.trim() || !/^\S+@\S+\.\S+$/.test(form.repEmail)) return t("Valid representative email is required.", "Put valid representative email.");
       if (form.repEmail.trim().toLowerCase() !== form.repEmailConfirm.trim().toLowerCase()) {
         return t("Email confirmation does not match.", "Email confirmation no match.");
@@ -639,59 +639,12 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       if (form.referred === "yes" && !form.referrerCodeOrPhone.trim()) {
         return t("Enter referrer phone or code.", "Put referrer phone or code.");
       }
+      if (!form.preferredVerification) {
+        return t("Choose how you want verification updates.", "Choose how you want verification updates.");
+      }
     }
 
     return "";
-  };
-
-  const handleSendOtp = async () => {
-    if (!isValidNigerianPhone(form.repPhone)) {
-      setError(t("Your phone number must be 11 digits.", "Your phone number must be 11 digits."));
-      return;
-    }
-
-    if (otpCooldownSeconds > 0) {
-      setError(
-        t(
-          `Please wait ${otpCooldownSeconds}s before requesting another OTP.`,
-          `Wait ${otpCooldownSeconds}s before you request another OTP.`
-        )
-      );
-      return;
-    }
-
-    setError("");
-    setSendingOtp(true);
-    try {
-      const res = await API.post("/api/onboarding/otp/send", { phone: normalizePhone(form.repPhone) });
-      setOtpInput("");
-      setOtpSent(true);
-      setOtpVerified(false);
-      setLastAutoOtpAttempt("");
-      setOtpPhone(normalizePhone(form.repPhone));
-      setOtpRef(String(res?.data?.otpRef || ""));
-      setOtpCooldownUntil(Date.now() + 30 * 1000);
-      setOtpExpiresUntil(Date.now() + 300 * 1000);
-      setOtpVerifyLockUntil(0);
-      const devOtp = res?.data?.otp;
-      setSuccess(devOtp ? t(`OTP sent. Demo code: ${devOtp}`, `OTP don send. Demo code na ${devOtp}`) : t("OTP sent successfully.", "OTP don send successfully."));
-    } catch (err: any) {
-      const retryAfterSeconds = parseRetryAfterSeconds(err);
-      if (err?.response?.status === 429 && retryAfterSeconds > 0) {
-        setOtpCooldownUntil(Date.now() + retryAfterSeconds * 1000);
-      }
-      setError(
-        err?.response?.data?.message ||
-          (retryAfterSeconds > 0
-            ? t(
-                `Too many OTP requests. Try again in ${retryAfterSeconds}s.`,
-                `Too many OTP requests. Try again in ${retryAfterSeconds}s.`
-              )
-            : t("Unable to send OTP now.", "We no fit send OTP now."))
-      );
-    } finally {
-      setSendingOtp(false);
-    }
   };
 
   const handleVerifyOtp = useCallback(async () => {
@@ -983,51 +936,9 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
             <label className="grid gap-1 text-sm font-semibold text-green-950">Phone number (+234) <span className="text-red-500">*</span>
               <input value={form.repPhone} onChange={(e) => handleRepPhoneChange(e.target.value)} className="min-h-12 rounded-lg border border-green-200 px-3" />
             </label>
-            <div className="grid gap-2 rounded-lg border border-green-100 bg-green-50 p-3">
-              {otpSent || otpVerified ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetOtpSession();
-                    setSuccess(t("Use the phone field above and request a new OTP.", "Use phone field above, request new OTP."));
-                    setError("");
-                  }}
-                  className="w-fit rounded-md border border-green-300 bg-white px-2 py-1 text-[11px] font-semibold text-green-800"
-                >
-                  Use a different phone number
-                </button>
-              ) : null}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  disabled={sendingOtp || otpCooldownSeconds > 0}
-                  className="rounded-lg bg-green-700 px-3 py-2 text-xs font-bold text-white disabled:opacity-60"
-                >
-                  {sendingOtp
-                    ? "Sending..."
-                    : otpCooldownSeconds > 0
-                      ? `Resend in ${otpCooldownSeconds}s`
-                      : "Send OTP"}
-                </button>
-                <input ref={otpInputRef} value={otpInput} onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))} placeholder="Enter OTP" maxLength={6} className="min-h-11 flex-1 rounded-lg border border-green-200 px-3" />
-                <button
-                  type="button"
-                  onClick={handleVerifyOtp}
-                  disabled={verifyingOtpState || !otpSent || otpVerifyLockSeconds > 0}
-                  className="rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-bold text-green-800 disabled:opacity-60"
-                >
-                  {verifyingOtpState ? "Verifying..." : otpVerifyLockSeconds > 0 ? `Locked ${otpVerifyLockSeconds}s` : "Verify OTP"}
-                </button>
-              </div>
-              <p className={`m-0 text-xs ${otpVerified ? "text-emerald-700" : "text-slate-600"}`}>{otpVerified ? "Phone verified." : "Please verify phone before next step."}</p>
-              {otpSent && !otpVerified ? (
-                <p className="m-0 text-xs text-amber-700">
-                  {otpExpiresSeconds > 0
-                    ? `OTP expires in ${String(Math.floor(otpExpiresSeconds / 60)).padStart(2, "0")}:${String(otpExpiresSeconds % 60).padStart(2, "0")}.`
-                    : "OTP expired. Request a new code."}
-                </p>
-              ) : null}
+            <div className="rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-900">
+              <p className="m-0 font-semibold">Verification update</p>
+              <p className="m-0 mt-1">Phone OTP is temporarily disabled. You will choose Email or WhatsApp verification in the final step.</p>
             </div>
             <label className="grid gap-1 text-sm font-semibold text-green-950">Alternative phone (optional)
               <input value={form.repAltPhone} onChange={(e) => setField("repAltPhone", e.target.value)} className="min-h-12 rounded-lg border border-green-200 px-3" />
@@ -1340,6 +1251,23 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
               <p className="m-0 font-semibold">Fallback support</p>
               <p className="m-0 mt-1">For poor internet, request a PDF form by email and submit attachments later.</p>
             </div>
+            <label className="grid gap-1 text-sm font-semibold text-green-950">Preferred verification channel <span className="text-red-500">*</span>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: "email", label: "Email verification" },
+                  { value: "whatsapp", label: "WhatsApp verification" },
+                ] as const).map((item) => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setField("preferredVerification", item.value)}
+                    className={`min-h-12 rounded-lg border text-sm font-bold ${form.preferredVerification === item.value ? "border-green-700 bg-green-700 text-white" : "border-green-200 bg-white text-green-900"}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </label>
           </div>
         ) : null}
       </div>

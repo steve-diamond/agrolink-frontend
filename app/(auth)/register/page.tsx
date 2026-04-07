@@ -67,6 +67,7 @@ type FarmerForm = {
   signature: string;
   wasReferred: YesNo | "";
   referrer: string;
+  preferredVerification: "email" | "whatsapp" | "";
 };
 
 const DRAFT_KEY = "agrolink_farmer_register_draft_v1";
@@ -203,6 +204,7 @@ const defaultFarmerForm: FarmerForm = {
   signature: "",
   wasReferred: "",
   referrer: "",
+  preferredVerification: "",
 };
 
 const stepLabels = [
@@ -211,7 +213,7 @@ const stepLabels = [
   "Farming Practices & Assets",
   "Financial & Bank Details",
   "Membership & Consent",
-  "Referral",
+  "Referral & Verification",
 ] as const;
 
 const ageFromDob = (dob: string): number => {
@@ -265,12 +267,11 @@ export default function RegisterPage() {
   const [otpInput, setOtpInput] = useState("");
   const [otpRef, setOtpRef] = useState("");
   const [otpPhone, setOtpPhone] = useState("");
-  const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [otpCooldownUntil, setOtpCooldownUntil] = useState(0);
-  const [otpCooldownSeconds, setOtpCooldownSeconds] = useState(0);
+  const [, setOtpCooldownSeconds] = useState(0);
   const [otpExpiresUntil, setOtpExpiresUntil] = useState(0);
-  const [otpExpiresSeconds, setOtpExpiresSeconds] = useState(0);
+  const [, setOtpExpiresSeconds] = useState(0);
   const [otpVerifyLockUntil, setOtpVerifyLockUntil] = useState(0);
   const [otpVerifyLockSeconds, setOtpVerifyLockSeconds] = useState(0);
   const [lastAutoOtpAttempt, setLastAutoOtpAttempt] = useState("");
@@ -535,9 +536,6 @@ export default function RegisterPage() {
       if (!isValidNigerianPhone(farmerForm.phone)) {
         return getText("Phone number must be valid (+234...).", "Your phone number must be 11 digits. Try again.");
       }
-      if (!otpVerified) {
-        return getText("Please complete OTP verification.", "Verify your phone with OTP before you continue.");
-      }
       if (!farmerForm.dateOfBirth) return getText("Date of birth is required.", "Pick your date of birth.");
       if (ageFromDob(farmerForm.dateOfBirth) < 18) return getText("Applicant must be at least 18 years old.", "You never reach 18 years.");
       if (!farmerForm.idType) return getText("Select an ID type.", "Choose your ID type.");
@@ -611,6 +609,9 @@ export default function RegisterPage() {
       if (!farmerForm.wasReferred) return getText("Please choose referral option.", "Choose if person refer you.");
       if (farmerForm.wasReferred === "yes" && !farmerForm.referrer.trim()) {
         return getText("Enter referrer code or phone.", "Put referrer phone or code.");
+      }
+      if (!farmerForm.preferredVerification) {
+        return getText("Choose how you want verification updates.", "Choose how you want verification updates.");
       }
     }
 
@@ -754,63 +755,6 @@ export default function RegisterPage() {
     },
     [otpSent, otpVerified, otpRef, otpPhone, resetOtpSession, getText]
   );
-
-  const sendOtp = async () => {
-    if (!isValidNigerianPhone(farmerForm.phone)) {
-      setError(getText("Enter a valid Nigerian phone number before OTP.", "Put correct phone number before OTP."));
-      return;
-    }
-
-    if (otpCooldownSeconds > 0) {
-      setError(
-        getText(
-          `Please wait ${otpCooldownSeconds}s before requesting another OTP.`,
-          `Wait ${otpCooldownSeconds}s before you request another OTP.`
-        )
-      );
-      return;
-    }
-
-    setError("");
-    setSuccess("");
-    setSendingOtp(true);
-    try {
-      const res = await API.post("/api/onboarding/otp/send", {
-        phone: normalizePhone(farmerForm.phone),
-      });
-      setOtpInput("");
-      setOtpSent(true);
-      setOtpVerified(false);
-      setLastAutoOtpAttempt("");
-      setOtpPhone(normalizePhone(farmerForm.phone));
-      setOtpRef(String(res?.data?.otpRef || ""));
-      setOtpCooldownUntil(Date.now() + 30 * 1000);
-      setOtpExpiresUntil(Date.now() + 300 * 1000);
-      setOtpVerifyLockUntil(0);
-      const debugOtp = res?.data?.otp;
-      if (debugOtp) {
-        setSuccess(getText(`OTP sent. Demo code: ${debugOtp}`, `OTP don send. Demo code na ${debugOtp}`));
-      } else {
-        setSuccess(getText("OTP sent successfully.", "OTP don send successfully."));
-      }
-    } catch (err: any) {
-      const retryAfterSeconds = parseRetryAfterSeconds(err);
-      if (err?.response?.status === 429 && retryAfterSeconds > 0) {
-        setOtpCooldownUntil(Date.now() + retryAfterSeconds * 1000);
-      }
-      setError(
-        err?.response?.data?.message ||
-          (retryAfterSeconds > 0
-            ? getText(
-                `Too many OTP requests. Try again in ${retryAfterSeconds}s.`,
-                `Too many OTP requests. Try again in ${retryAfterSeconds}s.`
-              )
-            : getText("Unable to send OTP now.", "We no fit send OTP now."))
-      );
-    } finally {
-      setSendingOtp(false);
-    }
-  };
 
   const verifyOtp = useCallback(async () => {
     if (!otpSent) return;
@@ -1148,75 +1092,9 @@ export default function RegisterPage() {
         />
       </label>
 
-      <div className="grid gap-2 rounded-lg border border-green-100 bg-green-50 p-3">
-        {otpSent || otpVerified ? (
-          <button
-            type="button"
-            onClick={() => {
-              resetOtpSession();
-              setSuccess(getText("Use the phone field above and request a new OTP.", "Use phone field above, request new OTP."));
-              setError("");
-            }}
-            className="w-fit rounded-md border border-green-300 bg-white px-2 py-1 text-[11px] font-semibold text-green-800"
-          >
-            {getText("Use a different phone number", "Use another phone number")}
-          </button>
-        ) : null}
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={sendOtp}
-            disabled={sendingOtp || otpCooldownSeconds > 0}
-            className="rounded-lg bg-green-700 px-3 py-2 text-xs font-bold text-white disabled:opacity-60"
-          >
-            {sendingOtp
-              ? getText("Sending...", "Sending...")
-              : otpCooldownSeconds > 0
-                ? getText(`Resend in ${otpCooldownSeconds}s`, `Resend in ${otpCooldownSeconds}s`)
-                : getText("Send OTP", "Send OTP")}
-          </button>
-          <input
-            ref={otpInputRef}
-            type="text"
-            inputMode="numeric"
-            value={otpInput}
-            onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ""))}
-            placeholder="Enter OTP"
-            maxLength={6}
-            className="min-h-11 flex-1 rounded-lg border border-green-200 px-3 outline-none"
-          />
-          <button
-            type="button"
-            onClick={verifyOtp}
-            disabled={verifyingOtp || !otpSent || otpVerifyLockSeconds > 0}
-            className="rounded-lg border border-green-300 bg-white px-3 py-2 text-xs font-bold text-green-800 disabled:opacity-60"
-          >
-            {verifyingOtp
-              ? getText("Verifying...", "Verifying...")
-              : otpVerifyLockSeconds > 0
-                ? getText(`Locked ${otpVerifyLockSeconds}s`, `Locked ${otpVerifyLockSeconds}s`)
-                : getText("Verify OTP", "Verify OTP")}
-          </button>
-        </div>
-        <p className={`m-0 text-xs ${otpVerified ? "text-emerald-700" : "text-slate-600"}`}>
-          {otpVerified
-            ? getText("Phone verified.", "Phone don verify.")
-            : getText("Please verify your phone before moving to next step.", "Abeg verify your phone before next step.")}
-        </p>
-        {otpSent && !otpVerified ? (
-          <p className="m-0 text-xs text-amber-700">
-            {otpExpiresSeconds > 0
-              ? getText(
-                  `OTP expires in ${String(Math.floor(otpExpiresSeconds / 60)).padStart(2, "0")}:${String(
-                    otpExpiresSeconds % 60
-                  ).padStart(2, "0")}.`,
-                  `OTP go expire in ${String(Math.floor(otpExpiresSeconds / 60)).padStart(2, "0")}:${String(
-                    otpExpiresSeconds % 60
-                  ).padStart(2, "0")}.`
-                )
-              : getText("OTP expired. Request a new code.", "OTP don expire. Request new code.")}
-          </p>
-        ) : null}
+      <div className="rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-900">
+        <p className="m-0 font-semibold">Verification update</p>
+        <p className="m-0 mt-1">Phone OTP is temporarily disabled. You will choose Email or WhatsApp verification in the final step.</p>
       </div>
 
       <label className="grid gap-1 text-sm font-semibold text-green-950">
@@ -1843,6 +1721,29 @@ export default function RegisterPage() {
         <p className="m-0 font-semibold">USSD fallback</p>
         <p className="m-0 mt-1">Dial *347*1# to complete basic registration on feature phones.</p>
       </div>
+
+      <label className="grid gap-1 text-sm font-semibold text-green-950">
+        Preferred verification channel <span className="text-red-500">*</span>
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            { value: "email", label: "Email verification" },
+            { value: "whatsapp", label: "WhatsApp verification" },
+          ] as const).map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => setFarmerField("preferredVerification", item.value)}
+              className={`min-h-12 rounded-lg border text-sm font-bold ${
+                farmerForm.preferredVerification === item.value
+                  ? "border-green-700 bg-green-700 text-white"
+                  : "border-green-200 bg-white text-green-900"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </label>
     </div>
   );
 
