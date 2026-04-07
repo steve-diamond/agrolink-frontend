@@ -819,11 +819,6 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!otpRef) {
-      setError(getText("OTP session expired. Please request a new OTP.", "OTP don expire. Request new OTP."));
-      return;
-    }
-
     if (otpVerifyLockSeconds > 0) {
       setError(
         getText(

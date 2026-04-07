@@ -701,11 +701,6 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       return;
     }
 
-    if (!otpRef) {
-      setError(t("OTP session expired. Please request a new OTP.", "OTP don expire. Request new OTP."));
-      return;
-    }
-
     if (otpVerifyLockSeconds > 0) {
       setError(
         t(
