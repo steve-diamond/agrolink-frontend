@@ -976,7 +976,14 @@ export default function RegisterPage() {
       router.push(`/register/success?name=${encodeURIComponent(accountForm.name.trim())}&appId=${encodeURIComponent(appId)}&queued=0&kycPending=${kycPending}`);
     } catch (err: any) {
       const statusCode = err?.response?.status;
-      if (!statusCode) {
+      const errorMessage = String(
+        err?.response?.data?.message || err?.response?.data?.error || err?.message || ""
+      );
+      const isDbUnavailable =
+        /buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(errorMessage) ||
+        statusCode === 503;
+
+      if (!statusCode || isDbUnavailable) {
         const payload: QueuePayload = {
           account: {
             name: accountForm.name.trim(),
@@ -988,7 +995,13 @@ export default function RegisterPage() {
         };
 
         queueSubmission(payload);
-        setSuccess(getText("No network now. We saved your application and will send when internet returns.", "No network now. We save your form. We go send am when network return."));
+        clearDraft();
+        const offlineId = uid();
+        router.push(
+          `/register/success?name=${encodeURIComponent(accountForm.name.trim())}&appId=${encodeURIComponent(
+            offlineId
+          )}&queued=1&kycPending=1`
+        );
         return;
       }
 

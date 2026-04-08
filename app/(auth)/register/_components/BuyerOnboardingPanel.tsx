@@ -819,9 +819,22 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       router.push(`/register/buyer/success?name=${encodeURIComponent(form.businessName || accountForm.name)}&appId=${encodeURIComponent(appId)}&queued=0&verificationPending=${verificationPending}`);
     } catch (err: any) {
       const statusCode = err?.response?.status;
-      if (!statusCode) {
+      const errorMessage = String(
+        err?.response?.data?.message || err?.response?.data?.error || err?.message || ""
+      );
+      const isDbUnavailable =
+        /buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(errorMessage) ||
+        statusCode === 503;
+
+      if (!statusCode || isDbUnavailable) {
         queueSubmission({ ...payload, status: "queued" });
-        setSuccess(t("No network now. Draft queued and will submit when online.", "No network now. Draft don queue, e go submit when online."));
+        localStorage.removeItem(DRAFT_KEY);
+        const appId = uid();
+        router.push(
+          `/register/buyer/success?name=${encodeURIComponent(
+            form.businessName || accountForm.name
+          )}&appId=${encodeURIComponent(appId)}&queued=1&verificationPending=1`
+        );
         return;
       }
       setError(err?.response?.data?.message || err?.response?.data?.error || t("Submission failed. Please try again.", "Submission fail. Try again."));
