@@ -338,14 +338,11 @@ export default function RegisterPage() {
       accountForm,
       farmerForm,
       currentFarmerStep,
-      otpSent,
-      otpVerified,
-      otpRef,
       language,
       savedAt: new Date().toISOString(),
     };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
-  }, [accountForm, farmerForm, currentFarmerStep, otpSent, otpVerified, otpRef, language]);
+  }, [accountForm, farmerForm, currentFarmerStep, language]);
 
   useEffect(() => {
     if (accountForm.role === "farmer") {
@@ -363,9 +360,6 @@ export default function RegisterPage() {
         accountForm?: typeof accountForm;
         farmerForm?: FarmerForm;
         currentFarmerStep?: number;
-        otpSent?: boolean;
-        otpVerified?: boolean;
-        otpRef?: string;
         language?: Language;
       };
 
@@ -378,9 +372,9 @@ export default function RegisterPage() {
       if (parsed.currentFarmerStep && parsed.currentFarmerStep >= 1 && parsed.currentFarmerStep <= 6) {
         setCurrentFarmerStep(parsed.currentFarmerStep);
       }
-      setOtpSent(Boolean(parsed.otpSent));
-      setOtpVerified(Boolean(parsed.otpVerified));
-      setOtpRef(typeof parsed.otpRef === "string" ? parsed.otpRef : "");
+      setOtpSent(false);
+      setOtpVerified(false);
+      setOtpRef("");
       if (parsed.language) {
         setLanguage(parsed.language);
       }

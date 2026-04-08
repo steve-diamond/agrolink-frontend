@@ -303,12 +303,9 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       JSON.stringify({
         form,
         step,
-        otpSent,
-        otpVerified,
-        otpRef,
       })
     );
-  }, [form, step, otpSent, otpVerified, otpRef]);
+  }, [form, step]);
 
   useEffect(() => {
     saveDraft();
@@ -324,15 +321,12 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         const parsed = JSON.parse(raw) as {
           form?: BuyerForm;
           step?: number;
-          otpSent?: boolean;
-          otpVerified?: boolean;
-          otpRef?: string;
         };
         if (parsed.form) setForm((prev) => ({ ...prev, ...parsed.form }));
         if (parsed.step && parsed.step >= 1 && parsed.step <= 7) setStep(parsed.step);
-        setOtpSent(Boolean(parsed.otpSent));
-        setOtpVerified(Boolean(parsed.otpVerified));
-        setOtpRef(typeof parsed.otpRef === "string" ? parsed.otpRef : "");
+        setOtpSent(false);
+        setOtpVerified(false);
+        setOtpRef("");
       } catch {
         localStorage.removeItem(DRAFT_KEY);
       }
