@@ -360,14 +360,24 @@ export default function AdminUnifiedCommandCenter({ users, orders, currencyForma
         </div>
 
         <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs ${darkMode ? "border-emerald-500/40 bg-emerald-900/30 text-emerald-200" : "border-emerald-300 bg-emerald-50 text-emerald-700"}`}>
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs ${
+              darkMode
+                ? "border-emerald-500/40 bg-emerald-900/30 text-emerald-200"
+                : "border-emerald-300 bg-emerald-50 text-emerald-700"
+            }`}
+          >
             <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
             WebSocket: Connected
           </span>
           <button
             type="button"
             onClick={() => setDarkMode((prev) => !prev)}
-            className={`rounded-lg border px-3 py-2 text-xs font-semibold ${darkMode ? "border-slate-600 bg-slate-800 text-slate-100" : "border-slate-300 bg-slate-100 text-slate-700"}`}
+            className={`rounded-lg border px-3 py-2 text-xs font-semibold ${
+              darkMode
+                ? "border-slate-600 bg-slate-800 text-slate-100"
+                : "border-slate-300 bg-slate-100 text-slate-700"
+            }`}
           >
             {darkMode ? "Switch to Light" : "Switch to Dark"}
           </button>
