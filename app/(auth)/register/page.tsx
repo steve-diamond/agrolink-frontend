@@ -1005,6 +1005,16 @@ export default function RegisterPage() {
         return;
       }
 
+      if (/buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(errorMessage)) {
+        setError(
+          getText(
+            "Service is temporarily unavailable. Please try again shortly.",
+            "Service dey temporarily unavailable. Try again shortly."
+          )
+        );
+        return;
+      }
+
       setError(
         err?.response?.data?.message ||
           err?.response?.data?.error ||

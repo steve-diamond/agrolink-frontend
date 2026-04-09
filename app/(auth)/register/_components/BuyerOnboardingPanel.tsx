@@ -837,6 +837,12 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         );
         return;
       }
+
+      if (/buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(errorMessage)) {
+        setError(t("Service is temporarily unavailable. Please try again shortly.", "Service dey temporarily unavailable. Try again shortly."));
+        return;
+      }
+
       setError(err?.response?.data?.message || err?.response?.data?.error || t("Submission failed. Please try again.", "Submission fail. Try again."));
     } finally {
       setLoading(false);
