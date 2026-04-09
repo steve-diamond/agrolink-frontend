@@ -850,6 +850,10 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   };
 
   const stepProgress = useMemo(() => `${Math.round((step / 7) * 100)}%`, [step]);
+  const displayError =
+    error && /users\.insertOne\(\)|buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(error)
+      ? t("Service is temporarily unavailable. Please try again shortly.", "Service dey temporarily unavailable. Try again shortly.")
+      : error;
 
   return (
     <>
@@ -867,7 +871,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         </p>
       </div>
 
-      {error ? <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div> : null}
+      {displayError ? <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{displayError}</div> : null}
       {success ? <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</div> : null}
 
       <div className="card rounded-xl border border-blue-100 p-4">

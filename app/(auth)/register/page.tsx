@@ -1773,6 +1773,14 @@ export default function RegisterPage() {
     return renderReferralStep;
   };
 
+  const displayError =
+    error && /users\.insertOne\(\)|buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(error)
+      ? getText(
+          "Service is temporarily unavailable. Please try again shortly.",
+          "Service dey temporarily unavailable. Try again shortly."
+        )
+      : error;
+
   return (
     <AuthShell
       eyebrow="Create Account"
@@ -1802,8 +1810,8 @@ export default function RegisterPage() {
 
         {renderLanguageToggle}
 
-        {error ? (
-          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{error}</div>
+        {displayError ? (
+          <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{displayError}</div>
         ) : null}
 
         {success ? (
