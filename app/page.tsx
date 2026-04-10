@@ -51,7 +51,13 @@ const trustItems = [
     metric: "Measured growth across value chains",
   },
 ];
-const partners = ["Lagos State", "IFAD", "ACCESS", "NIRSAL", "NDA"];
+const partners = [
+  { name: "Lagos State", tag: "Public Sector" },
+  { name: "IFAD", tag: "Development Finance" },
+  { name: "ACCESS", tag: "Banking Partner" },
+  { name: "NIRSAL", tag: "Risk & Credit" },
+  { name: "NDA", tag: "Agricultural Programs" },
+];
 
 const heroSlides = [
   {
@@ -201,18 +207,31 @@ export default function Home() {
           <Image src="/agropro/images/chose.jpg" alt="Success stories" fill className="dos-story-bg" sizes="100vw" />
           <div className="dos-story-overlay" />
           <div className="dos-story-content">
+            <p className="dos-story-kicker">Field Impact</p>
             <h2>Success Stories</h2>
-            <blockquote>&quot;DosAgrolink helped me double my yield!&quot;</blockquote>
-            <p>- Adebayo, Ondo State</p>
+            <div className="dos-story-quote-card">
+              <blockquote>&quot;DosAgrolink helped me double my yield and secure better buyers in one season.&quot;</blockquote>
+              <p>Adebayo, Ondo State • Maize Farmer</p>
+            </div>
+            <div className="dos-story-metrics" aria-label="Impact metrics">
+              <span>2x Yield Improvement</span>
+              <span>Verified Buyer Access</span>
+              <span>Better Price Confidence</span>
+            </div>
             <Link href="/vision" className="dos-btn-green">View More Stories</Link>
           </div>
         </section>
 
         <section className="dos-partners" aria-label="Partners">
           <h2>Our Partners</h2>
+          <p className="dos-partners-intro">Trusted institutions enabling inclusive agricultural growth across finance, logistics, and market access.</p>
           <div className="dos-partners-grid">
             {partners.map((item) => (
-              <div key={item} className="dos-partner-chip">{item}</div>
+              <article key={item.name} className="dos-partner-chip">
+                <span className="dos-partner-mark">{item.name.slice(0, 2).toUpperCase()}</span>
+                <strong>{item.name}</strong>
+                <small>{item.tag}</small>
+              </article>
             ))}
           </div>
           <p>In Partnership With</p>
