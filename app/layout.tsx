@@ -1,4 +1,5 @@
 import "./globals.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import NavBar from "@/components/NavBar";
 import SiteFooter from "@/components/SiteFooter";
 import ClientErrorBoundary from "@/components/ClientErrorBoundary";

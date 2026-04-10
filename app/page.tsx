@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import dosLogo from "../dos logo.jpg";
 import HomeLanguageSwitcher from "@/components/HomeLanguageSwitcher";
+import FarmerLogoCarousel from "@/components/FarmerLogoCarousel";
 
 const navItems = [
   { label: "Marketplace", href: "/marketplace" },
@@ -51,14 +52,6 @@ const trustItems = [
     metric: "Measured growth across value chains",
   },
 ];
-const partners = [
-  { name: "Lagos State", tag: "Public Sector" },
-  { name: "IFAD", tag: "Development Finance" },
-  { name: "ACCESS", tag: "Banking Partner" },
-  { name: "NIRSAL", tag: "Risk & Credit" },
-  { name: "NDA", tag: "Agricultural Programs" },
-];
-
 const heroSlides = [
   {
     image: "/agropro/images/banner.jpg",
@@ -223,18 +216,12 @@ export default function Home() {
         </section>
 
         <section className="dos-partners" aria-label="Partners">
-          <h2>Our Partners</h2>
-          <p className="dos-partners-intro">Trusted institutions enabling inclusive agricultural growth across finance, logistics, and market access.</p>
-          <div className="dos-partners-grid">
-            {partners.map((item) => (
-              <article key={item.name} className="dos-partner-chip">
-                <span className="dos-partner-mark">{item.name.slice(0, 2).toUpperCase()}</span>
-                <strong>{item.name}</strong>
-                <small>{item.tag}</small>
-              </article>
-            ))}
+          <div className="dos-partners-copy">
+            <h2>Our Farmers & Partners</h2>
+            <p className="dos-partners-intro">Trusted institutions and farmer communities powering inclusive agricultural growth across finance, logistics, and market access.</p>
           </div>
-          <p>In Partnership With</p>
+          <FarmerLogoCarousel />
+          <p>In Partnership With Leading Farmer Networks</p>
         </section>
 
         <section className="dos-cta-strip">
