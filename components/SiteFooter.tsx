@@ -22,10 +22,6 @@ const footerLinks = [
 export default function SiteFooter() {
   const pathname = usePathname();
 
-  if (pathname === "/") {
-    return null;
-  }
-
   return (
     <footer className="site-footer" aria-label="Site footer">
       <div className="site-footer-wrap">

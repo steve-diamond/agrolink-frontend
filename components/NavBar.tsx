@@ -88,10 +88,6 @@ export default function NavBar() {
     { href: "/vision", label: "Vision" },
   ];
 
-  if (pathname === "/") {
-    return null;
-  }
-
   return (
     <header className="border-b border-slate-200 shadow-[0_1px_0_rgba(15,23,42,0.04)]">
       <div className="bg-green-800 text-green-50">

@@ -1,17 +1,11 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import dosLogo from "../dos logo.jpg";
-import HomeLanguageSwitcher from "@/components/HomeLanguageSwitcher";
 import FarmerLogoCarousel from "@/components/FarmerLogoCarousel";
+import { getStoredLanguage, listenToLanguageChanges, type UiLanguage } from "@/services/uiLanguage";
 
-const navItems = [
-  { label: "Marketplace", href: "/marketplace" },
-  { label: "Finance", href: "/loan-application" },
-  { label: "Logistics", href: "/logistics" },
-  { label: "Warehouse", href: "/warehouse" },
-  { label: "Investor Desk", href: "/investor" },
-  { label: "About Us", href: "/about-us" },
-];
 const valueCards = [
   {
     icon: "🌱",
@@ -55,85 +49,166 @@ const trustItems = [
 const heroSlides = [
   {
     image: "/agropro/images/banner.jpg",
-    title: "Empowering Nigerian Farmers & Investors",
-    subtitle: "Grow, Trade, Invest - All in One Platform",
-    ctaPrimary: { label: "Enter Marketplace", href: "/marketplace" },
-    ctaSecondary: { label: "Join Our Network", href: "/join-us" },
+    title: {
+      en: "Empowering Nigerian Farmers & Investors",
+      ha: "Karfafa manoma da masu zuba jari na Najeriya",
+      yo: "Mimu agbara awon agbe ati awon oludokoowo ni Naijiria",
+      ig: "Inye ike ndi oru ugbo na ndi itinye ego na Naijiria",
+      pcm: "Empower Nigerian farmers and investors",
+    },
+    subtitle: {
+      en: "Grow, Trade, Invest - All in One Platform",
+      ha: "Noma, ciniki, saka jari - duka a wuri guda",
+      yo: "Dagba, ta, nawo - gbogbo e ninu pẹpẹ kan",
+      ig: "Kowa, ree, tinye ego - n'otu ebe",
+      pcm: "Grow, trade, invest - all for one platform",
+    },
+    ctaPrimary: { label: { en: "Enter Marketplace", ha: "Shiga kasuwa", yo: "Wo Oja", ig: "Banye ahia", pcm: "Enter market" }, href: "/marketplace" },
+    ctaSecondary: { label: { en: "Join Our Network", ha: "Shiga cibiyar mu", yo: "Darapo mo wa", ig: "Soro n'otu anyi", pcm: "Join network" }, href: "/join-us" },
   },
   {
     image: "/agropro/images/BannerMaize.jpg",
-    title: "Transparent Market Access for Every Harvest",
-    subtitle: "We connect producers to verified buyers with fair pricing intelligence.",
-    ctaPrimary: { label: "Explore Prices", href: "/marketplace" },
-    ctaSecondary: { label: "View Vision", href: "/vision" },
+    title: {
+      en: "Transparent Market Access for Every Harvest",
+      ha: "Bayyanannen shiga kasuwa ga kowanne girbi",
+      yo: "Wiwọle oja to han gbangba fun gbogbo ikore",
+      ig: "Nweta ahia doro anya maka owuwe ihe ubi niile",
+      pcm: "Clear market access for every harvest",
+    },
+    subtitle: {
+      en: "We connect producers to verified buyers with fair pricing intelligence.",
+      ha: "Muna hada masu noma da masu saye tabbatattu da farashi adalci.",
+      yo: "A so awọn olupese pọ mọ awọn onra to jẹrisi pelu iye to tọ.",
+      ig: "Anyi na-ejikota ndi na-emepụta na ndi na-azu ihe akwadoro.",
+      pcm: "We connect producers to verified buyers with fair prices.",
+    },
+    ctaPrimary: { label: { en: "Explore Prices", ha: "Duba farashi", yo: "Wo iye", ig: "Lelee onu ahia", pcm: "Check prices" }, href: "/marketplace" },
+    ctaSecondary: { label: { en: "View Vision", ha: "Duba hangen nesa", yo: "Wo iran", ig: "Lelee ọhụụ", pcm: "View vision" }, href: "/vision" },
   },
   {
     image: "/agropro/images/cassava.jpg",
-    title: "From Farm Gate to National Value Chains",
-    subtitle: "Digitized aggregation helps smallholders scale supply with confidence.",
-    ctaPrimary: { label: "See Opportunities", href: "/investor" },
-    ctaSecondary: { label: "Partner With Us", href: "/join-us" },
+    title: {
+      en: "From Farm Gate to National Value Chains",
+      ha: "Daga gona zuwa manyan sarkokin daraja",
+      yo: "Lati ẹnu-ọna oko de awọn pq iye kari orilẹ-ede",
+      ig: "Site n'uzo ubi ruo n'usoro uru mba",
+      pcm: "From farm gate to national value chains",
+    },
+    subtitle: {
+      en: "Digitized aggregation helps smallholders scale supply with confidence.",
+      ha: "Tattara kaya ta dijital na taimaka wa kananan manoma su bunkasa.",
+      yo: "Ikojọpọ dijita n ran awọn agbe kekere lọwọ lati gbooro ipese.",
+      ig: "Nchịkọta dijitalu na-enyere obere ndi oru ugbo ka ha too.",
+      pcm: "Digital aggregation helps small farmers scale supply.",
+    },
+    ctaPrimary: { label: { en: "See Opportunities", ha: "Ga dama", yo: "Wo anfani", ig: "Hu ohere", pcm: "See opportunities" }, href: "/investor" },
+    ctaSecondary: { label: { en: "Partner With Us", ha: "Yi hadin gwiwa", yo: "Sopọ pelu wa", ig: "Soro rụọ ọrụ", pcm: "Partner with us" }, href: "/join-us" },
   },
   {
     image: "/agropro/images/chicken.jpg",
-    title: "Reliable Food Systems, Built With Data",
-    subtitle: "Our platform strengthens planning, quality, and resilient production cycles.",
-    ctaPrimary: { label: "Farmer Dashboard", href: "/dashboard" },
-    ctaSecondary: { label: "Read Stories", href: "/vision" },
+    title: {
+      en: "Reliable Food Systems, Built With Data",
+      ha: "Tsarin abinci mai dogaro da bayanai",
+      yo: "Eto ounje to le lori data",
+      ig: "Usoro nri a pụrụ ịdabere na ya, nke data wuru",
+      pcm: "Reliable food systems built with data",
+    },
+    subtitle: {
+      en: "Our platform strengthens planning, quality, and resilient production cycles.",
+      ha: "Dandalinmu na karfafa tsari, inganci da juriya a samarwa.",
+      yo: "Pẹpẹ wa n mu eto, didara ati iṣelọpọ to lagbara pọ si.",
+      ig: "Ikpo okwu anyi na-eme ka atumatu, ogo na mmepụta sie ike.",
+      pcm: "Our platform strengthens planning and quality output cycles.",
+    },
+    ctaPrimary: { label: { en: "Farmer Dashboard", ha: "Allon manomi", yo: "Dasibodu agbe", ig: "Dashboard onye oru ugbo", pcm: "Farmer dashboard" }, href: "/dashboard" },
+    ctaSecondary: { label: { en: "Read Stories", ha: "Karanta labarai", yo: "Ka itan", ig: "Gụọ akụkọ", pcm: "Read stories" }, href: "/vision" },
   },
   {
     image: "/agropro/images/fish.jpeg",
-    title: "Inclusive Finance That Powers Productivity",
-    subtitle: "Credit, wallet rails, and repayment visibility unlock sustainable growth.",
-    ctaPrimary: { label: "Apply for Finance", href: "/loan-application" },
-    ctaSecondary: { label: "Investor Desk", href: "/investor" },
+    title: {
+      en: "Inclusive Finance That Powers Productivity",
+      ha: "Tallafi na kudi mai hada kowa don kara yawan amfanin gona",
+      yo: "Inawo to gba gbogbo eniyan laaye fun iṣelọpọ to ga",
+      ig: "Ego gụnyere onye ọ bụla na-akwalite mmepụta",
+      pcm: "Inclusive finance for stronger productivity",
+    },
+    subtitle: {
+      en: "Credit, wallet rails, and repayment visibility unlock sustainable growth.",
+      ha: "Bashi da walat na dijital suna bude hanyar ci gaba mai dorewa.",
+      yo: "Kirẹditi ati apamọwọ dijita n ṣii idagbasoke alagbero.",
+      ig: "Ego mgbazinye na wallet dijitalu na-emepe uto na-adịgide adịgide.",
+      pcm: "Credit and wallet rails unlock sustainable growth.",
+    },
+    ctaPrimary: { label: { en: "Apply for Finance", ha: "Nemi kudi", yo: "Beere inawo", ig: "Tinye maka ego", pcm: "Apply for finance" }, href: "/loan-application" },
+    ctaSecondary: { label: { en: "Investor Desk", ha: "Ofishin masu zuba jari", yo: "Tabili oludokoowo", ig: "Desk onye itinye ego", pcm: "Investor desk" }, href: "/investor" },
   },
   {
     image: "/agropro/images/plantain.jpg",
-    title: "Integrated Logistics and Storage Infrastructure",
-    subtitle: "Reduce post-harvest losses with traceable movement and warehouse support.",
-    ctaPrimary: { label: "Track Logistics", href: "/logistics" },
-    ctaSecondary: { label: "Book Storage", href: "/warehouse" },
+    title: {
+      en: "Integrated Logistics and Storage Infrastructure",
+      ha: "Hadin kai na jigila da ajiyar kaya",
+      yo: "Eto iṣipopada ati ibi ipamọ to so pọ",
+      ig: "Nhazi jikọtara njem na nchekwa",
+      pcm: "Integrated logistics and storage infrastructure",
+    },
+    subtitle: {
+      en: "Reduce post-harvest losses with traceable movement and warehouse support.",
+      ha: "Rage asarar bayan girbi ta hanyar jigilar da ake iya bin sawu.",
+      yo: "Din adanu lẹhin ikore ku pẹlu gbigbe to le tọpinpin.",
+      ig: "Belata mfu owuwe ihe ubi site na mmegharị a na-enyocha.",
+      pcm: "Cut post-harvest losses with traceable movement and storage.",
+    },
+    ctaPrimary: { label: { en: "Track Logistics", ha: "Bibi jigila", yo: "Tọpa gbigbe", ig: "Soro njem", pcm: "Track logistics" }, href: "/logistics" },
+    ctaSecondary: { label: { en: "Book Storage", ha: "Ajiye wuri", yo: "Buki ibi ipamo", ig: "Debe nchekwa", pcm: "Book storage" }, href: "/warehouse" },
   },
   {
     image: "/agropro/images/ugu.jpg",
-    title: "A Shared Vision for Prosperous Rural Economies",
-    subtitle: "We build trust between farmers, buyers, and institutions for long-term impact.",
-    ctaPrimary: { label: "About DosAgrolink", href: "/about-us" },
-    ctaSecondary: { label: "Become a Partner", href: "/join-us" },
+    title: {
+      en: "A Shared Vision for Prosperous Rural Economies",
+      ha: "Hangen nesa daya don bunkasar tattalin arzikin karkara",
+      yo: "Iran apapọ fun eto-ọrọ igberiko to ni ilọsiwaju",
+      ig: "Ohu otu maka uto akụnụba ime obodo",
+      pcm: "Shared vision for prosperous rural economies",
+    },
+    subtitle: {
+      en: "We build trust between farmers, buyers, and institutions for long-term impact.",
+      ha: "Muna gina amincewa tsakanin manoma, masu saye da cibiyoyi.",
+      yo: "A n kọ igbẹkẹle laarin awọn agbe, onra ati awọn ile-iṣẹ.",
+      ig: "Anyị na-ewu ntụkwasị obi n'etiti ndị ọrụ ugbo na ụlọọrụ.",
+      pcm: "We build trust between farmers, buyers, and institutions.",
+    },
+    ctaPrimary: { label: { en: "About DosAgrolink", ha: "Game da mu", yo: "Nipa wa", ig: "Banyere anyi", pcm: "About us" }, href: "/about-us" },
+    ctaSecondary: { label: { en: "Become a Partner", ha: "Zama abokin hulda", yo: "Di alabaṣepọ", ig: "Bụrụ onye mmekọ", pcm: "Become partner" }, href: "/join-us" },
   },
 ];
 
 export default function Home() {
+  const [language, setLanguage] = useState<UiLanguage>("en");
+
+  useEffect(() => {
+    setLanguage(getStoredLanguage());
+    const detach = listenToLanguageChanges((next) => setLanguage(next));
+    return detach;
+  }, []);
+
+  const localizedHeroSlides = useMemo(
+    () =>
+      heroSlides.map((slide) => ({
+        image: slide.image,
+        title: slide.title[language] || slide.title.en,
+        subtitle: slide.subtitle[language] || slide.subtitle.en,
+        ctaPrimary: { href: slide.ctaPrimary.href, label: slide.ctaPrimary.label[language] || slide.ctaPrimary.label.en },
+        ctaSecondary: { href: slide.ctaSecondary.href, label: slide.ctaSecondary.label[language] || slide.ctaSecondary.label.en },
+      })),
+    [language]
+  );
+
   return (
     <main className="dos-homepage">
       <section className="dos-home-card">
-        <header className="dos-topbar">
-          <div className="dos-brand">
-            <Image src={dosLogo} alt="DosAgrolink" width={32} height={32} className="dos-brand-logo" />
-            <strong>DosAgrolink</strong>
-          </div>
-          <nav className="dos-menu" aria-label="Primary">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href}>{item.label}</Link>
-            ))}
-          </nav>
-        </header>
-
-        <div className="dos-subbar">
-          <div className="dos-subbar-contact" aria-label="Contact channels">
-            <span>Call Us</span>
-            <span>|</span>
-            <span>WhatsApp</span>
-          </div>
-          <div className="dos-subbar-divider" aria-hidden="true">|</div>
-          <HomeLanguageSwitcher />
-          <Link href="/register" className="dos-get-started">Get Started</Link>
-        </div>
-
         <section className="dos-hero">
           <div className="dos-hero-carousel" aria-label="DosAgrolink vision highlights">
-            {heroSlides.map((slide, index) => (
+            {localizedHeroSlides.map((slide, index) => (
               <article
                 key={slide.image}
                 className="dos-hero-slide"
@@ -150,18 +225,20 @@ export default function Home() {
                 />
                 <div className="dos-hero-overlay" />
                 <div className="dos-hero-content">
-                  <h1>{slide.title}</h1>
-                  <p>{slide.subtitle}</p>
-                  <div className="dos-hero-actions">
-                    <Link href={slide.ctaPrimary.href} className="dos-btn-green">{slide.ctaPrimary.label}</Link>
-                    <Link href={slide.ctaSecondary.href} className="dos-btn-cream">{slide.ctaSecondary.label}</Link>
+                  <div className="dos-hero-caption-shell">
+                    <h1>{slide.title}</h1>
+                    <p>{slide.subtitle}</p>
+                    <div className="dos-hero-actions">
+                      <Link href={slide.ctaPrimary.href} className="dos-btn-green">{slide.ctaPrimary.label}</Link>
+                      <Link href={slide.ctaSecondary.href} className="dos-btn-cream">{slide.ctaSecondary.label}</Link>
+                    </div>
                   </div>
                 </div>
               </article>
             ))}
 
             <div className="dos-hero-progress" aria-hidden="true">
-              {heroSlides.map((slide, index) => (
+              {localizedHeroSlides.map((slide, index) => (
                 <span key={`${slide.image}-${index}`} style={{ animationDelay: `${index * 5}s` }} />
               ))}
             </div>
@@ -238,9 +315,6 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="dos-mini-footer">
-          <p>Privacy Policy | Terms of Service | FAQs</p>
-        </footer>
       </section>
     </main>
   );
