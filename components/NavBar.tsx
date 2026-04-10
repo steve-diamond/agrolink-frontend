@@ -70,11 +70,11 @@ export default function NavBar() {
 
   const topBarLinks = [
     { href: "/marketplace", label: "Marketplace" },
-    { href: "/product-listing", label: "Product Listing" },
-    { href: "/loan-application", label: "Farmer Loans" },
+    { href: "/loan-application", label: "Finance" },
     { href: "/logistics", label: "Logistics" },
     { href: "/warehouse", label: "Warehouse" },
     { href: "/investor", label: "Investor Desk" },
+    { href: "/about-us", label: "About Us" },
   ];
 
   const mainNavLinks = [
@@ -85,7 +85,7 @@ export default function NavBar() {
     { href: "/order-management", label: "Order Management" },
     { href: "/equipment-listing", label: "Equipment" },
     { href: "/about-us", label: "About Us" },
-    { href: "/investor", label: "Vision" },
+    { href: "/vision", label: "Vision" },
   ];
 
   if (pathname === "/") {

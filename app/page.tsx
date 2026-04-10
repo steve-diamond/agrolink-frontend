@@ -2,7 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import dosLogo from "../dos logo.jpg";
 
-const navItems = ["Marketplace", "Finance", "Logistics", "Warehouse", "Investor Desk", "About Us"];
+const navItems = [
+  { label: "Marketplace", href: "/marketplace" },
+  { label: "Finance", href: "/loan-application" },
+  { label: "Logistics", href: "/logistics" },
+  { label: "Warehouse", href: "/warehouse" },
+  { label: "Investor Desk", href: "/investor" },
+  { label: "About Us", href: "/about-us" },
+];
 const valueCards = [
   { icon: "🌱", title: "Agri Loans", desc: "Easy finance for your farm" },
   { icon: "🚚", title: "Logistics Support", desc: "Reliable transport solutions" },
@@ -26,7 +33,7 @@ export default function Home() {
           </div>
           <nav className="dos-menu" aria-label="Primary">
             {navItems.map((item) => (
-              <a key={item} href="#">{item}</a>
+              <Link key={item.href} href={item.href}>{item.label}</Link>
             ))}
           </nav>
         </header>
