@@ -8,27 +8,6 @@ import { useLocalizedCopy } from "@/services/useLocalizedCopy";
 
 const marketplaceCategories = ["All", "Seeds", "Fertilizers", "Equipment", "Livestock"];
 
-const featuredPromotions = [
-  {
-    title: "Seed Starter Week",
-    detail: "Save up to 15% on certified maize, rice, and vegetable seed packs.",
-    cta: "Shop Seeds",
-    href: "#categories",
-  },
-  {
-    title: "Logistics Boost",
-    detail: "Get reduced transport fees for bulk orders from verified sellers.",
-    cta: "See Logistics",
-    href: "/logistics",
-  },
-  {
-    title: "Warehouse Protection",
-    detail: "Secure storage offers for post-harvest produce and livestock feed.",
-    cta: "Book Storage",
-    href: "/warehouse",
-  },
-];
-
 const isValidRemoteImageUrl = (value?: string) => {
   if (!value) return false;
 
@@ -82,6 +61,27 @@ export default function Marketplace() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+
+  const featuredPromotions = [
+    {
+      title: copy.marketplacePromoSeedTitle,
+      detail: copy.marketplacePromoSeedDetail,
+      cta: copy.marketplacePromoSeedCta,
+      href: "#categories",
+    },
+    {
+      title: copy.marketplacePromoLogisticsTitle,
+      detail: copy.marketplacePromoLogisticsDetail,
+      cta: copy.marketplacePromoLogisticsCta,
+      href: "/logistics",
+    },
+    {
+      title: copy.marketplacePromoWarehouseTitle,
+      detail: copy.marketplacePromoWarehouseDetail,
+      cta: copy.marketplacePromoWarehouseCta,
+      href: "/warehouse",
+    },
+  ];
 
   useEffect(() => {
     getProducts({ approved: true })
@@ -169,36 +169,36 @@ export default function Marketplace() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <section className="rounded-2xl bg-linear-to-r from-emerald-950 via-green-800 to-lime-700 p-5 text-white shadow-xl sm:p-7">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-amber-200">Agrolink Marketplace</p>
-        <h1 className="mt-2 text-2xl font-bold sm:text-4xl">Trending Agricultural Products From Verified Sellers</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-amber-200">{copy.marketplaceHeroTag}</p>
+        <h1 className="mt-2 text-2xl font-bold sm:text-4xl">{copy.marketplaceHeroTitle}</h1>
         <p className="mt-2 max-w-3xl text-sm text-emerald-100 sm:text-base">
-          Design a responsive, mobile-first marketplace homepage for Agrolink that showcases top categories, trust signals, featured promotions, and fast buying.
+          {copy.marketplaceHeroDescription}
         </p>
 
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-sm font-semibold">4.8/5 Avg Seller Ratings</div>
-          <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-sm font-semibold">Verified Badges on Trusted Stores</div>
-          <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-sm font-semibold">GlobalPay Secure Payments</div>
+          <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-sm font-semibold">{copy.marketplaceTrustRating}</div>
+          <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-sm font-semibold">{copy.marketplaceTrustVerified}</div>
+          <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-sm font-semibold">{copy.marketplaceTrustPayment}</div>
         </div>
       </section>
 
       <section className="mt-6 rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm" id="categories">
-        <h2 className="text-lg font-bold text-slate-900">Search and Filter Marketplace</h2>
-        <p className="mt-1 text-sm text-slate-600">Find products by name, location, category, or price range.</p>
+        <h2 className="text-lg font-bold text-slate-900">{copy.marketplaceSearchTitle}</h2>
+        <p className="mt-1 text-sm text-slate-600">{copy.marketplaceSearchDescription}</p>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           <input
             type="search"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Search products or location"
+            placeholder={copy.marketplaceSearchPlaceholder}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring lg:col-span-2"
           />
 
           <select
             value={selectedCategory}
             onChange={(event) => setSelectedCategory(event.target.value)}
-            aria-label="Filter by category"
+            aria-label={copy.marketplaceCategoryFilterLabel}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
           >
             {marketplaceCategories.map((category) => (
@@ -211,7 +211,7 @@ export default function Marketplace() {
             min={0}
             value={minPrice}
             onChange={(event) => setMinPrice(event.target.value)}
-            placeholder="Min price"
+            placeholder={copy.marketplaceMinPricePlaceholder}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
           />
 
@@ -220,7 +220,7 @@ export default function Marketplace() {
             min={0}
             value={maxPrice}
             onChange={(event) => setMaxPrice(event.target.value)}
-            placeholder="Max price"
+            placeholder={copy.marketplaceMaxPricePlaceholder}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
           />
         </div>
@@ -228,8 +228,8 @@ export default function Marketplace() {
 
       <section className="mt-6">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-xl font-bold text-slate-900">Featured Promotions</h2>
-          <p className="text-sm text-slate-500">Competitive with leading marketplaces</p>
+          <h2 className="text-xl font-bold text-slate-900">{copy.marketplacePromotionsTitle}</h2>
+          <p className="text-sm text-slate-500">{copy.marketplacePromotionsSubtitle}</p>
         </div>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -256,13 +256,13 @@ export default function Marketplace() {
       ) : null}
 
       {!loading && filteredProducts.length === 0 && !fetchError ? (
-        <p className="mt-6 text-slate-600">No approved products available yet.</p>
+        <p className="mt-6 text-slate-600">{copy.marketplaceNoApprovedProducts}</p>
       ) : null}
 
       <section className="mt-6 flex items-center justify-between gap-3">
-        <h2 className="text-xl font-bold text-slate-900">Trending Products</h2>
+        <h2 className="text-xl font-bold text-slate-900">{copy.marketplaceTrendingTitle}</h2>
         <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-          {trendingProducts.length} products found
+          {trendingProducts.length} {copy.marketplaceProductsFoundSuffix}
         </span>
       </section>
 
@@ -294,12 +294,12 @@ export default function Marketplace() {
                   {normalizeCategory(product.category)}
                 </span>
                 <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-                  Verified Seller
+                  {copy.marketplaceVerifiedSeller}
                 </span>
               </div>
               <p className="text-xl font-bold text-emerald-700">₦{Number(product.price).toLocaleString()}</p>
               <p className="text-sm text-slate-600">{product.location}</p>
-              <p className="text-xs text-slate-500">⭐ {getSellerRating(product._id)} · {getReviewsCount(product._id)} reviews</p>
+              <p className="text-xs text-slate-500">⭐ {getSellerRating(product._id)} · {getReviewsCount(product._id)} {copy.marketplaceReviewsSuffix}</p>
               <p className="text-sm text-slate-500">{copy.available}: {product.quantity}</p>
 
               <label
@@ -339,7 +339,7 @@ export default function Marketplace() {
                 rel="noopener noreferrer"
                 className="mt-2 block w-full rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-center text-sm font-semibold text-emerald-800 no-underline transition hover:bg-emerald-100"
               >
-                WhatsApp Live Chat
+                {copy.marketplaceWhatsappLiveChat}
               </a>
             </div>
           </article>
@@ -347,26 +347,26 @@ export default function Marketplace() {
       </section>
 
       <section className="mt-8 rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-bold text-slate-900">Simplified Checkout in 3 Steps</h2>
-        <p className="mt-1 text-sm text-slate-600">Built for fast mobile conversions with secure global payment support.</p>
+        <h2 className="text-xl font-bold text-slate-900">{copy.marketplaceCheckoutTitle}</h2>
+        <p className="mt-1 text-sm text-slate-600">{copy.marketplaceCheckoutDescription}</p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Step 1</p>
-            <h3 className="mt-1 text-base font-semibold text-slate-900">Select Product</h3>
-            <p className="mt-1 text-sm text-slate-600">Search, filter by category, and choose quantity from verified sellers.</p>
+            <h3 className="mt-1 text-base font-semibold text-slate-900">{copy.marketplaceStepOneTitle}</h3>
+            <p className="mt-1 text-sm text-slate-600">{copy.marketplaceStepOneDescription}</p>
           </article>
 
           <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Step 2</p>
-            <h3 className="mt-1 text-base font-semibold text-slate-900">Confirm Order</h3>
-            <p className="mt-1 text-sm text-slate-600">Review pricing, trust signals, and delivery options before checkout.</p>
+            <h3 className="mt-1 text-base font-semibold text-slate-900">{copy.marketplaceStepTwoTitle}</h3>
+            <p className="mt-1 text-sm text-slate-600">{copy.marketplaceStepTwoDescription}</p>
           </article>
 
           <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Step 3</p>
-            <h3 className="mt-1 text-base font-semibold text-slate-900">Pay with GlobalPay</h3>
-            <p className="mt-1 text-sm text-slate-600">Complete payment securely and get instant order confirmation.</p>
+            <h3 className="mt-1 text-base font-semibold text-slate-900">{copy.marketplaceStepThreeTitle}</h3>
+            <p className="mt-1 text-sm text-slate-600">{copy.marketplaceStepThreeDescription}</p>
           </article>
         </div>
       </section>
@@ -377,7 +377,7 @@ export default function Marketplace() {
         rel="noopener noreferrer"
         className="fixed bottom-5 right-4 z-40 rounded-full border border-emerald-700 bg-emerald-700 px-4 py-3 text-sm font-bold text-white no-underline shadow-lg transition hover:bg-emerald-800"
       >
-        WhatsApp Live Chat
+        {copy.marketplaceWhatsappLiveChat}
       </a>
     </main>
   );

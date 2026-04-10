@@ -48,6 +48,43 @@ type CopyPack = {
   offline: string;
   online: string;
   queued: string;
+  marketplaceHeroTag: string;
+  marketplaceHeroTitle: string;
+  marketplaceHeroDescription: string;
+  marketplaceTrustRating: string;
+  marketplaceTrustVerified: string;
+  marketplaceTrustPayment: string;
+  marketplaceSearchTitle: string;
+  marketplaceSearchDescription: string;
+  marketplaceSearchPlaceholder: string;
+  marketplaceCategoryFilterLabel: string;
+  marketplaceMinPricePlaceholder: string;
+  marketplaceMaxPricePlaceholder: string;
+  marketplacePromotionsTitle: string;
+  marketplacePromotionsSubtitle: string;
+  marketplacePromoSeedTitle: string;
+  marketplacePromoSeedDetail: string;
+  marketplacePromoSeedCta: string;
+  marketplacePromoLogisticsTitle: string;
+  marketplacePromoLogisticsDetail: string;
+  marketplacePromoLogisticsCta: string;
+  marketplacePromoWarehouseTitle: string;
+  marketplacePromoWarehouseDetail: string;
+  marketplacePromoWarehouseCta: string;
+  marketplaceNoApprovedProducts: string;
+  marketplaceTrendingTitle: string;
+  marketplaceProductsFoundSuffix: string;
+  marketplaceVerifiedSeller: string;
+  marketplaceReviewsSuffix: string;
+  marketplaceWhatsappLiveChat: string;
+  marketplaceCheckoutTitle: string;
+  marketplaceCheckoutDescription: string;
+  marketplaceStepOneTitle: string;
+  marketplaceStepOneDescription: string;
+  marketplaceStepTwoTitle: string;
+  marketplaceStepTwoDescription: string;
+  marketplaceStepThreeTitle: string;
+  marketplaceStepThreeDescription: string;
 };
 
 const ENGLISH: CopyPack = {
@@ -98,6 +135,44 @@ const ENGLISH: CopyPack = {
   offline: "Offline",
   online: "Online",
   queued: "Queued",
+  marketplaceHeroTag: "Agrolink Marketplace",
+  marketplaceHeroTitle: "Trending Agricultural Products From Verified Sellers",
+  marketplaceHeroDescription:
+    "Design a responsive, mobile-first marketplace homepage for Agrolink that showcases top categories, trust signals, featured promotions, and fast buying.",
+  marketplaceTrustRating: "4.8/5 Avg Seller Ratings",
+  marketplaceTrustVerified: "Verified Badges on Trusted Stores",
+  marketplaceTrustPayment: "GlobalPay Secure Payments",
+  marketplaceSearchTitle: "Search and Filter Marketplace",
+  marketplaceSearchDescription: "Find products by name, location, category, or price range.",
+  marketplaceSearchPlaceholder: "Search products or location",
+  marketplaceCategoryFilterLabel: "Filter by category",
+  marketplaceMinPricePlaceholder: "Min price",
+  marketplaceMaxPricePlaceholder: "Max price",
+  marketplacePromotionsTitle: "Featured Promotions",
+  marketplacePromotionsSubtitle: "Competitive with leading marketplaces",
+  marketplacePromoSeedTitle: "Seed Starter Week",
+  marketplacePromoSeedDetail: "Save up to 15% on certified maize, rice, and vegetable seed packs.",
+  marketplacePromoSeedCta: "Shop Seeds",
+  marketplacePromoLogisticsTitle: "Logistics Boost",
+  marketplacePromoLogisticsDetail: "Get reduced transport fees for bulk orders from verified sellers.",
+  marketplacePromoLogisticsCta: "See Logistics",
+  marketplacePromoWarehouseTitle: "Warehouse Protection",
+  marketplacePromoWarehouseDetail: "Secure storage offers for post-harvest produce and livestock feed.",
+  marketplacePromoWarehouseCta: "Book Storage",
+  marketplaceNoApprovedProducts: "No approved products available yet.",
+  marketplaceTrendingTitle: "Trending Products",
+  marketplaceProductsFoundSuffix: "products found",
+  marketplaceVerifiedSeller: "Verified Seller",
+  marketplaceReviewsSuffix: "reviews",
+  marketplaceWhatsappLiveChat: "WhatsApp Live Chat",
+  marketplaceCheckoutTitle: "Simplified Checkout in 3 Steps",
+  marketplaceCheckoutDescription: "Built for fast mobile conversions with secure global payment support.",
+  marketplaceStepOneTitle: "Select Product",
+  marketplaceStepOneDescription: "Search, filter by category, and choose quantity from verified sellers.",
+  marketplaceStepTwoTitle: "Confirm Order",
+  marketplaceStepTwoDescription: "Review pricing, trust signals, and delivery options before checkout.",
+  marketplaceStepThreeTitle: "Pay with GlobalPay",
+  marketplaceStepThreeDescription: "Complete payment securely and get instant order confirmation.",
 };
 
 const HAUSA: CopyPack = {
