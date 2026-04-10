@@ -184,6 +184,19 @@ body {
   border-bottom: 1px solid var(--dos-earth-300);
 }
 
+.dos-hero-carousel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.dos-hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: dosHeroCycle 35s infinite;
+}
+
 .dos-hero-bg {
   object-fit: cover;
   object-position: center;
@@ -198,7 +211,7 @@ body {
 .dos-hero-content {
   position: relative;
   z-index: 1;
-  width: min(690px, 100%);
+  width: min(710px, 100%);
   padding: 2rem 1.2rem;
 }
 
@@ -222,6 +235,72 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
+}
+
+.dos-hero-progress {
+  position: absolute;
+  left: 1.2rem;
+  right: 1.2rem;
+  bottom: 0.8rem;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.dos-hero-progress span {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(253, 250, 238, 0.35);
+  overflow: hidden;
+  position: relative;
+}
+
+.dos-hero-progress span::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: linear-gradient(90deg, #f1d67a, #eab84e);
+  animation: dosHeroProgress 35s infinite;
+}
+
+@keyframes dosHeroCycle {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  2% {
+    opacity: 1;
+  }
+  12% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  14.28% {
+    opacity: 0;
+    transform: scale(1.045);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.045);
+  }
+}
+
+@keyframes dosHeroProgress {
+  0% {
+    transform: scaleX(0);
+  }
+  12% {
+    transform: scaleX(1);
+  }
+  14.28% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(0);
+  }
 }
 
 .dos-btn-green,
@@ -2674,6 +2753,13 @@ button {
 
   .dos-hero {
     min-height: 300px;
+  }
+
+  .dos-hero-progress {
+    left: 0.72rem;
+    right: 0.72rem;
+    bottom: 0.52rem;
+    gap: 0.25rem;
   }
 
   .dos-hero-content h1 {

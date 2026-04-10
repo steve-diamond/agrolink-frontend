@@ -23,6 +23,58 @@ const trustItems = [
 ];
 const partners = ["Lagos State", "IFAD", "ACCESS", "NIRSAL", "NDA"];
 
+const heroSlides = [
+  {
+    image: "/agropro/images/banner.jpg",
+    title: "Empowering Nigerian Farmers & Investors",
+    subtitle: "Grow, Trade, Invest - All in One Platform",
+    ctaPrimary: { label: "Enter Marketplace", href: "/marketplace" },
+    ctaSecondary: { label: "Join Our Network", href: "/join-us" },
+  },
+  {
+    image: "/agropro/images/BannerMaize.jpg",
+    title: "Transparent Market Access for Every Harvest",
+    subtitle: "We connect producers to verified buyers with fair pricing intelligence.",
+    ctaPrimary: { label: "Explore Prices", href: "/marketplace" },
+    ctaSecondary: { label: "View Vision", href: "/vision" },
+  },
+  {
+    image: "/agropro/images/cassava.jpg",
+    title: "From Farm Gate to National Value Chains",
+    subtitle: "Digitized aggregation helps smallholders scale supply with confidence.",
+    ctaPrimary: { label: "See Opportunities", href: "/investor" },
+    ctaSecondary: { label: "Partner With Us", href: "/join-us" },
+  },
+  {
+    image: "/agropro/images/chicken.jpg",
+    title: "Reliable Food Systems, Built With Data",
+    subtitle: "Our platform strengthens planning, quality, and resilient production cycles.",
+    ctaPrimary: { label: "Farmer Dashboard", href: "/dashboard" },
+    ctaSecondary: { label: "Read Stories", href: "/vision" },
+  },
+  {
+    image: "/agropro/images/fish.jpeg",
+    title: "Inclusive Finance That Powers Productivity",
+    subtitle: "Credit, wallet rails, and repayment visibility unlock sustainable growth.",
+    ctaPrimary: { label: "Apply for Finance", href: "/loan-application" },
+    ctaSecondary: { label: "Investor Desk", href: "/investor" },
+  },
+  {
+    image: "/agropro/images/plantain.jpg",
+    title: "Integrated Logistics and Storage Infrastructure",
+    subtitle: "Reduce post-harvest losses with traceable movement and warehouse support.",
+    ctaPrimary: { label: "Track Logistics", href: "/logistics" },
+    ctaSecondary: { label: "Book Storage", href: "/warehouse" },
+  },
+  {
+    image: "/agropro/images/ugu.jpg",
+    title: "A Shared Vision for Prosperous Rural Economies",
+    subtitle: "We build trust between farmers, buyers, and institutions for long-term impact.",
+    ctaPrimary: { label: "About DosAgrolink", href: "/about-us" },
+    ctaSecondary: { label: "Become a Partner", href: "/join-us" },
+  },
+];
+
 export default function Home() {
   return (
     <main className="dos-homepage">
@@ -51,14 +103,38 @@ export default function Home() {
         </div>
 
         <section className="dos-hero">
-          <Image src="/agropro/images/banner.jpg" alt="Nigerian farmers" fill priority className="dos-hero-bg" sizes="100vw" />
-          <div className="dos-hero-overlay" />
-          <div className="dos-hero-content">
-            <h1>Empowering Nigerian Farmers &amp; Investors</h1>
-            <p>Grow, Trade, Invest - All in One Platform</p>
-            <div className="dos-hero-actions">
-              <Link href="/marketplace" className="dos-btn-green">Enter Marketplace</Link>
-              <Link href="/join-us" className="dos-btn-cream">Join Our Network</Link>
+          <div className="dos-hero-carousel" aria-label="DosAgrolink vision highlights">
+            {heroSlides.map((slide, index) => (
+              <article
+                key={slide.image}
+                className="dos-hero-slide"
+                style={{ animationDelay: `${index * 5}s` }}
+                aria-label={`Slide ${index + 1}`}
+              >
+                <Image
+                  src={slide.image}
+                  alt={slide.title}
+                  fill
+                  priority={index === 0}
+                  className="dos-hero-bg"
+                  sizes="100vw"
+                />
+                <div className="dos-hero-overlay" />
+                <div className="dos-hero-content">
+                  <h1>{slide.title}</h1>
+                  <p>{slide.subtitle}</p>
+                  <div className="dos-hero-actions">
+                    <Link href={slide.ctaPrimary.href} className="dos-btn-green">{slide.ctaPrimary.label}</Link>
+                    <Link href={slide.ctaSecondary.href} className="dos-btn-cream">{slide.ctaSecondary.label}</Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+
+            <div className="dos-hero-progress" aria-hidden="true">
+              {heroSlides.map((slide, index) => (
+                <span key={`${slide.image}-${index}`} style={{ animationDelay: `${index * 5}s` }} />
+              ))}
             </div>
           </div>
         </section>
