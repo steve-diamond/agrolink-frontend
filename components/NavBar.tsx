@@ -160,11 +160,27 @@ export default function NavBar() {
               {copy.syncStatus}: {isOnline ? copy.online : copy.offline} · {copy.queued} {pendingQueueCount}
             </span>
 
+            <label className="hidden items-center gap-1 rounded-md border border-[#d4bf88] bg-[#f8f2e4] px-1.5 py-1 text-[10px] font-bold uppercase tracking-[0.07em] text-[#5b4a25] lg:inline-flex">
+              Lang
+              <select
+                value={language}
+                onChange={(e) => handleLanguageChange(e.target.value as UiLanguage)}
+                aria-label="Choose language"
+                className="min-h-7 rounded-md border border-[#c7b17b] bg-[#fff9ed] px-1.5 text-[11px] font-bold text-[#3f3a2a] outline-none"
+              >
+                <option value="en">EN</option>
+                <option value="ha">HA</option>
+                <option value="yo">YO</option>
+                <option value="ig">IG</option>
+                <option value="pcm">PC</option>
+              </select>
+            </label>
+
             <select
               value={language}
               onChange={(e) => handleLanguageChange(e.target.value as UiLanguage)}
               aria-label="Choose language"
-              className="min-h-8 rounded-md border border-slate-300 bg-white px-1.5 text-[11px] font-semibold text-slate-700 sm:min-h-9 sm:px-2 sm:text-xs"
+              className="min-h-8 rounded-md border border-[#d4bf88] bg-[#f8f2e4] px-1.5 text-[11px] font-bold text-[#3f3a2a] outline-none lg:hidden"
             >
               <option value="en">EN</option>
               <option value="ha">HA</option>

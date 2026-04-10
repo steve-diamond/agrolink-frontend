@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import dosLogo from "../dos logo.jpg";
+import HomeLanguageSwitcher from "@/components/HomeLanguageSwitcher";
 
 const navItems = [
   { label: "Marketplace", href: "/marketplace" },
@@ -39,11 +40,13 @@ export default function Home() {
         </header>
 
         <div className="dos-subbar">
-          <span>Call Us</span>
-          <span>|</span>
-          <span>WhatsApp</span>
-          <span>|</span>
-          <span>En · Yo · IgHa</span>
+          <div className="dos-subbar-contact" aria-label="Contact channels">
+            <span>Call Us</span>
+            <span>|</span>
+            <span>WhatsApp</span>
+          </div>
+          <div className="dos-subbar-divider" aria-hidden="true">|</div>
+          <HomeLanguageSwitcher />
           <Link href="/register" className="dos-get-started">Get Started</Link>
         </div>
 
