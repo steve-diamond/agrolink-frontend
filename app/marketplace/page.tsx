@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { getProducts, Product } from "@/services/productService";
 import API from "@/services/api";
 import { useLocalizedCopy } from "@/services/useLocalizedCopy";
@@ -52,12 +53,15 @@ const normalizeCategory = (category?: string): Exclude<MarketplaceCategoryValue,
 
 export default function Marketplace() {
   const { copy, language } = useLocalizedCopy();
+  const router = useRouter();
+  const pathname = usePathname();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
   const [buyingProductId, setBuyingProductId] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<MarketplaceCategoryValue>("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -86,6 +90,54 @@ export default function Marketplace() {
 
   const formatCurrency = (value: number) => currencyFormatter.format(Number.isFinite(value) ? value : 0);
   const formatCount = (value: number) => numberFormatter.format(Number.isFinite(value) ? value : 0);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q") || "";
+    const category = (params.get("category") || "all") as MarketplaceCategoryValue;
+    const min = params.get("min") || "";
+    const max = params.get("max") || "";
+
+    const allowedCategories: MarketplaceCategoryValue[] = ["all", "seeds", "fertilizers", "equipment", "livestock"];
+    const safeCategory = allowedCategories.includes(category) ? category : "all";
+
+    setSearchInput(q);
+    setDebouncedSearchTerm(q);
+    setSelectedCategory(safeCategory);
+    setMinPrice(min);
+    setMaxPrice(max);
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchInput.trim());
+    }, 250);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchInput]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (debouncedSearchTerm) params.set("q", debouncedSearchTerm);
+    else params.delete("q");
+
+    if (selectedCategory !== "all") params.set("category", selectedCategory);
+    else params.delete("category");
+
+    if (minPrice) params.set("min", minPrice);
+    else params.delete("min");
+
+    if (maxPrice) params.set("max", maxPrice);
+    else params.delete("max");
+
+    const nextQuery = params.toString();
+    const currentQuery = window.location.search.replace(/^\?/, "");
+
+    if (nextQuery !== currentQuery) {
+      router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+    }
+  }, [debouncedSearchTerm, selectedCategory, minPrice, maxPrice, pathname, router]);
 
   const marketplaceCategoryOptions: Array<{ value: MarketplaceCategoryValue; label: string }> = [
     { value: "all", label: copy.marketplaceCategoryAll },
@@ -145,9 +197,9 @@ export default function Marketplace() {
       const max = maxPrice ? Number(maxPrice) : null;
 
       const matchesSearch =
-        !searchTerm ||
-        name.includes(searchTerm.toLowerCase()) ||
-        String(product.location || "").toLowerCase().includes(searchTerm.toLowerCase());
+        !debouncedSearchTerm ||
+        name.includes(debouncedSearchTerm.toLowerCase()) ||
+        String(product.location || "").toLowerCase().includes(debouncedSearchTerm.toLowerCase());
 
       const matchesCategory = selectedCategory === "all" || normalizedCategory === selectedCategory;
       const matchesMinPrice = min === null || productPrice >= min;
@@ -155,7 +207,7 @@ export default function Marketplace() {
 
       return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
     });
-  }, [products, searchTerm, selectedCategory, minPrice, maxPrice]);
+  }, [products, debouncedSearchTerm, selectedCategory, minPrice, maxPrice]);
 
   const trendingProducts = useMemo(() => {
     return [...filteredProducts]
@@ -230,8 +282,8 @@ export default function Marketplace() {
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           <input
             type="search"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
             placeholder={copy.marketplaceSearchPlaceholder}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring lg:col-span-2"
           />
