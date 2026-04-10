@@ -352,19 +352,19 @@ export default function Marketplace() {
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Step 1</p>
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">{copy.marketplaceStepLabelOne}</p>
             <h3 className="mt-1 text-base font-semibold text-slate-900">{copy.marketplaceStepOneTitle}</h3>
             <p className="mt-1 text-sm text-slate-600">{copy.marketplaceStepOneDescription}</p>
           </article>
 
           <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Step 2</p>
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">{copy.marketplaceStepLabelTwo}</p>
             <h3 className="mt-1 text-base font-semibold text-slate-900">{copy.marketplaceStepTwoTitle}</h3>
             <p className="mt-1 text-sm text-slate-600">{copy.marketplaceStepTwoDescription}</p>
           </article>
 
           <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Step 3</p>
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">{copy.marketplaceStepLabelThree}</p>
             <h3 className="mt-1 text-base font-semibold text-slate-900">{copy.marketplaceStepThreeTitle}</h3>
             <p className="mt-1 text-sm text-slate-600">{copy.marketplaceStepThreeDescription}</p>
           </article>

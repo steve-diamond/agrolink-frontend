@@ -79,6 +79,9 @@ type CopyPack = {
   marketplaceWhatsappLiveChat: string;
   marketplaceCheckoutTitle: string;
   marketplaceCheckoutDescription: string;
+  marketplaceStepLabelOne: string;
+  marketplaceStepLabelTwo: string;
+  marketplaceStepLabelThree: string;
   marketplaceStepOneTitle: string;
   marketplaceStepOneDescription: string;
   marketplaceStepTwoTitle: string;
@@ -167,6 +170,9 @@ const ENGLISH: CopyPack = {
   marketplaceWhatsappLiveChat: "WhatsApp Live Chat",
   marketplaceCheckoutTitle: "Simplified Checkout in 3 Steps",
   marketplaceCheckoutDescription: "Built for fast mobile conversions with secure global payment support.",
+  marketplaceStepLabelOne: "Step 1",
+  marketplaceStepLabelTwo: "Step 2",
+  marketplaceStepLabelThree: "Step 3",
   marketplaceStepOneTitle: "Select Product",
   marketplaceStepOneDescription: "Search, filter by category, and choose quantity from verified sellers.",
   marketplaceStepTwoTitle: "Confirm Order",
@@ -245,6 +251,9 @@ const HAUSA: CopyPack = {
   marketplaceWhatsappLiveChat: "Tattaunawa Kai Tsaye ta WhatsApp",
   marketplaceCheckoutTitle: "Saukakken Biyan Oda a Matakai 3",
   marketplaceCheckoutDescription: "An gina shi don saurin saya a wayar hannu tare da tsaron biyan kudi na duniya.",
+  marketplaceStepLabelOne: "Mataki na 1",
+  marketplaceStepLabelTwo: "Mataki na 2",
+  marketplaceStepLabelThree: "Mataki na 3",
   marketplaceStepOneTitle: "Zabi Kaya",
   marketplaceStepOneDescription: "Nemo, tace ta rukuni, sannan ka zabi adadi daga tabbattun masu sayarwa.",
   marketplaceStepTwoTitle: "Tabbatar da Oda",
@@ -323,6 +332,9 @@ const YORUBA: CopyPack = {
   marketplaceWhatsappLiveChat: "Iwiregbe Live WhatsApp",
   marketplaceCheckoutTitle: "Sisanwo Rorun ni Igbesẹ Mẹta",
   marketplaceCheckoutDescription: "A ko o fun iyipada rira lori foonu pelu aabo isanwo agbaye.",
+  marketplaceStepLabelOne: "Igbesẹ 1",
+  marketplaceStepLabelTwo: "Igbesẹ 2",
+  marketplaceStepLabelThree: "Igbesẹ 3",
   marketplaceStepOneTitle: "Yan ọja",
   marketplaceStepOneDescription: "Wa, se asayan eya, ki o yan iye lati odo awon olutaja to je eri.",
   marketplaceStepTwoTitle: "Jẹrisi Aṣẹ",
@@ -401,6 +413,9 @@ const IGBO: CopyPack = {
   marketplaceWhatsappLiveChat: "Mkparịta ụka WhatsApp",
   marketplaceCheckoutTitle: "Ịkwụ Ụgwọ Dị Mfe n'Ihe Nzọụkwụ 3",
   marketplaceCheckoutDescription: "E wuru ya maka ịzụ ngwa ngwa na ekwentị na nchekwa ịkwụ ụgwọ ụwa.",
+  marketplaceStepLabelOne: "Nzọụkwụ 1",
+  marketplaceStepLabelTwo: "Nzọụkwụ 2",
+  marketplaceStepLabelThree: "Nzọụkwụ 3",
   marketplaceStepOneTitle: "Họrọ Ngwaahịa",
   marketplaceStepOneDescription: "Chọọ, họrọ ngalaba, ma họrọ ọnụọgụ site n'aka ndi na-ere ekwenyere.",
   marketplaceStepTwoTitle: "Kwenye Oda",
@@ -479,6 +494,9 @@ const PIDGIN: CopyPack = {
   marketplaceWhatsappLiveChat: "WhatsApp Live Chat",
   marketplaceCheckoutTitle: "Simple Checkout in 3 Steps",
   marketplaceCheckoutDescription: "Built for fast mobile conversion with secure global payment support.",
+  marketplaceStepLabelOne: "Step 1",
+  marketplaceStepLabelTwo: "Step 2",
+  marketplaceStepLabelThree: "Step 3",
   marketplaceStepOneTitle: "Select Product",
   marketplaceStepOneDescription: "Search, filter by category, choose quantity from verified sellers.",
   marketplaceStepTwoTitle: "Confirm Order",
