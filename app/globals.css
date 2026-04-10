@@ -749,6 +749,269 @@ button {
   gap: 0.9rem;
 }
 
+.social-carousel-block {
+  border: 1px solid #d5dfcf;
+  border-radius: 24px;
+  padding: clamp(1rem, 2vw, 1.35rem);
+  background:
+    radial-gradient(circle at 8% 12%, rgba(25, 109, 63, 0.16) 0%, rgba(25, 109, 63, 0) 36%),
+    radial-gradient(circle at 92% 88%, rgba(22, 133, 132, 0.15) 0%, rgba(22, 133, 132, 0) 34%),
+    linear-gradient(132deg, #f9f4e7 0%, #f4ecdb 52%, #f1f7ee 100%);
+  box-shadow: 0 16px 28px rgba(24, 60, 30, 0.1);
+}
+
+.social-carousel-head {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 72ch;
+}
+
+.social-carousel-head h2 {
+  margin: 0;
+  font-family: "Sora", "Segoe UI", sans-serif;
+  font-size: clamp(1.4rem, 2.5vw, 2.1rem);
+  line-height: 1.05;
+  color: #1e4f2f;
+}
+
+.social-carousel-head p {
+  margin: 0;
+  color: #445346;
+  font-size: 0.95rem;
+  max-width: 66ch;
+}
+
+.social-carousel-track {
+  margin-top: 0.8rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(300px, 1fr);
+  gap: 0.85rem;
+  overflow-x: auto;
+  padding: 0.15rem 0.05rem 0.25rem;
+  scroll-snap-type: x mandatory;
+}
+
+.social-carousel-track::-webkit-scrollbar {
+  height: 9px;
+}
+
+.social-carousel-track::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #b9cdbb;
+}
+
+.social-card {
+  scroll-snap-align: start;
+  border-radius: 18px;
+  border: 1px solid #d8d4bf;
+  background: #fffef9;
+  box-shadow: 0 14px 24px rgba(27, 57, 37, 0.09);
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 205px 1fr;
+  min-height: 100%;
+}
+
+.social-card-media {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #d8d4bf;
+}
+
+.social-card-image {
+  object-fit: cover;
+}
+
+.social-card-badge {
+  position: absolute;
+  left: 0.65rem;
+  top: 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  background: rgba(20, 84, 47, 0.85);
+  color: #f2ffe8;
+  font-size: 0.71rem;
+  letter-spacing: 0.04em;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.35rem 0.62rem;
+}
+
+.social-card-body {
+  display: grid;
+  gap: 0.68rem;
+  padding: 0.92rem;
+}
+
+.social-card-body h3 {
+  margin: 0;
+  font-family: "Sora", "Segoe UI", sans-serif;
+  font-size: 1.12rem;
+  line-height: 1.13;
+  color: #214f30;
+}
+
+.social-card-body p {
+  margin: 0;
+  color: #4a524a;
+  font-size: 0.9rem;
+  line-height: 1.52;
+}
+
+.social-metrics {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.social-metric-chip {
+  border-radius: 12px;
+  border: 1px solid #ddd8c4;
+  background: linear-gradient(120deg, #fcf9ee 0%, #f6f1dd 100%);
+  padding: 0.55rem 0.62rem;
+  display: flex;
+  align-items: center;
+  gap: 0.52rem;
+}
+
+.metric-icon {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid #cecfbf;
+  background: #f6f6ea;
+  position: relative;
+}
+
+.metric-icon::before,
+.metric-icon::after {
+  content: "";
+  position: absolute;
+}
+
+.metric-icon-roi::before {
+  left: 7px;
+  bottom: 7px;
+  width: 14px;
+  height: 2px;
+  background: #1f7a4a;
+  transform: rotate(-28deg);
+  transform-origin: left center;
+}
+
+.metric-icon-roi::after {
+  right: 6px;
+  top: 7px;
+  border-left: 5px solid #1f7a4a;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+
+.metric-icon-impact::before {
+  left: 7px;
+  top: 7px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid #167f7f;
+}
+
+.metric-icon-impact::after {
+  left: 13px;
+  bottom: 6px;
+  width: 3px;
+  height: 11px;
+  border-radius: 999px;
+  background: #167f7f;
+}
+
+.social-metric-chip strong {
+  display: block;
+  color: #224d31;
+  font-size: 0.89rem;
+  line-height: 1.15;
+}
+
+.social-metric-chip small {
+  display: block;
+  margin-top: 0.1rem;
+  color: #627166;
+  font-size: 0.73rem;
+  letter-spacing: 0.01em;
+}
+
+.social-card-actions {
+  margin-top: 0.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.social-cta-primary,
+.social-cta-secondary {
+  min-height: 40px;
+  border-radius: 999px;
+  padding: 0.52rem 0.9rem;
+  text-decoration: none;
+  font-size: 0.79rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-cta-primary {
+  border: 1px solid #16673d;
+  background: linear-gradient(135deg, #1b7a47, #105a33);
+  color: #f3ffef;
+}
+
+.social-cta-secondary {
+  border: 1px solid #d4a72f;
+  background: linear-gradient(135deg, #f0ce6b, #e0b54d);
+  color: #5f4300;
+}
+
+.social-qr-box {
+  margin-top: 0.08rem;
+  border-radius: 12px;
+  border: 1px solid #cec7ac;
+  background: linear-gradient(145deg, #fffdf2 0%, #f7efd4 100%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.62rem;
+}
+
+.social-qr-code {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  border: 1px solid #b7b18f;
+  background:
+    linear-gradient(90deg, #1d2b20 10%, transparent 10%) 0 0 / 10px 10px,
+    linear-gradient(#1d2b20 10%, transparent 10%) 0 0 / 10px 10px,
+    linear-gradient(90deg, transparent 90%, #1d2b20 90%) 0 0 / 10px 10px,
+    linear-gradient(transparent 90%, #1d2b20 90%) 0 0 / 10px 10px,
+    #faf8ec;
+}
+
+.social-qr-box strong {
+  display: block;
+  color: #234e32;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.social-qr-box span {
+  display: block;
+  margin-top: 0.12rem;
+  color: #5f6b5f;
+  font-size: 0.72rem;
+}
+
 .live-news-header {
   display: grid;
   gap: 0.65rem;
@@ -1696,6 +1959,54 @@ button {
 
   .footer-bottom {
     gap: 0.5rem;
+  }
+
+  .social-carousel-block {
+    border-radius: 20px;
+    padding: 0.9rem;
+  }
+
+  .social-carousel-head h2 {
+    font-size: clamp(1.22rem, 6vw, 1.56rem);
+  }
+
+  .social-carousel-head p {
+    font-size: 0.88rem;
+  }
+
+  .social-carousel-track {
+    grid-auto-columns: 88%;
+    gap: 0.7rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .social-card {
+    grid-template-rows: 188px 1fr;
+  }
+
+  .social-card-body {
+    padding: 0.78rem;
+    gap: 0.58rem;
+  }
+
+  .social-card-actions {
+    gap: 0.45rem;
+  }
+
+  .social-cta-primary,
+  .social-cta-secondary {
+    min-height: 38px;
+    font-size: 0.75rem;
+    padding: 0.5rem 0.76rem;
+  }
+
+  .social-qr-box {
+    padding: 0.5rem;
+  }
+
+  .social-qr-code {
+    width: 46px;
+    height: 46px;
   }
 }
 

@@ -20,6 +20,45 @@ const heroImages = [
   "/agropro/images/service2.jpg",
 ];
 
+const socialCarouselSlides = [
+  {
+    id: "farmer-growth",
+    audience: "Farmer Growth",
+    title: "Market-ready crop sales with better margins",
+    summary:
+      "Turn weekly harvest into structured marketplace listings, faster settlement, and transparent buyer demand signals.",
+    image: "/agropro/images/about_img.jpg",
+    roi: "ROI +18%",
+    impact: "1,240 farmers onboarded",
+    ctaPrimary: { href: "/marketplace", label: "Enter Marketplace" },
+    ctaSecondary: { href: "/join-us", label: "Join Network" },
+  },
+  {
+    id: "investor-insight",
+    audience: "Investor Desk",
+    title: "Portfolio visibility with social impact tracking",
+    summary:
+      "Monitor project performance, expected returns, and social outcomes from one clean dashboard built for investment decisions.",
+    image: "/agropro/images/service3.jpg",
+    roi: "ROI up to 22%",
+    impact: "350 hectares cultivated",
+    ctaPrimary: { href: "/investor", label: "View Investor Desk" },
+    ctaSecondary: { href: "/vision", label: "See Impact Model" },
+  },
+  {
+    id: "logistics-reliability",
+    audience: "Logistics + Warehouse",
+    title: "Delivery reliability backed by storage rails",
+    summary:
+      "Coordinate shipment milestones, warehouse capacity, and payment confidence to reduce spoilage and delay risk.",
+    image: "/agropro/images/service2.jpg",
+    roi: "Losses down 30%",
+    impact: "95 active delivery routes",
+    ctaPrimary: { href: "/logistics", label: "Track Logistics" },
+    ctaSecondary: { href: "/warehouse", label: "Explore Warehousing" },
+  },
+] as const;
+
 export default function Home() {
   return (
     <main className="agropro-page">
@@ -45,6 +84,67 @@ export default function Home() {
             farmer income and reduce avoidable losses.
           </p>
           <Link href="/marketplace" className="agropro-cta">Enter Marketplace</Link>
+        </div>
+      </section>
+
+      <section className="slide-kit-block social-carousel-block" aria-label="DosAgrolink social media carousel">
+        <div className="social-carousel-head">
+          <p className="section-kicker">SOCIAL MEDIA CAROUSEL</p>
+          <h2>Stories, returns, and impact in one visual flow</h2>
+          <p>
+            Designed for bold communication across mobile and desktop with stronger hierarchy, balanced whitespace,
+            and clear conversion paths.
+          </p>
+        </div>
+
+        <div className="social-carousel-track" role="list">
+          {socialCarouselSlides.map((slide) => (
+            <article key={slide.id} className="social-card" role="listitem">
+              <div className="social-card-media">
+                <Image src={slide.image} alt={slide.title} fill className="social-card-image" sizes="(max-width: 980px) 84vw, 34vw" />
+                <span className="social-card-badge">{slide.audience}</span>
+              </div>
+
+              <div className="social-card-body">
+                <h3>{slide.title}</h3>
+                <p>{slide.summary}</p>
+
+                <div className="social-metrics">
+                  <div className="social-metric-chip">
+                    <span className="metric-icon metric-icon-roi" aria-hidden="true" />
+                    <div>
+                      <strong>{slide.roi}</strong>
+                      <small>Return signal</small>
+                    </div>
+                  </div>
+                  <div className="social-metric-chip">
+                    <span className="metric-icon metric-icon-impact" aria-hidden="true" />
+                    <div>
+                      <strong>{slide.impact}</strong>
+                      <small>Social impact</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="social-card-actions">
+                  <Link href={slide.ctaPrimary.href} className="social-cta-primary">
+                    {slide.ctaPrimary.label}
+                  </Link>
+                  <Link href={slide.ctaSecondary.href} className="social-cta-secondary">
+                    {slide.ctaSecondary.label}
+                  </Link>
+                </div>
+
+                <div className="social-qr-box" aria-label="QR call to action">
+                  <div className="social-qr-code" aria-hidden="true" />
+                  <div>
+                    <strong>Scan QR for instant onboarding</strong>
+                    <span>Open WhatsApp onboarding and media kit</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
