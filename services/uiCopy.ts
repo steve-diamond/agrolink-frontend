@@ -58,6 +58,12 @@ type CopyPack = {
   marketplaceSearchDescription: string;
   marketplaceSearchPlaceholder: string;
   marketplaceCategoryFilterLabel: string;
+  marketplaceCategoryAll: string;
+  marketplaceCategorySeeds: string;
+  marketplaceCategoryFertilizers: string;
+  marketplaceCategoryEquipment: string;
+  marketplaceCategoryLivestock: string;
+  marketplaceCategoryGeneral: string;
   marketplaceMinPricePlaceholder: string;
   marketplaceMaxPricePlaceholder: string;
   marketplacePromotionsTitle: string;
@@ -149,6 +155,12 @@ const ENGLISH: CopyPack = {
   marketplaceSearchDescription: "Find products by name, location, category, or price range.",
   marketplaceSearchPlaceholder: "Search products or location",
   marketplaceCategoryFilterLabel: "Filter by category",
+  marketplaceCategoryAll: "All",
+  marketplaceCategorySeeds: "Seeds",
+  marketplaceCategoryFertilizers: "Fertilizers",
+  marketplaceCategoryEquipment: "Equipment",
+  marketplaceCategoryLivestock: "Livestock",
+  marketplaceCategoryGeneral: "General",
   marketplaceMinPricePlaceholder: "Min price",
   marketplaceMaxPricePlaceholder: "Max price",
   marketplacePromotionsTitle: "Featured Promotions",
@@ -230,6 +242,12 @@ const HAUSA: CopyPack = {
   marketplaceSearchDescription: "Nemo kaya ta suna, wuri, rukuni, ko farashi.",
   marketplaceSearchPlaceholder: "Nemo kaya ko wuri",
   marketplaceCategoryFilterLabel: "Tace ta rukuni",
+  marketplaceCategoryAll: "Duka",
+  marketplaceCategorySeeds: "Iri",
+  marketplaceCategoryFertilizers: "Taki",
+  marketplaceCategoryEquipment: "Kayan Aiki",
+  marketplaceCategoryLivestock: "Dabbobi",
+  marketplaceCategoryGeneral: "Na Gaba Daya",
   marketplaceMinPricePlaceholder: "Mafi karancin farashi",
   marketplaceMaxPricePlaceholder: "Mafi girman farashi",
   marketplacePromotionsTitle: "Rangwame na Musamman",
@@ -311,6 +329,12 @@ const YORUBA: CopyPack = {
   marketplaceSearchDescription: "Wa ọja nipa oruko, ibi, eya, tabi ibiti owo de.",
   marketplaceSearchPlaceholder: "Wa ọja tabi ibi",
   marketplaceCategoryFilterLabel: "Se asayan eya",
+  marketplaceCategoryAll: "Gbogbo",
+  marketplaceCategorySeeds: "Irugbin",
+  marketplaceCategoryFertilizers: "Ajile",
+  marketplaceCategoryEquipment: "Ohun elo",
+  marketplaceCategoryLivestock: "Eranko",
+  marketplaceCategoryGeneral: "Gbogbogbo",
   marketplaceMinPricePlaceholder: "Owo kere julo",
   marketplaceMaxPricePlaceholder: "Owo to po julo",
   marketplacePromotionsTitle: "Ipolowo Pataki",
@@ -392,6 +416,12 @@ const IGBO: CopyPack = {
   marketplaceSearchDescription: "Chọta ngwaahịa site n'aha, ebe, ngalaba, ma ọ bụ oke ego.",
   marketplaceSearchPlaceholder: "Chọọ ngwaahịa ma ọ bụ ebe",
   marketplaceCategoryFilterLabel: "Họrọ ngalaba",
+  marketplaceCategoryAll: "Niile",
+  marketplaceCategorySeeds: "Mkpuru",
+  marketplaceCategoryFertilizers: "Fatịlaịza",
+  marketplaceCategoryEquipment: "Ngwaọrụ",
+  marketplaceCategoryLivestock: "Anụmanụ",
+  marketplaceCategoryGeneral: "N'ozuzu",
   marketplaceMinPricePlaceholder: "Ego kacha nta",
   marketplaceMaxPricePlaceholder: "Ego kacha elu",
   marketplacePromotionsTitle: "Mbelata Ego Pụrụ Iche",
@@ -473,6 +503,12 @@ const PIDGIN: CopyPack = {
   marketplaceSearchDescription: "Find products by name, location, category, or price range.",
   marketplaceSearchPlaceholder: "Search product or location",
   marketplaceCategoryFilterLabel: "Filter by category",
+  marketplaceCategoryAll: "All",
+  marketplaceCategorySeeds: "Seeds",
+  marketplaceCategoryFertilizers: "Fertilizers",
+  marketplaceCategoryEquipment: "Equipment",
+  marketplaceCategoryLivestock: "Livestock",
+  marketplaceCategoryGeneral: "General",
   marketplaceMinPricePlaceholder: "Minimum price",
   marketplaceMaxPricePlaceholder: "Maximum price",
   marketplacePromotionsTitle: "Featured Promos",

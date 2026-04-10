@@ -6,7 +6,7 @@ import { getProducts, Product } from "@/services/productService";
 import API from "@/services/api";
 import { useLocalizedCopy } from "@/services/useLocalizedCopy";
 
-const marketplaceCategories = ["All", "Seeds", "Fertilizers", "Equipment", "Livestock"];
+type MarketplaceCategoryValue = "all" | "seeds" | "fertilizers" | "equipment" | "livestock";
 
 const isValidRemoteImageUrl = (value?: string) => {
   if (!value) return false;
@@ -41,13 +41,13 @@ const getReviewsCount = (productId: string) => {
   return 12 + (scoreSeed % 120);
 };
 
-const normalizeCategory = (category?: string) => {
+const normalizeCategory = (category?: string): Exclude<MarketplaceCategoryValue, "all"> | "general" => {
   const raw = String(category || "").toLowerCase();
-  if (raw.includes("seed")) return "Seeds";
-  if (raw.includes("fertil")) return "Fertilizers";
-  if (raw.includes("equip") || raw.includes("tool")) return "Equipment";
-  if (raw.includes("livestock") || raw.includes("poultry") || raw.includes("animal")) return "Livestock";
-  return "General";
+  if (raw.includes("seed")) return "seeds";
+  if (raw.includes("fertil")) return "fertilizers";
+  if (raw.includes("equip") || raw.includes("tool")) return "equipment";
+  if (raw.includes("livestock") || raw.includes("poultry") || raw.includes("animal")) return "livestock";
+  return "general";
 };
 
 export default function Marketplace() {
@@ -58,9 +58,25 @@ export default function Marketplace() {
   const [buyingProductId, setBuyingProductId] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState<MarketplaceCategoryValue>("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+
+  const marketplaceCategoryOptions: Array<{ value: MarketplaceCategoryValue; label: string }> = [
+    { value: "all", label: copy.marketplaceCategoryAll },
+    { value: "seeds", label: copy.marketplaceCategorySeeds },
+    { value: "fertilizers", label: copy.marketplaceCategoryFertilizers },
+    { value: "equipment", label: copy.marketplaceCategoryEquipment },
+    { value: "livestock", label: copy.marketplaceCategoryLivestock },
+  ];
+
+  const localizedCategoryLabelByValue: Record<Exclude<MarketplaceCategoryValue, "all"> | "general", string> = {
+    seeds: copy.marketplaceCategorySeeds,
+    fertilizers: copy.marketplaceCategoryFertilizers,
+    equipment: copy.marketplaceCategoryEquipment,
+    livestock: copy.marketplaceCategoryLivestock,
+    general: copy.marketplaceCategoryGeneral,
+  };
 
   const featuredPromotions = [
     {
@@ -98,7 +114,7 @@ export default function Marketplace() {
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const name = String(product.name || "").toLowerCase();
-      const category = normalizeCategory(product.category);
+      const normalizedCategory = normalizeCategory(product.category);
       const productPrice = Number(product.price || 0);
       const min = minPrice ? Number(minPrice) : null;
       const max = maxPrice ? Number(maxPrice) : null;
@@ -108,7 +124,7 @@ export default function Marketplace() {
         name.includes(searchTerm.toLowerCase()) ||
         String(product.location || "").toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesCategory = selectedCategory === "All" || category === selectedCategory;
+      const matchesCategory = selectedCategory === "all" || normalizedCategory === selectedCategory;
       const matchesMinPrice = min === null || productPrice >= min;
       const matchesMaxPrice = max === null || productPrice <= max;
 
@@ -197,12 +213,12 @@ export default function Marketplace() {
 
           <select
             value={selectedCategory}
-            onChange={(event) => setSelectedCategory(event.target.value)}
+            onChange={(event) => setSelectedCategory(event.target.value as MarketplaceCategoryValue)}
             aria-label={copy.marketplaceCategoryFilterLabel}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
           >
-            {marketplaceCategories.map((category) => (
-              <option key={category} value={category}>{category}</option>
+            {marketplaceCategoryOptions.map((category) => (
+              <option key={category.value} value={category.value}>{category.label}</option>
             ))}
           </select>
 
@@ -291,7 +307,7 @@ export default function Marketplace() {
               <h2 className="line-clamp-1 text-lg font-semibold text-slate-900">{product.name}</h2>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-semibold text-slate-600">
-                  {normalizeCategory(product.category)}
+                  {localizedCategoryLabelByValue[normalizeCategory(product.category)]}
                 </span>
                 <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                   {copy.marketplaceVerifiedSeller}
