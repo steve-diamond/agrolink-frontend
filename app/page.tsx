@@ -12,14 +12,44 @@ const navItems = [
   { label: "About Us", href: "/about-us" },
 ];
 const valueCards = [
-  { icon: "🌱", title: "Agri Loans", desc: "Easy finance for your farm" },
-  { icon: "🚚", title: "Logistics Support", desc: "Reliable transport solutions" },
-  { icon: "🏠", title: "Warehousing", desc: "Secure storage for your harvest" },
+  {
+    icon: "🌱",
+    title: "Agri Loans",
+    desc: "Flexible working capital and seasonal credit designed for productive farms.",
+    detail: "Fast review • Transparent repayment",
+  },
+  {
+    icon: "🚚",
+    title: "Logistics Support",
+    desc: "Coordinated pickup and route visibility from farm gate to buyer destination.",
+    detail: "Tracked delivery • Lower spoilage risk",
+  },
+  {
+    icon: "🏠",
+    title: "Warehousing",
+    desc: "Quality-assured storage that protects value until market timing is right.",
+    detail: "Verified inventory • Receipt-ready records",
+  },
 ];
 const trustItems = [
-  { icon: "🤝", title: "Trusted Partnerships" },
-  { icon: "🔒", title: "Secure Payments" },
-  { icon: "📊", title: "Proven Results" },
+  {
+    icon: "🤝",
+    title: "Trusted Partnerships",
+    desc: "We collaborate with cooperatives, institutions, and communities to scale impact.",
+    metric: "50+ ecosystem partners",
+  },
+  {
+    icon: "🔒",
+    title: "Secure Payments",
+    desc: "Protected transaction rails and audit trails ensure confidence across every trade.",
+    metric: "End-to-end payment traceability",
+  },
+  {
+    icon: "📊",
+    title: "Proven Results",
+    desc: "Data-backed execution improves farmer outcomes, buyer reliability, and market access.",
+    metric: "Measured growth across value chains",
+  },
 ];
 const partners = ["Lagos State", "IFAD", "ACCESS", "NIRSAL", "NDA"];
 
@@ -146,6 +176,7 @@ export default function Home() {
               <div>
                 <h2>{item.title}</h2>
                 <p>{item.desc}</p>
+                <small>{item.detail}</small>
               </div>
             </article>
           ))}
@@ -153,11 +184,14 @@ export default function Home() {
 
         <section className="dos-why" aria-label="Why choose us">
           <h2>Why Choose Us?</h2>
+          <p className="dos-why-intro">A purpose-built agricultural platform combining trust, technology, and execution excellence.</p>
           <div className="dos-why-grid">
             {trustItems.map((item) => (
               <article key={item.title} className="dos-why-item">
-                <span aria-hidden="true">{item.icon}</span>
+                <span className="dos-why-icon" aria-hidden="true">{item.icon}</span>
                 <h3>{item.title}</h3>
+                <p>{item.desc}</p>
+                <small>{item.metric}</small>
               </article>
             ))}
           </div>
