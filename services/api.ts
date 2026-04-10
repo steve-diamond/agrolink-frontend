@@ -32,6 +32,37 @@ export const api = axios.create({
   baseURL: getBaseUrl(),
 });
 
+const isTechnicalDbError = (message: string): boolean => {
+  return /users\.insertOne\(\)|buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(
+    message
+  );
+};
+
+const sanitizeApiError = (error: any) => {
+  const message = String(
+    error?.response?.data?.message || error?.response?.data?.error || error?.message || ""
+  );
+
+  if (!isTechnicalDbError(message)) {
+    return error;
+  }
+
+  const safeMessage = "Service is temporarily unavailable. Please try again shortly.";
+
+  if (error?.response?.data) {
+    error.response.data.message = safeMessage;
+    if (error.response.data.error) {
+      error.response.data.error = safeMessage;
+    }
+  }
+
+  if (typeof error?.message === "string") {
+    error.message = safeMessage;
+  }
+
+  return error;
+};
+
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
@@ -45,5 +76,10 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(sanitizeApiError(error))
+);
 
 export default api;
