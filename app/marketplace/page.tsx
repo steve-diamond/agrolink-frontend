@@ -51,7 +51,7 @@ const normalizeCategory = (category?: string): Exclude<MarketplaceCategoryValue,
 };
 
 export default function Marketplace() {
-  const { copy } = useLocalizedCopy();
+  const { copy, language } = useLocalizedCopy();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
@@ -61,6 +61,31 @@ export default function Marketplace() {
   const [selectedCategory, setSelectedCategory] = useState<MarketplaceCategoryValue>("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+
+  const localeByLanguage = {
+    en: "en-NG",
+    ha: "ha-Latn-NG",
+    yo: "yo-NG",
+    ig: "ig-NG",
+    pcm: "en-NG",
+  } as const;
+
+  const activeLocale = localeByLanguage[language] || "en-NG";
+
+  const currencyFormatter = useMemo(() => {
+    return new Intl.NumberFormat(activeLocale, {
+      style: "currency",
+      currency: "NGN",
+      maximumFractionDigits: 0,
+    });
+  }, [activeLocale]);
+
+  const numberFormatter = useMemo(() => {
+    return new Intl.NumberFormat(activeLocale);
+  }, [activeLocale]);
+
+  const formatCurrency = (value: number) => currencyFormatter.format(Number.isFinite(value) ? value : 0);
+  const formatCount = (value: number) => numberFormatter.format(Number.isFinite(value) ? value : 0);
 
   const marketplaceCategoryOptions: Array<{ value: MarketplaceCategoryValue; label: string }> = [
     { value: "all", label: copy.marketplaceCategoryAll },
@@ -278,7 +303,7 @@ export default function Marketplace() {
       <section className="mt-6 flex items-center justify-between gap-3">
         <h2 className="text-xl font-bold text-slate-900">{copy.marketplaceTrendingTitle}</h2>
         <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-          {trendingProducts.length} {copy.marketplaceProductsFoundSuffix}
+          {formatCount(trendingProducts.length)} {copy.marketplaceProductsFoundSuffix}
         </span>
       </section>
 
@@ -313,10 +338,10 @@ export default function Marketplace() {
                   {copy.marketplaceVerifiedSeller}
                 </span>
               </div>
-              <p className="text-xl font-bold text-emerald-700">₦{Number(product.price).toLocaleString()}</p>
+              <p className="text-xl font-bold text-emerald-700">{formatCurrency(Number(product.price))}</p>
               <p className="text-sm text-slate-600">{product.location}</p>
-              <p className="text-xs text-slate-500">⭐ {getSellerRating(product._id)} · {getReviewsCount(product._id)} {copy.marketplaceReviewsSuffix}</p>
-              <p className="text-sm text-slate-500">{copy.available}: {product.quantity}</p>
+              <p className="text-xs text-slate-500">⭐ {getSellerRating(product._id)} · {formatCount(getReviewsCount(product._id))} {copy.marketplaceReviewsSuffix}</p>
+              <p className="text-sm text-slate-500">{copy.available}: {formatCount(Number(product.quantity || 0))}</p>
 
               <label
                 htmlFor={`quantity-${product._id}`}
