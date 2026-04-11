@@ -946,7 +946,6 @@ export default function AdminDashboardPage() {
                           <td className="py-2 px-3 text-xs text-slate-400">{new Date(entry.timestamp).toLocaleString()}</td>
                         </tr>
                       ))}
-                    </>
 
 
             {activeModule === "farmers" ? (
