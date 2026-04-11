@@ -1107,7 +1107,7 @@ export default function AdminDashboardPage() {
                       </div>
                 </div>
               </section>
-            ) : null
+      			) : null;
 
             {activeModule === "analytics" ? (
               <section className="space-y-4">
