@@ -1073,7 +1073,7 @@ export default function AdminDashboardPage() {
                           </div>
                         )}
 
-                        {activeModule === "auditlog" && (
+                        {activeModule === "auditlog" ? (
                           <div className="max-w-3xl mx-auto">
                             <h3 className="text-lg font-bold mb-4">Audit Log</h3>
                             <table className="w-full bg-white rounded-lg shadow">
@@ -1101,7 +1101,7 @@ export default function AdminDashboardPage() {
                               </tbody>
                             </table>
                           </div>
-                        )}
+                        ) : null}
 
                         {/* ...other module blocks (farmers, products, orders, analytics, settings)... */}
                       </div>
