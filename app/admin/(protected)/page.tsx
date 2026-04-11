@@ -753,7 +753,7 @@ export default function AdminDashboardPage() {
                   </button>
                 ))}
               </div>
-            ) : null}
+            ) : null
           </header>
 
             {/* Quick Actions and Insights Bar */}
