@@ -156,159 +156,160 @@ const chartTooltipStyle = {
 } as const;
 
 const getAuthHeaders = () => ({
-  Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-});
+                        <>
+                          {activeModule === "notifications" && (
+                            <div className="max-w-2xl mx-auto">
+                              <h3 className="text-lg font-bold mb-4">Notifications Center</h3>
+                              <ul className="space-y-2">
+                                {notifications.length === 0 && <li className="text-slate-500">No notifications.</li>}
+                                {notifications.map((notif) => (
+                                  <li key={notif.id} className="rounded-lg bg-white shadow px-4 py-3 flex items-center gap-3 border-l-4 border-green-600/60">
+                                    <span className="inline-block w-2 h-2 rounded-full bg-green-600/60"></span>
+                                    <span className="flex-1">
+                                      <span className="font-semibold">{NOTIF_TYPES[notif.type] || notif.type}:</span> {notif.message}
+                                    </span>
+                                    <span className="text-xs text-slate-400">{new Date(notif.createdAt).toLocaleTimeString()}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
 
-const hashText = (value: string): number => {
-  let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash << 5) - hash + value.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-};
+                          {activeModule === "auditlog" ? (
+                            <div className="max-w-3xl mx-auto">
+                              <h3 className="text-lg font-bold mb-4">Audit Log</h3>
+                              <table className="w-full bg-white rounded-lg shadow">
+                                <thead>
+                                  <tr className="bg-green-50 text-green-900">
+                                    <th className="py-2 px-3 text-left">Action</th>
+                                    <th className="py-2 px-3 text-left">User</th>
+                                    <th className="py-2 px-3 text-left">Target</th>
+                                    <th className="py-2 px-3 text-left">Timestamp</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {auditLog.length === 0 ? (
+                                    <tr><td colSpan={4} className="text-slate-500 py-4 text-center">No audit log entries.</td></tr>
+                                  ) : (
+                                    auditLog.map((entry) => (
+                                      <tr key={entry.id} className="border-b last:border-b-0">
+                                        <td className="py-2 px-3">{entry.action}</td>
+                                        <td className="py-2 px-3">{entry.user}</td>
+                                        <td className="py-2 px-3">{entry.target}</td>
+                                        <td className="py-2 px-3 text-xs text-slate-400">{new Date(entry.timestamp).toLocaleString()}</td>
+                                      </tr>
+                                    ))
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : null}
 
-const normalizeOrderStatus = (raw?: string): (typeof ORDER_STATUSES)[number] | "Unknown" => {
-  const value = String(raw || "").trim().toLowerCase();
-  if (value === "pending") return "Pending";
-  if (value === "shipped") return "Shipped";
-  if (value === "delivered") return "Delivered";
-  return "Unknown";
-};
+                          {activeModule === "analytics" ? (
+                            <section className="space-y-4">
+                              <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <h3 className="m-0 text-lg font-semibold">Analytics Module</h3>
+                                  <select
+                                    value={analyticsCategory}
+                                    onChange={(event) => setAnalyticsCategory(event.target.value)}
+                                    className="ml-auto rounded-md border border-slate-300 bg-white px-3 py-2 text-xs"
+                                  >
+                                    <option value="All">All categories</option>
+                                    {FARMER_CATEGORIES.map((category) => (
+                                      <option key={category} value={category}>{category}</option>
+                                    ))}
+                                  </select>
+                                  <select
+                                    value={analyticsRegion}
+                                    onChange={(event) => setAnalyticsRegion(event.target.value)}
+                                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs"
+                                  >
+                                    {analyticsRegions.map((region) => (
+                                      <option key={region} value={region}>{region}</option>
+                                    ))}
+                                  </select>
+                                  <button onClick={exportAnalyticsCsv} className="rounded-md bg-cyan-600 px-3 py-2 text-xs font-semibold text-white">Download CSV</button>
+                                  <button onClick={printInvestorReport} className="rounded-md bg-slate-700 px-3 py-2 text-xs font-semibold text-white">Download PDF</button>
+                                </div>
+                              </article>
 
-const normalizeFarmerCategory = (raw?: string): (typeof FARMER_CATEGORIES)[number] | null => {
-  const value = String(raw || "").trim().toLowerCase();
-  if (!value) return null;
+                              <div className="grid gap-4 lg:grid-cols-2">
+                                <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                                  <h3 className="m-0 text-sm font-semibold">Farmer Registrations by Category</h3>
+                                  <div className="mt-3 h-72">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                      <BarChart data={analyticsCategoryData}>
+                                        <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+                                        <XAxis dataKey="category" tick={{ fontSize: 12 }} />
+                                        <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                                        <Tooltip contentStyle={chartTooltipStyle} />
+                                        <Bar dataKey="count" fill="#16a34a" radius={[6, 6, 0, 0]} />
+                                      </BarChart>
+                                    </ResponsiveContainer>
+                                  </div>
+                                </article>
 
-  if (value.includes("mixed")) return "Mixed";
-  if (value.includes("organic")) return "Organic";
-  if (value.includes("dairy") || value.includes("milk")) return "Dairy";
-  if (value.includes("fish") || value.includes("aquaculture")) return "Fish";
-  if (value.includes("poultry") || value.includes("chicken") || value.includes("egg")) return "Poultry";
-  if (value.includes("hort") || value.includes("vegetable") || value.includes("fruit") || value.includes("pepper")) return "Horticultural";
-  if (value.includes("livestock") || value.includes("cattle") || value.includes("goat") || value.includes("sheep") || value.includes("animal")) return "Livestock";
-  if (value.includes("arable") || value.includes("maize") || value.includes("rice") || value.includes("yam") || value.includes("cassava") || value.includes("crop")) return "Arable";
+                                <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                                  <h3 className="m-0 text-sm font-semibold">Weekly Product Approvals</h3>
+                                  <div className="mt-3 h-72">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                      <LineChart data={weeklyApprovalsData}>
+                                        <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+                                        <XAxis dataKey="week" tick={{ fontSize: 12 }} />
+                                        <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+                                        <Tooltip contentStyle={chartTooltipStyle} />
+                                        <Line type="monotone" dataKey="approvals" stroke="#0ea5e9" strokeWidth={3} dot={{ r: 4 }} />
+                                      </LineChart>
+                                    </ResponsiveContainer>
+                                  </div>
+                                </article>
+                              </div>
 
-  return null;
-};
+                              <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                                <h3 className="m-0 text-sm font-semibold">Order Volumes and Revenue Trends</h3>
+                                <div className="mt-3 h-72">
+                                  <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={analyticsTrendData}>
+                                      <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+                                      <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+                                      <YAxis tick={{ fontSize: 12 }} />
+                                      <Tooltip
+                                        contentStyle={chartTooltipStyle}
+                                        formatter={(value, name) => {
+                                          if (name === "revenue") return [currencyFormatter.format(Number(value || 0)), "Revenue"];
+                                          return [value, "Order Volume"];
+                                        }}
+                                      />
+                                      <Legend />
+                                      <Line type="monotone" dataKey="volume" name="Order Volume" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} />
+                                      <Line type="monotone" dataKey="revenue" name="Revenue" stroke="#16a34a" strokeWidth={2.5} dot={{ r: 3 }} />
+                                    </LineChart>
+                                  </ResponsiveContainer>
+                                </div>
+                              </article>
+                            </section>
+                          ) : null}
 
-export default function AdminDashboardPage() {
-    // Notifications and Audit Log state/hooks
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
-    const notifInterval = useRef<NodeJS.Timeout | null>(null);
-
-    // Simulate real-time notifications (replace with real API/websocket in production)
-    useEffect(() => {
-      notifInterval.current = setInterval(() => {
-        setNotifications((prev) => [
-          {
-            id: Math.random().toString(36).slice(2),
-            message: `New order received at ${new Date().toLocaleTimeString()}`,
-            type: "info",
-            createdAt: new Date().toISOString(),
-          },
-          ...prev.slice(0, 9),
-        ]);
-      }, 15000);
-      return () => {
-        if (notifInterval.current) clearInterval(notifInterval.current);
-      };
-    }, []);
-
-    // Simulate audit log (replace with real API in production)
-    useEffect(() => {
-      setAuditLog([
-        { id: "1", action: "Approved product", user: "Admin", target: "Tomatoes", timestamp: new Date(Date.now() - 3600000).toISOString() },
-        { id: "2", action: "Rejected farmer application", user: "Admin", target: "Jane Doe", timestamp: new Date(Date.now() - 7200000).toISOString() },
-        { id: "3", action: "Updated order status", user: "Admin", target: "Order #1234", timestamp: new Date(Date.now() - 10800000).toISOString() },
-      ]);
-    }, []);
-  const router = useRouter();
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [products, setProducts] = useState<AdminProduct[]>([]);
-  const [orders, setOrders] = useState<AdminOrder[]>([]);
-  const [farmerApplications, setFarmerApplications] = useState<AdminFarmerApplication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [approvingProductId, setApprovingProductId] = useState<string | null>(null);
-  const [rangeDays, setRangeDays] = useState<DateRange>(90);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeModule, setActiveModule] = useState<ModuleKey>("dashboard");
-  const [analyticsCategory, setAnalyticsCategory] = useState<string>("All");
-  const [analyticsRegion, setAnalyticsRegion] = useState<string>("All");
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token") ?? "";
-
-    if (!token) {
-      router.replace("/admin/login");
-      return;
-    }
-
-    Promise.all([
-      API.get("/api/admin/users", { headers: getAuthHeaders() }),
-      API.get("/api/admin/products", { headers: getAuthHeaders() }),
-      API.get("/api/admin/orders", { headers: getAuthHeaders() }),
-      API.get("/api/admin/farmer-applications", { headers: getAuthHeaders() }),
-    ])
-      .then(([usersRes, productsRes, ordersRes, farmerApplicationsRes]) => {
-        const usersPayload = usersRes.data as any;
-        const productsPayload = productsRes.data as any;
-        const ordersPayload = ordersRes.data as any;
-        const farmerApplicationsPayload = farmerApplicationsRes.data as any;
-
-        const usersData = Array.isArray(usersPayload)
-          ? usersPayload
-          : Array.isArray(usersPayload?.users)
-          ? usersPayload.users
-          : [];
-
-        const productsData = Array.isArray(productsPayload)
-          ? productsPayload
-          : Array.isArray(productsPayload?.products)
-          ? productsPayload.products
-          : [];
-
-        const ordersData = Array.isArray(ordersPayload)
-          ? ordersPayload
-          : Array.isArray(ordersPayload?.orders)
-          ? ordersPayload.orders
-          : [];
-
-        const farmerApplicationsData = Array.isArray(farmerApplicationsPayload)
-          ? farmerApplicationsPayload
-          : Array.isArray(farmerApplicationsPayload?.applications)
-          ? farmerApplicationsPayload.applications
-          : [];
-
-        setUsers(usersData);
-        setProducts(productsData);
-        setOrders(ordersData);
-        setFarmerApplications(farmerApplicationsData);
-      })
-      .catch((err: any) => {
-        setError(err?.response?.data?.message || "Failed to load admin dashboard.");
-      })
-      .finally(() => setLoading(false));
-  }, [router]);
-
-  const handleDelete = async (type: "users" | "products" | "orders", id: string) => {
-    if (!confirm(`Delete this ${type.slice(0, -1)}? This cannot be undone.`)) return;
-    setDeleting(id);
-    try {
-      await API.delete(`/api/admin/${type}/${id}`, { headers: getAuthHeaders() });
-      if (type === "users") setUsers((prev) => prev.filter((u) => u._id !== id));
-      if (type === "products") setProducts((prev) => prev.filter((p) => p._id !== id));
-      if (type === "orders") setOrders((prev) => prev.filter((o) => o._id !== id));
-    } catch (err: any) {
-      alert(err?.response?.data?.message || `Failed to delete ${type.slice(0, -1)}.`);
-    } finally {
-      setDeleting(null);
-    }
+                          {activeModule === "settings" ? (
+                            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                              <h3 className="m-0 text-lg font-semibold">Settings</h3>
+                              <p className="mt-2 text-sm text-slate-600">Manage admin preferences, notifications, and module behavior.</p>
+                              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                                <label className="rounded-lg border border-slate-200 p-3 text-sm">
+                                  <span className="font-semibold">Email Notifications</span>
+                                  <p className="m-0 mt-1 text-xs text-slate-500">Receive approvals and order alerts by email.</p>
+                                  <input type="checkbox" className="mt-2" defaultChecked />
+                                </label>
+                                <label className="rounded-lg border border-slate-200 p-3 text-sm">
+                                  <span className="font-semibold">Auto-refresh Dashboard</span>
+                                  <p className="m-0 mt-1 text-xs text-slate-500">Keep analytics and KPIs updated in real time.</p>
+                                  <input type="checkbox" className="mt-2" defaultChecked />
+                                </label>
+                              </div>
+                            </section>
+                          ) : null}
+                        </>
   };
 
   const deleteProduct = (id: string) => handleDelete("products", id);
