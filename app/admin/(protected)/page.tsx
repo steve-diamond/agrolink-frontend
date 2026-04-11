@@ -862,9 +862,7 @@ export default function AdminDashboardPage() {
                           )}
               <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="m-0 text-sm font-semibold text-slate-500">Total Farmers</p>
-                    <p className="m-0 mt-2 text-3xl font-bold text-slate-800">{compactFormatter.format(totalFarmers)}</p>
+  				</div>
                   </div>
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-700">FM</span>
                 </div>
