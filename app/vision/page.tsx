@@ -4,8 +4,10 @@ import { visionPoints } from "@/lib/visionPoints";
 
 export default function VisionPage() {
   return (
-    <main className="mx-auto grid max-w-6xl gap-6 py-6">
-      <section className="card p-5 sm:p-6">
+    <main className="mx-auto grid max-w-6xl gap-4 sm:gap-6 py-4 sm:py-6 px-2 sm:px-0">
+      <section className="card p-4 sm:p-6 w-full flex items-center gap-3 mb-4">
+        <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={44} height={44} className="rounded-lg shadow" priority />
+        <span className="text-xl font-extrabold text-green-900 tracking-tight">DOS AGROLINK VISION</span>
         <p className="text-xs font-bold tracking-[0.2em] text-amber-700">DOS AGROLINK VISION</p>
         <h1 className="mt-2 text-3xl font-extrabold text-green-900 sm:text-4xl">Our 7-Point Vision in Action</h1>
         <p className="mt-3 max-w-4xl text-sm text-slate-700 sm:text-base">
@@ -20,7 +22,7 @@ export default function VisionPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
+      <section className="grid gap-4 grid-cols-1 md:grid-cols-2 w-full">
         {visionPoints.map((item, index) => (
           <article key={item.slug} className="card overflow-hidden">
             <div className="relative min-h-[170px]">

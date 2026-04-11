@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import API from "@/services/api";
 
 type OrderProduct = {
@@ -177,7 +178,11 @@ export default function OrdersPage() {
   const deliveredCount = orders.filter((order) => order.status === "delivered").length;
 
   return (
-    <main className="mx-auto grid max-w-5xl gap-4">
+    <main className="mx-auto grid max-w-5xl gap-4 sm:gap-5 py-4 sm:py-6 px-2 sm:px-0">
+      <header className="flex items-center gap-3 mb-4">
+        <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={40} height={40} className="rounded-lg shadow" priority />
+        <span className="text-lg font-extrabold text-green-900 tracking-tight">DOS AGROLINK</span>
+      </header>
       <section className="rounded-2xl border border-green-900/25 bg-linear-to-br from-green-950 via-green-900 to-green-700 p-5 text-green-50 shadow-xl shadow-green-900/25">
         <p className="m-0 text-xs uppercase tracking-[0.16em] text-green-100">Order Management</p>
         <h1 className="m-0 mt-1 text-3xl font-bold">My Orders</h1>

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import FarmerLogoCarousel from "@/components/FarmerLogoCarousel";
+import Image from "next/image";
 import { getStoredLanguage, listenToLanguageChanges, type UiLanguage } from "@/services/uiLanguage";
 
 const valueCards = [
@@ -204,7 +205,11 @@ export default function Home() {
   );
 
   return (
-    <main className="dos-homepage">
+    <main className="dos-homepage px-2 sm:px-0 py-4 sm:py-6 grid gap-4 sm:gap-6 w-full">
+      <header className="flex items-center gap-3 mb-4">
+        <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={56} height={56} className="rounded-xl shadow" priority />
+        <span className="text-2xl font-extrabold text-green-900 tracking-tight">DOS AGROLINK</span>
+      </header>
       <section className="dos-home-card">
         <section className="dos-hero">
           <div className="dos-hero-carousel" aria-label="DosAgrolink vision highlights">

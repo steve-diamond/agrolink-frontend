@@ -20,8 +20,10 @@ export default async function VisionDetailPage({ params }: VisionDetailPageProps
   }
 
   return (
-    <main className="mx-auto grid max-w-6xl gap-6 py-6">
-      <section className="card overflow-hidden">
+    <main className="mx-auto grid max-w-6xl gap-4 sm:gap-6 py-4 sm:py-6 px-2 sm:px-0">
+      <section className="card overflow-hidden w-full flex items-center gap-3 mb-4">
+        <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={44} height={44} className="rounded-lg shadow" priority />
+        <span className="text-xl font-extrabold text-green-900 tracking-tight">DOS AGROLINK</span>
         <div className="relative min-h-[250px] sm:min-h-[320px]">
           <Image src={point.image} alt={point.title} fill className="object-cover" sizes="100vw" />
           <div className="absolute inset-0 bg-gradient-to-r from-green-950/80 via-green-900/60 to-transparent" />
@@ -39,7 +41,7 @@ export default async function VisionDetailPage({ params }: VisionDetailPageProps
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 grid-cols-1 md:grid-cols-3 w-full">
         <article className="card p-5">
           <h2 className="text-xl font-bold text-green-900">Who Benefits</h2>
           <ul className="mt-3 grid gap-2 text-sm text-slate-700">
@@ -68,7 +70,7 @@ export default async function VisionDetailPage({ params }: VisionDetailPageProps
         </article>
       </section>
 
-      <section className="card p-5">
+      <section className="card p-4 sm:p-5 w-full">
         <h2 className="text-2xl font-bold text-green-900">Take Action</h2>
         <p className="mt-2 max-w-3xl text-sm text-slate-700">
           Ready to benefit from {point.title}? Join the DOS AGROLINK ecosystem and connect your farm, cooperative,
