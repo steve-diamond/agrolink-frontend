@@ -754,53 +754,54 @@ export default function AdminDashboardPage() {
             ) : null}
         </header>
 
+
         {/* Quick Actions and Insights Bar */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-              <div className="flex flex-wrap gap-2 items-center">
-                <button
-                  className="rounded-md bg-green-700 text-white px-3 py-2 text-xs font-semibold hover:bg-green-800 transition"
-                  onClick={() => {
-                    if (pendingProducts.length === 0) return alert('No pending products to approve.');
-                    if (!confirm(`Approve all ${pendingProducts.length} pending products?`)) return;
-                    pendingProducts.forEach((product) => approveProduct(product._id));
-                  }}
-                  disabled={pendingProducts.length === 0}
-                >
-                  Approve All Pending Products
-                </button>
-                <button
-                  className="rounded-md bg-cyan-700 text-white px-3 py-2 text-xs font-semibold hover:bg-cyan-800 transition"
-                  onClick={exportAnalyticsCsv}
-                >
-                  Export Data (CSV)
-                </button>
-              </div>
-              <div className="rounded-lg bg-white/60 px-4 py-2 text-xs text-slate-700 shadow border border-slate-200 max-w-md">
-                <strong>Insight:</strong> {totalRevenue > 0
-                  ? `Revenue in the last ${rangeDays} days: ${currencyFormatter.format(totalRevenue)}.`
-                  : 'No revenue recorded in this period.'}
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {[30, 90, 365].map((value) => (
-                <button
-                  key={value}
-                  onClick={() => setRangeDays(value as DateRange)}
-                  className={`rounded-md border px-3 py-1.5 text-xs font-semibold ${
-                    rangeDays === value ? "border-green-700 bg-green-700 text-white" : "border-slate-300 bg-white text-slate-700"
-                  }`}
-                >
-                  Last {value} days
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="ml-auto rounded-md border border-rose-300 bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700"
-              >
-                Logout
-              </button>
-            </div>
+          <div className="flex flex-wrap gap-2 items-center">
+            <button
+              className="rounded-md bg-green-700 text-white px-3 py-2 text-xs font-semibold hover:bg-green-800 transition"
+              onClick={() => {
+                if (pendingProducts.length === 0) return alert('No pending products to approve.');
+                if (!confirm(`Approve all ${pendingProducts.length} pending products?`)) return;
+                pendingProducts.forEach((product) => approveProduct(product._id));
+              }}
+              disabled={pendingProducts.length === 0}
+            >
+              Approve All Pending Products
+            </button>
+            <button
+              className="rounded-md bg-cyan-700 text-white px-3 py-2 text-xs font-semibold hover:bg-cyan-800 transition"
+              onClick={exportAnalyticsCsv}
+            >
+              Export Data (CSV)
+            </button>
+          </div>
+          <div className="rounded-lg bg-white/60 px-4 py-2 text-xs text-slate-700 shadow border border-slate-200 max-w-md">
+            <strong>Insight:</strong> {totalRevenue > 0
+              ? `Revenue in the last ${rangeDays} days: ${currencyFormatter.format(totalRevenue)}.`
+              : 'No revenue recorded in this period.'}
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          {[30, 90, 365].map((value) => (
+            <button
+              key={value}
+              onClick={() => setRangeDays(value as DateRange)}
+              className={`rounded-md border px-3 py-1.5 text-xs font-semibold ${
+                rangeDays === value ? "border-green-700 bg-green-700 text-white" : "border-slate-300 bg-white text-slate-700"
+              }`}
+            >
+              Last {value} days
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="ml-auto rounded-md border border-rose-300 bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700"
+          >
+            Logout
+          </button>
+        </div>
 
             {loading ? <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">Loading admin dashboard...</div> : null}
             {!loading && error ? <div className="rounded-xl border border-rose-300 bg-rose-100 px-4 py-3 text-rose-700">{error}</div> : null}
