@@ -1,52 +1,21 @@
+
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import {
-  Bar,
-  BarChart,
-  Cell,
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import API from "@/services/api";
+// ...existing imports here...
 
-type DateRange = 30 | 90 | 365;
-type ModuleKey = "dashboard" | "farmers" | "products" | "orders" | "analytics" | "notifications" | "auditlog" | "settings";
+// ...type definitions here...
 
-type AdminUser = {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  approved?: boolean;
-  category?: string;
-  createdAt?: string;
-};
+export default function AdminProtectedPage() {
+  // ...all hooks, state, and logic here...
 
-type AdminProduct = {
-  _id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  approved?: boolean;
-  category?: string;
-  location?: string;
-  description?: string;
-  image?: string;
-  imageUrl?: string;
-  farmer?: string | { _id?: string };
-  createdAt?: string;
-};
+  // ...existing code...
+
+  return (
+    <>
+      {/* ...all JSX including withdrawals table, audit log, analytics, etc. goes here... */}
+    </>
+  );
+}
 
 type AdminOrder = {
   _id: string;
@@ -168,38 +137,15 @@ const chartTooltipStyle = {
   color: "#e2e8f0",
 } as const;
 
-const getAuthHeaders = () => ({
-                        <>
-                          {activeModule === "notifications" && (
-                            <div className="max-w-2xl mx-auto">
-                              <h3 className="text-lg font-bold mb-4">Notifications Center</h3>
-                              <ul className="space-y-2">
-                                {notifications.length === 0 && <li className="text-slate-500">No notifications.</li>}
-                                {notifications.map((notif) => (
-                                  <li key={notif.id} className="rounded-lg bg-white shadow px-4 py-3 flex items-center gap-3 border-l-4 border-green-600/60">
-                                    <span className="inline-block w-2 h-2 rounded-full bg-green-600/60"></span>
-                                    <span className="flex-1">
-                                      <span className="font-semibold">{NOTIF_TYPES[notif.type] || notif.type}:</span> {notif.message}
-                                    </span>
-                                    <span className="text-xs text-slate-400">{new Date(notif.createdAt).toLocaleTimeString()}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {activeModule === "auditlog" ? (
-                            <div className="max-w-3xl mx-auto">
-                              <h3 className="text-lg font-bold mb-4">Audit Log</h3>
-                              <table className="w-full bg-white rounded-lg shadow">
-                                <thead>
-                                  <tr className="bg-green-50 text-green-900">
-                                    <th className="py-2 px-3 text-left">Action</th>
-                                    <th className="py-2 px-3 text-left">User</th>
-                                    <th className="py-2 px-3 text-left">Target</th>
-                                    <th className="py-2 px-3 text-left">Timestamp</th>
-                                  </tr>
-                                </thead>
+const getAuthHeaders = () => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      return { Authorization: `Bearer ${token}` };
+    }
+  }
+  return {};
+};
                                 <tbody>
                                   {auditLog.length === 0 ? (
                                     <tr><td colSpan={4} className="text-slate-500 py-4 text-center">No audit log entries.</td></tr>
@@ -242,8 +188,11 @@ const getAuthHeaders = () => ({
                                   )}
                                 </tbody>
                               </table>
+
                             </div>
-                          ) : null}
+                          ) : null)
+
+// --- End Audit Log Section ---
 
                           {activeModule === "analytics" ? (
                             <section className="space-y-4">

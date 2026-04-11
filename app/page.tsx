@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+// Removed duplicate import
 import Link from "next/link";
 import FarmerLogoCarousel from "@/components/FarmerLogoCarousel";
 import Image from "next/image";
