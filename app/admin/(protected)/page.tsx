@@ -934,7 +934,6 @@ export default function AdminDashboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    <>
                       {auditLog.length === 0 && (
                         <tr><td colSpan={4} className="text-slate-500 py-4 text-center">No audit log entries.</td></tr>
                       )}
