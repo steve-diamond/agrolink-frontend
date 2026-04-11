@@ -614,20 +614,17 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-2">
               <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={36} height={36} className="rounded-lg bg-white/20" priority />
               <h1 className="m-0 text-xl font-semibold">Dos Agrolink</h1>
-                  <tbody>
-                    {auditLog.length === 0 ? (
-                      <tr><td colSpan={4} className="text-slate-500 py-4 text-center">No audit log entries.</td></tr>
-                    ) : (
-                      auditLog.map((entry) => (
-                        <tr key={entry.id} className="border-b last:border-b-0">
-                          <td className="py-2 px-3">{entry.action}</td>
-                          <td className="py-2 px-3">{entry.user}</td>
-                          <td className="py-2 px-3">{entry.target}</td>
-                          <td className="py-2 px-3 text-xs text-slate-400">{new Date(entry.timestamp).toLocaleString()}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
+            </div>
+          </div>
+          <nav className="flex flex-col gap-1 px-2 py-4">
+            {SIDE_NAV_ITEMS.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setActiveModule(item.key)}
+                className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold ${activeModule === item.key ? "bg-green-900" : "bg-green-800/70"}`}
+              >
+                <span className="inline-flex items-center justify-center w-6 h-6">
                   {SIDE_NAV_ICON[item.key]}
                 </span>
                 <span className="text-base font-medium tracking-tight">
