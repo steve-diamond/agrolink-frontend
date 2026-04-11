@@ -26,6 +26,7 @@ type QueuePayload = {
 type FarmerForm = {
   phone: string;
   altPhone: string;
+  farmerCategory: string;
   dateOfBirth: string;
   idType: string;
   idNumber: string;
@@ -33,6 +34,7 @@ type FarmerForm = {
   idPhotoUrl: string;
   selfieWithIdName: string;
   selfieWithIdUrl: string;
+  farmAddress: string;
   state: string;
   lga: string;
   townVillage: string;
@@ -41,6 +43,10 @@ type FarmerForm = {
   gpsLng: string;
   farmSizeValue: string;
   farmSizeUnit: "hectares" | "acres" | "plots" | "";
+  productionCapacity: string;
+  certifications: string;
+  cooperativeMembershipNumber: string;
+  bankWalletDetails: string;
   landOwnership: "owned" | "family" | "rented" | "sharecropper" | "";
   crops: string[];
   otherCrop: string;
@@ -142,6 +148,17 @@ const CROPS = [
 
 const ASSETS = ["tractor", "sprayer", "harvester", "storage facility", "none"] as const;
 
+const FARMER_CATEGORIES = [
+  "Arable Farmer",
+  "Livestock Farmer",
+  "Horticultural Farmer",
+  "Poultry Farmer",
+  "Fish Farmer",
+  "Organic Farmer",
+  "Dairy Farmer",
+  "Mixed Farmer",
+] as const;
+
 const BANKS = [
   "Access Bank",
   "First Bank",
@@ -163,6 +180,7 @@ const BANKS = [
 const defaultFarmerForm: FarmerForm = {
   phone: "",
   altPhone: "",
+  farmerCategory: "",
   dateOfBirth: "",
   idType: "",
   idNumber: "",
@@ -170,6 +188,7 @@ const defaultFarmerForm: FarmerForm = {
   idPhotoUrl: "",
   selfieWithIdName: "",
   selfieWithIdUrl: "",
+  farmAddress: "",
   state: "",
   lga: "",
   townVillage: "",
@@ -178,6 +197,10 @@ const defaultFarmerForm: FarmerForm = {
   gpsLng: "",
   farmSizeValue: "",
   farmSizeUnit: "",
+  productionCapacity: "",
+  certifications: "",
+  cooperativeMembershipNumber: "",
+  bankWalletDetails: "",
   landOwnership: "",
   crops: [],
   otherCrop: "",
@@ -529,6 +552,9 @@ export default function RegisterPage() {
     if (step === 1) {
       if (!isValidNigerianPhone(farmerForm.phone)) {
         return getText("Phone number must be valid (+234...).", "Your phone number must be 11 digits. Try again.");
+      }
+      if (!farmerForm.farmerCategory) {
+        return getText("Select farmer category.", "Choose your farmer category.");
       }
       if (!farmerForm.dateOfBirth) return getText("Date of birth is required.", "Pick your date of birth.");
       if (ageFromDob(farmerForm.dateOfBirth) < 18) return getText("Applicant must be at least 18 years old.", "You never reach 18 years.");
@@ -1099,6 +1125,20 @@ export default function RegisterPage() {
   const renderPersonalStep = (
     <div className="grid gap-3">
       <label className="grid gap-1 text-sm font-semibold text-green-950">
+        Farmer category <span className="text-red-500">*</span>
+        <select
+          value={farmerForm.farmerCategory}
+          onChange={(e) => setFarmerField("farmerCategory", e.target.value)}
+          className="min-h-12 rounded-lg border border-green-200 bg-white px-3 outline-none ring-green-200 focus:ring"
+        >
+          <option value="">Select farmer category</option>
+          {FARMER_CATEGORIES.map((category) => (
+            <option key={category} value={category}>{category}</option>
+          ))}
+        </select>
+      </label>
+
+      <label className="grid gap-1 text-sm font-semibold text-green-950">
         Phone number <span className="text-red-500">*</span>
         <input
           type="tel"
@@ -1169,7 +1209,7 @@ export default function RegisterPage() {
         Photo of ID <span className="text-red-500">*</span>
         <input
           type="file"
-          accept="image/*"
+          accept="image/*,.pdf"
           onChange={async (e) => {
             const file = e.target.files?.[0];
             if (!file) return;
@@ -1212,6 +1252,17 @@ export default function RegisterPage() {
 
   const renderLocationStep = (
     <div className="grid gap-3">
+      <label className="grid gap-1 text-sm font-semibold text-green-950">
+        Farm address
+        <input
+          type="text"
+          value={farmerForm.farmAddress}
+          onChange={(e) => setFarmerField("farmAddress", e.target.value)}
+          placeholder="Enter farm address"
+          className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
+        />
+      </label>
+
       <label className="grid gap-1 text-sm font-semibold text-green-950">
         State <span className="text-red-500">*</span>
         <select
@@ -1316,6 +1367,39 @@ export default function RegisterPage() {
           </select>
         </label>
       </div>
+
+      <label className="grid gap-1 text-sm font-semibold text-green-950">
+        Production capacity
+        <input
+          type="text"
+          value={farmerForm.productionCapacity}
+          onChange={(e) => setFarmerField("productionCapacity", e.target.value)}
+          placeholder="E.g. 12 tons per season"
+          className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
+        />
+      </label>
+
+      <label className="grid gap-1 text-sm font-semibold text-green-950">
+        Certifications (Organic, Cooperative, etc.)
+        <input
+          type="text"
+          value={farmerForm.certifications}
+          onChange={(e) => setFarmerField("certifications", e.target.value)}
+          placeholder="Optional certifications"
+          className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
+        />
+      </label>
+
+      <label className="grid gap-1 text-sm font-semibold text-green-950">
+        Cooperative membership number
+        <input
+          type="text"
+          value={farmerForm.cooperativeMembershipNumber}
+          onChange={(e) => setFarmerField("cooperativeMembershipNumber", e.target.value)}
+          placeholder="Enter membership number"
+          className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
+        />
+      </label>
 
       <label className="grid gap-1 text-sm font-semibold text-green-950">
         Land ownership <span className="text-red-500">*</span>
@@ -1605,6 +1689,17 @@ export default function RegisterPage() {
           <option value="wallet">Wallet</option>
           <option value="mobile-money">Mobile money</option>
         </select>
+      </label>
+
+      <label className="grid gap-1 text-sm font-semibold text-green-950">
+        Bank account / wallet details
+        <input
+          type="text"
+          value={farmerForm.bankWalletDetails}
+          onChange={(e) => setFarmerField("bankWalletDetails", e.target.value)}
+          placeholder="Account name, number, wallet ID, or preferred payout details"
+          className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
+        />
       </label>
     </div>
   );
