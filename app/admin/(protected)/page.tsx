@@ -753,11 +753,11 @@ export default function AdminDashboardPage() {
                   </button>
                 ))}
               </div>
-            ) : null
-          </header>
+            ) : null}
+        </header>
 
-            {/* Quick Actions and Insights Bar */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+        {/* Quick Actions and Insights Bar */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
               <div className="flex flex-wrap gap-2 items-center">
                 <button
                   className="rounded-md bg-green-700 text-white px-3 py-2 text-xs font-semibold hover:bg-green-800 transition"
