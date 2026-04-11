@@ -7,7 +7,7 @@ import AuthShell from "../../_components/AuthShell";
 
 type StatusResponse = {
   applicationId: string;
-  status: "draft" | "submitted" | "queued";
+  status: "draft" | "pending" | "approved" | "rejected" | "queued";
   account?: {
     name?: string;
     email?: string;

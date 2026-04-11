@@ -958,36 +958,35 @@ export default function RegisterPage() {
     }
 
     const normalizedPhone = normalizePhone(farmerForm.phone);
+    const accountPayload = {
+      name: accountForm.name.trim(),
+      email: accountForm.email.trim().toLowerCase(),
+      password: accountForm.password,
+      role: "farmer" as const,
+    };
+
+    const applicationPayload: QueuePayload = {
+      account: {
+        name: accountForm.name.trim(),
+        email: accountForm.email.trim().toLowerCase(),
+        phone: normalizedPhone,
+      },
+      application: {
+        ...farmerForm,
+        phone: normalizedPhone,
+        altPhone: normalizePhone(farmerForm.altPhone),
+        emergencyContactPhone: normalizePhone(farmerForm.emergencyContactPhone),
+      },
+      status: networkOnline ? "submitted" : "queued",
+    };
 
     setLoading(true);
     setError("");
     setSuccess("");
 
     try {
-      await API.post("/api/auth/register", {
-        name: accountForm.name.trim(),
-        email: accountForm.email.trim().toLowerCase(),
-        password: accountForm.password,
-        role: "farmer",
-      });
-
-      const payload: QueuePayload = {
-        account: {
-          name: accountForm.name.trim(),
-          email: accountForm.email.trim().toLowerCase(),
-          phone: normalizedPhone,
-        },
-        application: {
-          ...farmerForm,
-          phone: normalizedPhone,
-          altPhone: normalizePhone(farmerForm.altPhone),
-          emergencyContactPhone: normalizePhone(farmerForm.emergencyContactPhone),
-        },
-        status: networkOnline ? "submitted" : "queued",
-      };
-
       if (!networkOnline) {
-        queueSubmission(payload);
+        queueSubmission({ ...applicationPayload, status: "queued" });
         setSuccess(getText("Account created. Farmer form saved offline and queued for sync.", "Account don create. Farmer form don save offline and queue for send."));
         clearDraft();
         const offlineId = uid();
@@ -995,7 +994,41 @@ export default function RegisterPage() {
         return;
       }
 
-      const res = await API.post("/api/farmer-applications", payload);
+      try {
+        await API.post("/api/auth/register", accountPayload);
+      } catch (registerErr: any) {
+        const registerStatus = registerErr?.response?.status;
+        const registerMessage = String(
+          registerErr?.response?.data?.message || registerErr?.response?.data?.error || registerErr?.message || ""
+        );
+        const isExistingAccount = registerStatus === 409 || /already exists/i.test(registerMessage);
+        const isDbUnavailableOnRegister =
+          /buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(registerMessage) ||
+          registerStatus === 503;
+
+        if (isExistingAccount) {
+          setSuccess(
+            getText(
+              "Account already exists. Updating farmer application for admin review.",
+              "Account already dey. We dey update your farmer application for admin review."
+            )
+          );
+        } else if (!registerStatus || isDbUnavailableOnRegister) {
+          queueSubmission({ ...applicationPayload, status: "queued" });
+          clearDraft();
+          const offlineId = uid();
+          router.push(
+            `/register/success?name=${encodeURIComponent(accountForm.name.trim())}&appId=${encodeURIComponent(
+              offlineId
+            )}&queued=1&kycPending=1`
+          );
+          return;
+        } else {
+          throw registerErr;
+        }
+      }
+
+      const res = await API.post("/api/farmer-applications", { ...applicationPayload, status: "pending" });
       const appId = res?.data?.applicationId || uid();
       const kycPending = res?.data?.kycPending ? "1" : "0";
       clearDraft();
@@ -1010,17 +1043,7 @@ export default function RegisterPage() {
         statusCode === 503;
 
       if (!statusCode || isDbUnavailable) {
-        const payload: QueuePayload = {
-          account: {
-            name: accountForm.name.trim(),
-            email: accountForm.email.trim().toLowerCase(),
-            phone: normalizePhone(farmerForm.phone),
-          },
-          application: farmerForm,
-          status: "queued",
-        };
-
-        queueSubmission(payload);
+        queueSubmission({ ...applicationPayload, status: "queued" });
         clearDraft();
         const offlineId = uid();
         router.push(
