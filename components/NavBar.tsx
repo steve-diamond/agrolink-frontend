@@ -1,13 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import dosLogo from "../dos logo.jpg";
 import { isRouteActive } from "@/lib/navigationActive";
+import { emitLanguageChanged, getStoredLanguage, listenToLanguageChanges, setStoredLanguage, type UiLanguage } from "@/services/uiLanguage";
+
+const languageOptions: Array<{ label: string; value: UiLanguage }> = [
+  { label: "En", value: "en" },
+  { label: "Yo", value: "yo" },
+  { label: "Ig", value: "ig" },
+  { label: "Ha", value: "ha" },
+];
 
 export default function NavBar() {
   const pathname = usePathname();
+  const [language, setLanguage] = useState<UiLanguage>("en");
+
+  useEffect(() => {
+    setLanguage(getStoredLanguage());
+    return listenToLanguageChanges(setLanguage);
+  }, []);
+
+  const handleLanguageChange = (nextLanguage: UiLanguage) => {
+    setLanguage(nextLanguage);
+    setStoredLanguage(nextLanguage);
+    emitLanguageChanged();
+  };
 
   const primaryLinks = [
     { href: "/", label: "Home" },
@@ -48,7 +69,19 @@ export default function NavBar() {
           <span>|</span>
           <span>WhatsApp</span>
           <span>|</span>
-          <span>En · Yo · Ig·Ha</span>
+          <div className="dos-nav-language-switch" role="group" aria-label="Change language">
+            {languageOptions.map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() => handleLanguageChange(item.value)}
+                className={`dos-nav-language-btn ${language === item.value ? "is-active" : ""}`}
+                aria-label={`Switch language to ${item.label}`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="dos-subbar-cta-wrap">
           <Link href="/register" className="dos-get-started">Get Started</Link>

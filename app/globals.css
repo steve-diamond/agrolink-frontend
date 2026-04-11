@@ -130,6 +130,33 @@ body {
   gap: 0.42rem;
 }
 
+.dos-nav-language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dos-nav-language-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.dos-nav-language-btn:hover {
+  color: #2f5f42;
+}
+
+.dos-nav-language-btn.is-active {
+  background: rgba(28, 90, 45, 0.12);
+  color: #1c5a2d;
+}
+
 .dos-subbar-divider {
   opacity: 0.6;
 }

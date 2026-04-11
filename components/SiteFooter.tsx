@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 const quickLinks = [
   { href: "/marketplace", label: "Marketplace" },
@@ -11,7 +12,12 @@ const quickLinks = [
   { href: "/about-us", label: "About Us" },
 ];
 
-const partners = ["IFAD", "NIRSAL", "Access Bank", "CBN"];
+const partners = [
+  { name: "Maize Growers", tag: "Crop Cooperative", image: "/agropro/images/maize.jpg" },
+  { name: "Cassava Network", tag: "Root Value Chain", image: "/agropro/images/cassava.jpg" },
+  { name: "Plantain Union", tag: "Fresh Produce", image: "/agropro/images/plantain.jpg" },
+  { name: "Fish Farmers", tag: "Aquaculture Hub", image: "/agropro/images/fish.jpeg" },
+];
 
 export default function SiteFooter() {
   return (
@@ -47,12 +53,19 @@ export default function SiteFooter() {
           <h3 className="mb-4 font-bold">Our Partners</h3>
           <div className="grid grid-cols-2 gap-4">
             {partners.map((partner) => (
-              <div
-                key={partner}
-                className="flex h-16 items-center justify-center rounded-md border border-green-700 bg-green-950/40 px-2 text-center text-sm font-semibold"
-              >
-                {partner}
-              </div>
+              <article key={partner.name} className="overflow-hidden rounded-md border border-green-700 bg-green-950/40">
+                <Image
+                  src={partner.image}
+                  alt={partner.name}
+                  width={220}
+                  height={120}
+                  className="h-16 w-full object-cover"
+                />
+                <div className="px-2 py-1">
+                  <p className="text-xs font-semibold leading-tight">{partner.name}</p>
+                  <p className="text-[10px] text-green-200">{partner.tag}</p>
+                </div>
+              </article>
             ))}
           </div>
         </div>
