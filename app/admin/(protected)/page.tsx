@@ -102,11 +102,24 @@ type FarmerProfile = {
 const FARMER_CATEGORIES = ["Arable", "Livestock", "Horticultural", "Poultry", "Fish", "Organic", "Dairy", "Mixed"] as const;
 const ORDER_STATUSES = ["Pending", "Shipped", "Delivered"] as const;
 
+const ADMIN_MODULES: ModuleKey[] = [
+  "dashboard",
+  "farmers",
+  "products",
+  "orders",
+  "withdrawals",
+  "analytics",
+  "notifications",
+  "auditlog",
+  "settings",
+];
+
 const SIDE_NAV_ITEMS: Array<{ key: ModuleKey; label: string }> = [
   { key: "dashboard", label: "Dashboard" },
   { key: "farmers", label: "Farmers" },
   { key: "products", label: "Products" },
   { key: "orders", label: "Orders" },
+  { key: "withdrawals", label: "Withdrawals" },
   { key: "analytics", label: "Analytics" },
   { key: "notifications", label: "Notifications" },
   { key: "auditlog", label: "Audit Log" },
@@ -192,11 +205,38 @@ const getAuthHeaders = () => ({
                                     <tr><td colSpan={4} className="text-slate-500 py-4 text-center">No audit log entries.</td></tr>
                                   ) : (
                                     auditLog.map((entry) => (
-                                      <tr key={entry.id} className="border-b last:border-b-0">
-                                        <td className="py-2 px-3">{entry.action}</td>
-                                        <td className="py-2 px-3">{entry.user}</td>
-                                        <td className="py-2 px-3">{entry.target}</td>
-                                        <td className="py-2 px-3 text-xs text-slate-400">{new Date(entry.timestamp).toLocaleString()}</td>
+                                      <tr key={entry.id} className="border-b last:border-b-0 hover:bg-green-50/40 transition">
+                                        <td className="py-2 px-3 font-medium flex items-center gap-2">
+                                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 font-bold">
+                                            {entry.user?.name?.[0]?.toUpperCase() || entry.user?.email?.[0]?.toUpperCase() || "F"}
+                                          </span>
+                                          <span>{entry.user?.name || entry.user?.email || entry.user || "-"}</span>
+                                        </td>
+                                        <td className="py-2 px-3 font-semibold text-green-700">₦{entry.amount?.toLocaleString()}</td>
+                                        <td className="py-2 px-3 text-xs">
+                                          <div className="font-semibold">{entry.bankDetails?.accountName}</div>
+                                          <div className="text-slate-500">{entry.bankDetails?.accountNumber}</div>
+                                          <div className="text-slate-500">{entry.bankDetails?.bankName}</div>
+                                        </td>
+                                        <td className="py-2 px-3">
+                                          {entry.status === "pending" && <span className="inline-block rounded-full bg-amber-100 text-amber-700 px-3 py-1 text-xs font-semibold">Pending</span>}
+                                          {entry.status === "approved" && <span className="inline-block rounded-full bg-blue-100 text-blue-700 px-3 py-1 text-xs font-semibold">Approved</span>}
+                                          {entry.status === "paid" && <span className="inline-block rounded-full bg-green-100 text-green-700 px-3 py-1 text-xs font-semibold">Paid</span>}
+                                          {entry.status === "refunded" && <span className="inline-block rounded-full bg-rose-100 text-rose-700 px-3 py-1 text-xs font-semibold">Refunded</span>}
+                                        </td>
+                                        <td className="py-2 px-3">
+                                          {entry.status === "pending" && (
+                                            <div className="flex gap-2">
+                                              <button className="rounded-md bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-xs font-semibold shadow transition" onClick={() => handleApprove(entry._id)}>Approve</button>
+                                              <button className="rounded-md bg-rose-600 hover:bg-rose-700 text-white px-3 py-1 text-xs font-semibold shadow transition" onClick={() => handleRefund(entry._id)}>Refund</button>
+                                            </div>
+                                          )}
+                                          {entry.status === "approved" && (
+                                            <button className="rounded-md bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-xs font-semibold shadow transition" onClick={() => handleMarkPaid(entry._id)}>Mark Paid</button>
+                                          )}
+                                          {entry.status === "paid" && <span className="text-green-700 font-semibold">Paid</span>}
+                                          {entry.status === "refunded" && <span className="text-amber-700 font-semibold">Refunded</span>}
+                                        </td>
                                       </tr>
                                     ))
                                   )}
@@ -310,7 +350,7 @@ const getAuthHeaders = () => ({
                             </section>
                           ) : null}
                         </>
-  };
+  );
 
   const deleteProduct = (id: string) => handleDelete("products", id);
 
@@ -895,7 +935,7 @@ const getAuthHeaders = () => ({
                     </tr>
                   </thead>
                   <tbody>
-                      {auditLog.length === 0 && (
+                      {auditLog.length === 0 ? (
                         <tr><td colSpan={4} className="text-slate-500 py-4 text-center">No audit log entries.</td></tr>
                       )}
 
@@ -1106,7 +1146,9 @@ const getAuthHeaders = () => ({
 
                         {/* ...other module blocks (farmers, products, orders, analytics, settings)... */}
                       </div>
-                </div>
+                    </article>
+                  )}
+                </section>
               </section>
             ) : null;
 
