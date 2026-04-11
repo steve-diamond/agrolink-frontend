@@ -121,6 +121,78 @@ const normalizeOrderStatus = (raw?: string): (typeof ORDER_STATUSES)[number] | "
 };
 
 export default function AdminUnifiedCommandCenter({ users, products, orders, currencyFormatter, onApproveProduct }: Props) {
+  // Derived variables
+  const farmers = useMemo(() => users.filter((u) => u.role === "farmer"), [users]);
+  const verifiedFarmersCount = useMemo(() => farmers.filter((f) => f.approved).length, [farmers]);
+  const pendingProducts = useMemo(() => products.filter((p) => !p.approved), [products]);
+
+  // Helper functions
+  function resolveOrderProduct(order: any) {
+    if (order.productId && typeof order.productId === "object" && order.productId.name) return order.productId.name;
+    if (order.productId && typeof order.productId === "string") {
+      const prod = products.find((p) => p._id === order.productId);
+      return prod ? prod.name : "Unknown";
+    }
+    if (order.products && Array.isArray(order.products) && order.products.length > 0) {
+      const prod = order.products[0].productId;
+      if (typeof prod === "object" && prod.name) return prod.name;
+      if (typeof prod === "string") {
+        const p = products.find((pp) => pp._id === prod);
+        return p ? p.name : "Unknown";
+      }
+    }
+    return "Unknown";
+  }
+
+  function resolveOrderBuyer(order: any) {
+    if (order.buyerId && typeof order.buyerId === "object" && order.buyerId.name) return order.buyerId.name;
+    if (order.buyer && typeof order.buyer === "string") return order.buyer;
+    return "Unknown";
+  }
+
+  function resolveOrderQuantity(order: any) {
+    if (typeof order.quantity === "number") return order.quantity;
+    if (order.products && Array.isArray(order.products)) {
+      return order.products.reduce((sum: number, p: any) => sum + (p.quantity || 0), 0);
+    }
+    return "-";
+  }
+
+  function getOrderStatusBadgeClass(status: string) {
+    const s = String(status || "").toLowerCase();
+    if (s === "pending") return "bg-amber-900/40 text-amber-300";
+    if (s === "shipped") return "bg-blue-900/40 text-blue-300";
+    if (s === "delivered") return "bg-green-900/40 text-green-300";
+    return "bg-slate-700 text-slate-300";
+  }
+
+  // Approve product state/handler
+  const [approvingProductId, setApprovingProductId] = useState<string | null>(null);
+  const handleApproveProduct = async (id: string) => {
+    setApprovingProductId(id);
+    try {
+      await onApproveProduct(id);
+    } finally {
+      setApprovingProductId(null);
+    }
+  };
+
+  // Chart data
+  const farmerCategoryData = useMemo(() => {
+    return FARMER_CATEGORIES.map((cat) => ({
+      category: cat,
+      count: farmers.filter((f) => normalizeFarmerCategory(f.category) === cat).length,
+    }));
+  }, [farmers]);
+
+  const orderStatusData = useMemo(() => {
+    return [
+      { name: "Pending", value: orders.filter((o) => normalizeOrderStatus(o.status) === "Pending").length },
+      { name: "Shipped", value: orders.filter((o) => normalizeOrderStatus(o.status) === "Shipped").length },
+      { name: "Delivered", value: orders.filter((o) => normalizeOrderStatus(o.status) === "Delivered").length },
+    ];
+  }, [orders]);
+
   // ...existing code...
   return (
     <section className="mt-4 rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4 text-slate-100">
