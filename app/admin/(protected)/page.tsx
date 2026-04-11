@@ -66,6 +66,18 @@ type AdminOrder = {
   quantity?: number;
 };
 
+type AdminFarmerApplication = {
+  _id?: string;
+  applicationId: string;
+  status: "draft" | "pending" | "approved" | "rejected" | "queued";
+  account?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
+  createdAt?: string;
+};
+
 const getAuthHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
 });
@@ -75,6 +87,7 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [orders, setOrders] = useState<AdminOrder[]>([]);
+  const [farmerApplications, setFarmerApplications] = useState<AdminFarmerApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -93,11 +106,13 @@ export default function AdminDashboardPage() {
       API.get("/api/admin/users", { headers: getAuthHeaders() }),
       API.get("/api/admin/products", { headers: getAuthHeaders() }),
       API.get("/api/admin/orders", { headers: getAuthHeaders() }),
+      API.get("/api/admin/farmer-applications", { headers: getAuthHeaders() }),
     ])
-      .then(([usersRes, productsRes, ordersRes]) => {
+      .then(([usersRes, productsRes, ordersRes, farmerApplicationsRes]) => {
         const usersPayload = usersRes.data as any;
         const productsPayload = productsRes.data as any;
         const ordersPayload = ordersRes.data as any;
+        const farmerApplicationsPayload = farmerApplicationsRes.data as any;
 
         const usersData = Array.isArray(usersPayload)
           ? usersPayload
@@ -117,9 +132,16 @@ export default function AdminDashboardPage() {
           ? ordersPayload.orders
           : [];
 
+        const farmerApplicationsData = Array.isArray(farmerApplicationsPayload)
+          ? farmerApplicationsPayload
+          : Array.isArray(farmerApplicationsPayload?.applications)
+          ? farmerApplicationsPayload.applications
+          : [];
+
         setUsers(usersData);
         setProducts(productsData);
         setOrders(ordersData);
+        setFarmerApplications(farmerApplicationsData);
       })
       .catch((err: any) => {
         setError(err?.response?.data?.message || "Failed to load admin dashboard.");
@@ -159,12 +181,36 @@ export default function AdminDashboardPage() {
 
   const approveFarmer = async (id: string) => {
     try {
-      await API.patch(`/api/admin/users/${id}/approve`, null, {
-        headers: getAuthHeaders(),
-      });
-      setUsers((prev) =>
-        prev.map((user) => (user._id === id ? { ...user, approved: true } : user))
-      );
+      if (id.startsWith("app:")) {
+        const applicationId = id.replace("app:", "");
+        const response = await API.patch(`/api/admin/farmer-applications/${applicationId}/approve`, null, {
+          headers: getAuthHeaders(),
+        });
+
+        setFarmerApplications((prev) =>
+          prev.map((application) =>
+            application.applicationId === applicationId
+              ? { ...application, status: "approved" }
+              : application
+          )
+        );
+
+        const approvedUser = response?.data?.user;
+        if (approvedUser?._id) {
+          setUsers((prev) =>
+            prev.map((user) =>
+              user._id === approvedUser._id ? { ...user, approved: true, role: "farmer" } : user
+            )
+          );
+        }
+      } else {
+        await API.patch(`/api/admin/users/${id}/approve`, null, {
+          headers: getAuthHeaders(),
+        });
+        setUsers((prev) =>
+          prev.map((user) => (user._id === id ? { ...user, approved: true } : user))
+        );
+      }
     } catch (err: any) {
       alert(err?.response?.data?.message || "Failed to approve farmer.");
     }
@@ -221,6 +267,10 @@ export default function AdminDashboardPage() {
   const farmerCount = users.filter((user) => user.role === "farmer").length;
   const approvedFarmerCount = users.filter(
     (user) => user.role === "farmer" && user.approved
+  ).length;
+
+  const pendingApplicationCount = farmerApplications.filter(
+    (application) => application.status === "pending"
   ).length;
 
   const roleDistributionData = [
@@ -367,7 +417,7 @@ export default function AdminDashboardPage() {
     router.push("/admin/login");
   };
 
-  const pendingFarmerCount = Math.max(0, farmerCount - approvedFarmerCount);
+  const pendingFarmerCount = pendingApplicationCount;
   const pendingProductCount = products.filter((p) => !p.approved).length;
   const rangeLabel = `Last ${rangeDays} days`;
   const latestUpdateLabel = new Date().toLocaleTimeString("en-NG", {
@@ -377,7 +427,17 @@ export default function AdminDashboardPage() {
 
   const normalizedSearch = searchTerm.trim().toLowerCase();
 
-  const searchableUsers = users.filter((u) => {
+  const pendingFarmerApplicationCards: AdminUser[] = farmerApplications
+    .filter((application) => application.status === "pending")
+    .map((application) => ({
+      _id: `app:${application.applicationId}`,
+      name: application.account?.name || "Farmer Application",
+      email: application.account?.email || application.applicationId,
+      role: "farmer",
+      approved: false,
+    }));
+
+  const searchableUsers = [...pendingFarmerApplicationCards, ...users].filter((u) => {
     if (!normalizedSearch) return true;
     return [u.name, u.email, u.role].join(" ").toLowerCase().includes(normalizedSearch);
   });
