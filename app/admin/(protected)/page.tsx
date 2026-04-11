@@ -602,8 +602,10 @@ export default function AdminDashboardPage() {
 
       <AdminUnifiedCommandCenter
         users={users}
+        products={products}
         orders={orders}
         currencyFormatter={currencyFormatter}
+        onApproveProduct={approveProduct}
       />
     </main>
   );
