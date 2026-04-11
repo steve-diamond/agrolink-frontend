@@ -10,6 +10,7 @@ export default function NavBar() {
   const pathname = usePathname();
 
   const primaryLinks = [
+    { href: "/", label: "Home" },
     { href: "/marketplace", label: "Marketplace" },
     { href: "/loan-application", label: "Finance" },
     { href: "/logistics", label: "Logistics" },
@@ -21,10 +22,10 @@ export default function NavBar() {
   return (
     <header>
       <div className="dos-topbar">
-        <div className="dos-brand">
+        <Link href="/" className="dos-brand" aria-label="Go to homepage">
           <Image src={dosLogo} alt="DosAgrolink" width={26} height={26} className="dos-brand-logo" />
           <strong>DosAgrolink</strong>
-        </div>
+        </Link>
 
         <nav className="dos-menu" aria-label="Primary">
           {primaryLinks.map((item, index) => (
