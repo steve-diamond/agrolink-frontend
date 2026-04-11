@@ -294,7 +294,7 @@ export default function AdminUnifiedCommandCenter({ users, products, orders, cur
       <section>
         <h3 className="m-0 text-base font-semibold">Orders</h3>
         <div className="mt-3 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900/70">
-          <table className="w-full min-w-[760px] border-collapse text-sm">
+          <table className="w-full min-w-190 border-collapse text-sm">
             <thead>
               <tr className="bg-emerald-900/35 text-emerald-100">
                 <th className="px-3 py-2 text-left">Order ID</th>
@@ -446,7 +446,7 @@ export default function AdminUnifiedCommandCenter({ users, products, orders, cur
       <section>
         <h3 className="m-0 text-base font-semibold">Orders</h3>
         <div className="mt-3 overflow-x-auto rounded-xl border border-slate-700 bg-slate-900/70">
-          <table className="w-full min-w-[760px] border-collapse text-sm">
+          <table className="w-full min-w-190 border-collapse text-sm">
             <thead>
               <tr className="bg-emerald-900/35 text-emerald-100">
                 <th className="px-3 py-2 text-left">Order ID</th>
