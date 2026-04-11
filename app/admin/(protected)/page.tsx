@@ -860,43 +860,8 @@ export default function AdminDashboardPage() {
                               </article>
                             </div>
                           )}
-              <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between gap-3">
-  				</div>
-                  </div>
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-xs font-bold text-green-700">FM</span>
-                </div>
-              </article>
-              <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="m-0 text-sm font-semibold text-slate-500">Verified Farmers</p>
-                    <p className="m-0 mt-2 text-3xl font-bold text-green-700">{compactFormatter.format(verifiedFarmers)}</p>
-                  </div>
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">OK</span>
-                </div>
-              </article>
-              <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="m-0 text-sm font-semibold text-slate-500">Pending Products</p>
-                    <p className="m-0 mt-2 text-3xl font-bold text-amber-600">{compactFormatter.format(pendingProductsCount)}</p>
-                  </div>
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">PD</span>
-                </div>
-              </article>
-              <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="m-0 text-sm font-semibold text-slate-500">Active Orders</p>
-                    <p className="m-0 mt-2 text-3xl font-bold text-blue-600">{compactFormatter.format(activeOrders)}</p>
-                  </div>
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">OR</span>
-                </div>
-
-              </article>
-            </section>
-          ) : null}
+                        {/* End dashboard module block */}
+                        {/* The following articles should be inside the dashboard block or moved to the correct module block as needed. If they are dashboard stats, keep them inside the dashboard conditional. */}
 
             {activeModule === "notifications" ? (
               <div className="max-w-2xl mx-auto">
