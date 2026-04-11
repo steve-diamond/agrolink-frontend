@@ -657,9 +657,8 @@ export default function AdminDashboardPage() {
                       onChange={(event) => setSearchTerm(event.target.value)}
                       placeholder="Search..."
                       className="w-56 rounded-lg bg-white/20 px-3 py-2 text-sm text-white placeholder:text-white/70 outline-none"
-                          </>
-                        )
-                  <select
+                          )
+                        <select
                     className="rounded-md border border-white/30 bg-white/10 px-2 py-1 text-xs text-white"
                     value={activeModule === 'farmers' ? (searchTerm ? '' : 'all') : 'all'}
                     onChange={e => {
