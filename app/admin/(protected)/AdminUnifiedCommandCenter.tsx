@@ -1,19 +1,10 @@
-"use client";
 
-import { useMemo, useState } from "react";
+// Ensure this file is named AdminUnifiedCommandCenter.tsx
+// If not, please rename it to .tsx
+
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 type InputUser = {
   _id: string;
@@ -130,132 +121,7 @@ const normalizeOrderStatus = (raw?: string): (typeof ORDER_STATUSES)[number] | "
 };
 
 export default function AdminUnifiedCommandCenter({ users, products, orders, currencyFormatter, onApproveProduct }: Props) {
-  const [approvingProductId, setApprovingProductId] = useState<string | null>(null);
-
-  const farmers = useMemo(() => users.filter((user) => user.role === "farmer"), [users]);
-  const verifiedFarmersCount = useMemo(
-    () => farmers.filter((farmer) => farmer.approved).length,
-    [farmers]
-  );
-  const pendingProducts = useMemo(
-    () => products.filter((product) => !product.approved),
-    [products]
-  );
-
-  const farmerCategoryData = useMemo(
-    () => {
-      const farmerIds = new Set(farmers.map((farmer) => farmer._id));
-      const categoryCounterByFarmer: Record<string, Partial<Record<(typeof FARMER_CATEGORIES)[number], number>>> = {};
-
-      products.forEach((product) => {
-        const farmerId =
-          typeof product.farmer === "string"
-            ? product.farmer
-            : product.farmer?._id;
-
-        if (!farmerId || !farmerIds.has(farmerId)) return;
-
-        const normalizedCategory = normalizeFarmerCategory(product.category);
-        if (!normalizedCategory) return;
-
-        if (!categoryCounterByFarmer[farmerId]) {
-          categoryCounterByFarmer[farmerId] = {};
-        }
-
-        const current = categoryCounterByFarmer[farmerId][normalizedCategory] || 0;
-        categoryCounterByFarmer[farmerId][normalizedCategory] = current + 1;
-      });
-
-      const assignedFarmerCategory: Record<string, (typeof FARMER_CATEGORIES)[number]> = {};
-
-      Object.entries(categoryCounterByFarmer).forEach(([farmerId, counts]) => {
-        const topCategory = Object.entries(counts).sort((a, b) => Number(b[1] || 0) - Number(a[1] || 0))[0]?.[0] as
-          | (typeof FARMER_CATEGORIES)[number]
-          | undefined;
-
-        if (topCategory) {
-          assignedFarmerCategory[farmerId] = topCategory;
-        }
-      });
-
-      return FARMER_CATEGORIES.map((category) => {
-        const count = farmers.filter((farmer) => {
-          const directCategory = normalizeFarmerCategory(farmer.category);
-          const derivedCategory = assignedFarmerCategory[farmer._id];
-          const finalCategory = directCategory || derivedCategory || "Mixed";
-          return finalCategory === category;
-        }).length;
-
-        return {
-          category,
-          count,
-        };
-      });
-    },
-    [farmers, products]
-  );
-
-  const orderStatusData = useMemo(
-    () =>
-      ORDER_STATUSES.map((status) => ({
-        name: status,
-        value: orders.filter((order) => normalizeOrderStatus(order.status) === status).length,
-      })),
-    [orders]
-  );
-
-  const resolveOrderProduct = (order: InputOrder) => {
-    if (Array.isArray(order.products) && order.products.length > 0) {
-      const firstItemName = order.products[0]?.productId?.name;
-      return order.products.length === 1 ? firstItemName || "Unknown" : `${order.products.length} items`;
-    }
-
-    if (typeof order.productId === "object" && order.productId?.name) return order.productId.name;
-    if (typeof order.productId === "string") return order.productId;
-    return "Unknown";
-  };
-
-  const resolveOrderQuantity = (order: InputOrder) => {
-    if (Array.isArray(order.products) && order.products.length > 0) {
-      return order.products.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-    }
-
-    return Number(order.quantity || 0);
-  };
-
-  const resolveOrderBuyer = (order: InputOrder) => {
-    if (order.buyerId?.name) return order.buyerId.name;
-    if (order.buyerId?.email) return order.buyerId.email;
-    return order.buyer || "Unknown";
-  };
-
-  const handleApproveProduct = async (productId: string) => {
-    try {
-      setApprovingProductId(productId);
-      await onApproveProduct(productId);
-    } finally {
-      setApprovingProductId(null);
-    }
-  };
-
-  const getOrderStatusBadgeClass = (status: string) => {
-    const normalized = normalizeOrderStatus(status);
-
-    if (normalized === "Pending") {
-      return "border border-amber-400/60 bg-amber-500/15 text-amber-100";
-    }
-
-    if (normalized === "Shipped") {
-      return "border border-cyan-400/60 bg-cyan-500/15 text-cyan-100";
-    }
-
-    if (normalized === "Delivered") {
-      return "border border-emerald-400/60 bg-emerald-500/15 text-emerald-100";
-    }
-
-    return "border border-slate-500/60 bg-slate-700/40 text-slate-200";
-  };
-
+  // ...existing code...
   return (
     <section className="mt-4 rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4 text-slate-100">
       <header className="mb-6 flex flex-wrap items-start justify-between gap-2">
