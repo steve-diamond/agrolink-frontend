@@ -1,0 +1,207 @@
+/* agrolink-dashboard.css - Professional, rich, consistent admin dashboard theme */
+
+:root {
+  --color-primary: #157347;
+  --color-primary-dark: #0d5c37;
+  --color-accent: #16a34a;
+  --color-accent-light: #e6f4ea;
+  --color-bg: #f7fafc;
+  --color-card: #fff;
+  --color-border: #e2e8f0;
+  --color-shadow: 0 2px 8px rgba(21, 115, 71, 0.08);
+  --color-sidebar-gradient: linear-gradient(180deg, #157347 0%, #0d5c37 100%);
+  --color-danger: #e53e3e;
+  --color-danger-bg: #fff0f0;
+  --color-danger-text: #b91c1c;
+  --color-info: #0ea5e9;
+  --color-warning: #f59e0b;
+  --color-success: #16a34a;
+}
+
+body {
+  font-family: 'Inter', 'Roboto', Arial, sans-serif;
+  background: var(--color-bg);
+  color: #222;
+}
+
+.sidebar {
+  background: var(--color-sidebar-gradient);
+  color: #fff;
+  box-shadow: 2px 0 8px rgba(21, 115, 71, 0.05);
+}
+
+.sidebar .active, .sidebar .active:hover {
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 0.75rem;
+}
+
+.card, .dashboard-panel {
+  background: var(--color-card);
+  border-radius: 1rem;
+  box-shadow: var(--color-shadow);
+  border: 1px solid var(--color-border);
+}
+
+.header {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(21, 115, 71, 0.08);
+}
+
+.header .search-bar {
+  background: var(--color-accent-light);
+  border-radius: 9999px;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  color: var(--color-primary-dark);
+  min-width: 220px;
+}
+
+.header .search-bar:focus {
+  outline: 2px solid var(--color-accent);
+}
+
+.button-primary {
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: background 0.2s;
+  border: none;
+  padding: 0.5rem 1.5rem;
+}
+.button-primary:hover {
+  background: #12813a;
+}
+
+.button-ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-accent);
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+}
+.button-ghost:hover {
+  background: var(--color-accent-light);
+}
+
+.input, input[type="text"], input[type="search"], select {
+  background: #f3f6f9;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #222;
+  font-size: 1rem;
+}
+input:focus, select:focus {
+  outline: 2px solid var(--color-accent);
+}
+
+.alert {
+  background: var(--color-danger-bg);
+  border-left: 4px solid var(--color-danger);
+  color: var(--color-danger-text);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stats-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-card);
+  border-radius: 1rem;
+  box-shadow: var(--color-shadow);
+  border: 1px solid var(--color-border);
+  padding: 1.5rem 1rem;
+  min-width: 160px;
+  min-height: 120px;
+}
+
+.stats-card .stat-label {
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.stats-card .stat-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+.stats-card .stat-badge {
+  margin-top: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Chart containers */
+.chart-card {
+  background: var(--color-card);
+  border-radius: 1rem;
+  box-shadow: var(--color-shadow);
+  border: 1px solid var(--color-border);
+  padding: 1.5rem 1rem;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--color-card);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+thead {
+  background: var(--color-accent-light);
+}
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+th {
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  font-size: 1rem;
+}
+tbody tr {
+  border-bottom: 1px solid var(--color-border);
+}
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Notification badge */
+.header .notification-badge {
+  background: var(--color-accent);
+  color: #fff;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-left: 1rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 900px) {
+  .sidebar {
+    min-width: 56px;
+    padding: 0.5rem 0.25rem;
+  }
+  .header .search-bar {
+    min-width: 120px;
+  }
+  .stats-card {
+    min-width: 120px;
+    min-height: 80px;
+    padding: 1rem 0.5rem;
+  }
+}
