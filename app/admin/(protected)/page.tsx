@@ -937,6 +937,7 @@ export default function AdminDashboardPage() {
                       {auditLog.length === 0 && (
                         <tr><td colSpan={4} className="text-slate-500 py-4 text-center">No audit log entries.</td></tr>
                       )}
+
                       {auditLog.map((entry) => (
                         <tr key={entry.id} className="border-b last:border-b-0">
                           <td className="py-2 px-3">{entry.action}</td>
@@ -945,6 +946,7 @@ export default function AdminDashboardPage() {
                           <td className="py-2 px-3 text-xs text-slate-400">{new Date(entry.timestamp).toLocaleString()}</td>
                         </tr>
                       ))}
+                    </tbody>
 
 
             {activeModule === "farmers" ? (
