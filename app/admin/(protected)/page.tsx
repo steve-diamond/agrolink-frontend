@@ -1,5 +1,4 @@
-import dynamic from "next/dynamic";
-const AdminUnifiedCommandCenter = dynamic(() => import("./AdminUnifiedCommandCenter.client"), { ssr: false });
+import AdminUnifiedCommandCenter from "./AdminUnifiedCommandCenter.client";
 
 // TODO: Replace these with real data fetching logic
 
@@ -30,17 +29,12 @@ export default async function AdminProtectedPage() {
     fetchData("orders"),
   ]);
 
-  const currencyFormatter = {
-    style: "currency",
-    currency: "NGN",
-    locales: "en-NG"
-  };
   return (
     <AdminUnifiedCommandCenter
       users={users}
       products={products}
       orders={orders}
-      currencyFormatter={currencyFormatter}
+      currencyFormatter={{ style: "currency", currency: "NGN", locales: "en-NG" }}
     />
   );
 }
