@@ -39,17 +39,7 @@ export default async function AdminProtectedPage() {
   );
 }
 
-export default function AdminProtectedPage() {
-  return (
-    <AdminUnifiedCommandCenter
-      users={mockUsers}
-      products={mockProducts}
-      orders={mockOrders}
-      currencyFormatter={currencyFormatter}
-      onApproveProduct={onApproveProduct}
-    />
-  );
-}
+
 
 
 
