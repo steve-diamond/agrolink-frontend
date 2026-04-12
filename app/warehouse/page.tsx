@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function WarehousePage() {
   return (
     <main className="mx-auto grid max-w-5xl gap-4 sm:gap-5 py-4 sm:py-6 px-2 sm:px-0">
