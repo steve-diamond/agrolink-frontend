@@ -1,7 +1,6 @@
-import path from "path";
-import type { NextConfig } from "next";
+const path = require("path");
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   outputFileTracingRoot: path.resolve(__dirname),
   images: {
     remotePatterns: [
@@ -17,4 +16,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
