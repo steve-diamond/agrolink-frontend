@@ -1,4 +1,5 @@
-import AdminUnifiedCommandCenter from "./AdminUnifiedCommandCenter";
+import dynamic from "next/dynamic";
+const AdminUnifiedCommandCenter = dynamic(() => import("./AdminUnifiedCommandCenter.client"), { ssr: false });
 
 // TODO: Replace these with real data fetching logic
 
@@ -29,19 +30,17 @@ export default async function AdminProtectedPage() {
     fetchData("orders"),
   ]);
 
-  const currencyFormatter = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" });
-  const onApproveProduct = async (id) => {
-    "use server";
-    await fetch(`${API_URL}/products/${id}/approve`, { method: "POST" });
+  const currencyFormatter = {
+    style: "currency",
+    currency: "NGN",
+    locales: "en-NG"
   };
-
   return (
     <AdminUnifiedCommandCenter
       users={users}
       products={products}
       orders={orders}
       currencyFormatter={currencyFormatter}
-      onApproveProduct={onApproveProduct}
     />
   );
 }
