@@ -7,12 +7,27 @@ import { cookies } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-async function fetchData(endpoint) {
+
+async function fetchData(endpoint: string) {
+  // Try to get token from cookies (server-side) or localStorage (client-side fallback)
+  let token = null;
+  try {
+      const cookieStore = await cookies();
+      token = cookieStore.get("token")?.value;
+  } catch {
+    // Not in server context, try client
+    if (typeof window !== "undefined") {
+      token = localStorage.getItem("token");
+    }
+  }
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
   const res = await fetch(`${API_URL}/${endpoint}`, {
-    headers: {
-      "Content-Type": "application/json",
-      // Add auth headers if needed, e.g. Authorization: `Bearer ${token}`
-    },
+    headers,
     cache: "no-store"
   });
   if (!res.ok) throw new Error(`Failed to fetch ${endpoint}`);
@@ -34,7 +49,7 @@ export default async function AdminProtectedPage() {
       users={users}
       products={products}
       orders={orders}
-      currencyFormatter={{ style: "currency", currency: "NGN", locales: "en-NG" }}
+      currencyFormatter={new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" })}
     />
   );
 }
