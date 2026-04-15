@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -97,9 +97,33 @@ function normalizeOrderStatus(raw?: string): (typeof ORDER_STATUSES)[number] | "
 }
 
 export default function AdminUnifiedCommandCenter({ users, products, orders, currencyFormatter }: Props) {
+  const [approvingProductId, setApprovingProductId] = useState<string | null>(null);
+  const [pendingProductsState, setPendingProductsState] = useState(products.filter((p) => !p.approved));
+  const [notification, setNotification] = useState<string | null>(null);
+
+  const handleApproveProduct = async (productId: string) => {
+    try {
+      setApprovingProductId(productId);
+      const res = await fetch(`/api/admin/products/${productId}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) throw new Error("Failed to approve product");
+      setPendingProductsState((prev) => prev.filter((p) => p._id !== productId));
+      setNotification("Product approved successfully!");
+      setTimeout(() => setNotification(null), 3000);
+    } catch (error) {
+      setNotification("Failed to approve product.");
+      setTimeout(() => setNotification(null), 3000);
+      console.error(error);
+    } finally {
+      setApprovingProductId(null);
+    }
+  };
+
   const farmers = useMemo(() => users.filter((u) => u.role === "farmer"), [users]);
   const verifiedFarmersCount = useMemo(() => farmers.filter((f) => f.approved).length, [farmers]);
-  const pendingProducts = useMemo(() => products.filter((p) => !p.approved), [products]);
+  const pendingProducts = useMemo(() => pendingProductsState, [pendingProductsState]);
 
   function resolveOrderProduct(order: any) {
     if (order.productId && typeof order.productId === "object" && order.productId.name) return order.productId.name;
@@ -159,6 +183,11 @@ export default function AdminUnifiedCommandCenter({ users, products, orders, cur
 
   return (
     <section className="mt-4 rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4 text-slate-100">
+      {notification && (
+        <div className={`mb-4 rounded-lg px-4 py-2 text-sm font-semibold ${notification.includes('success') ? 'bg-emerald-800 text-emerald-100' : 'bg-red-800 text-red-100'}`}>
+          {notification}
+        </div>
+      )}
       <header className="mb-6 flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="m-0 text-xs uppercase tracking-[0.11em] text-emerald-300">Admin Insights</p>
@@ -246,7 +275,7 @@ export default function AdminUnifiedCommandCenter({ users, products, orders, cur
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {pendingProducts.slice(0, 6).map((product) => (
+          {pendingProductsState.slice(0, 6).map((product) => (
             <article key={product._id} className="rounded-xl border border-slate-700 bg-slate-800/70 p-3">
               {product.image || product.imageUrl ? (
                 <div className="relative h-36 w-full overflow-hidden rounded-lg">
@@ -278,8 +307,7 @@ export default function AdminUnifiedCommandCenter({ users, products, orders, cur
             </article>
           ))}
         </div>
-
-        {pendingProducts.length === 0 ? <p className="mt-3 text-sm text-slate-500">No pending products at the moment.</p> : null}
+        {pendingProductsState.length === 0 ? <p className="mt-3 text-sm text-slate-500">No pending products at the moment.</p> : null}
       </section>
 
       <section>
