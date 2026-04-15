@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import Image from "next/image";
 
 
 
@@ -80,7 +79,7 @@ export default function AdminUnifiedCommandCenter() {
     <div className="p-6 space-y-6">
       {/* Brand Header & Vision */}
       <header className="flex items-center gap-4 mb-6">
-        <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={48} height={48} className="rounded-lg shadow bg-white" priority />
+        <img src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={48} height={48} className="rounded-lg shadow" style={{ background: '#fff' }} />
         <div>
           <span className="text-2xl font-extrabold text-green-900 tracking-tight block">DOS AGROLINK</span>
           <p className="text-xs font-bold tracking-[0.18em] text-amber-700 mt-1">Empowering Farmers. Connecting Markets. Transforming Agriculture.</p>

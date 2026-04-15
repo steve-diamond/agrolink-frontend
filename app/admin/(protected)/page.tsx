@@ -1,7 +1,7 @@
-import AdminUnifiedCommandCenter from "./AdminUnifiedCommandCenter";
+import AdminDashboard from "./AdminDashboard";
 
 export default function AdminProtectedPage() {
-  return <AdminUnifiedCommandCenter />;
+  return <AdminDashboard />;
 }
 
 
