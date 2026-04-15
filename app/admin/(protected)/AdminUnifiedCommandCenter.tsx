@@ -17,6 +17,7 @@ const approveProductAPI = async (id: string) => {
 };
 
 
+export default function AdminUnifiedCommandCenter() {
   // State
   const [users, setUsers] = useState<User[]>([]);
   const [pendingProductsState, setPendingProductsState] = useState<Product[]>([]);
@@ -50,14 +51,12 @@ const approveProductAPI = async (id: string) => {
     fetchData();
   }, []);
 
-
   // Derived state (memoized)
   const farmers = useMemo(() => users.filter((u) => u.role === "farmer"), [users]);
   const verifiedFarmersCount = useMemo(() => farmers.filter((f) => f.approved).length, [farmers]);
   const pendingProducts = useMemo(() => pendingProductsState, [pendingProductsState]);
 
   // Handlers
-
   const handleApproveProduct = useCallback(async (productId: string) => {
     try {
       setApprovingProductId(productId);
@@ -71,7 +70,6 @@ const approveProductAPI = async (id: string) => {
       setApprovingProductId(null);
     }
   }, []);
-
 
   if (loading) {
     return <div className="p-6">Loading dashboard...</div>;
@@ -122,8 +120,24 @@ const approveProductAPI = async (id: string) => {
         <h2 className="text-lg font-semibold mb-3">Orders</h2>
         <div className="grid gap-4">
           {orders.slice(0, 10).map((order, index) => {
-            // Normalize product and buyer
-            const product = typeof order.productId === "object" ? order.productId : { name: order.productId, location: "", price: 0 };
+            // Normalize product and buyer with safe defaults
+            type NormalizedProduct = { name?: string; location?: string; price?: number };
+            let product: NormalizedProduct = { name: undefined, location: undefined, price: undefined };
+            if (order.productId && typeof order.productId === "object") {
+              product = {
+                name: (order.productId as any).name,
+                location: (order.productId as any).location ?? undefined,
+                price: (order.productId as any).price ?? undefined,
+              };
+            } else if (typeof order.productId === "string") {
+              product = { name: order.productId, location: undefined, price: undefined };
+            }
+            // Always ensure product has all keys
+            product = {
+              name: product.name,
+              location: product.location,
+              price: product.price,
+            };
             const buyer = order.buyerId || { name: order.buyer || "Unknown", email: "" };
             const total = (order as any).totalAmount ?? (order as any).totalPrice ?? 0;
             const paymentStatus = (order as any).paymentStatus ?? "pending";
@@ -138,8 +152,12 @@ const approveProductAPI = async (id: string) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div>
                     <div className="font-semibold text-slate-100">Product: <span className="text-slate-300">{product.name}</span></div>
-                    {product.location && <div className="text-xs text-slate-400">Location: {product.location}</div>}
-                    {typeof product.price === "number" && <div className="text-xs text-slate-400">Unit Price: ₦{Number(product.price).toLocaleString()}</div>}
+                    {product.location && (
+                      <div className="text-xs text-slate-400">Location: {product.location}</div>
+                    )}
+                    {typeof product.price === "number" && !isNaN(product.price) && (
+                      <div className="text-xs text-slate-400">Unit Price: ₦{Number(product.price).toLocaleString()}</div>
+                    )}
                   </div>
                   <div>
                     <div className="font-semibold text-slate-100">Buyer: <span className="text-slate-300">{buyer.name}</span></div>
