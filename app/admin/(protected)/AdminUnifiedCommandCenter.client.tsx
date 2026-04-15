@@ -54,7 +54,7 @@ async function approveProduct(productId: string) {
 	await fetch(`/api/admin/products/${productId}/approve`, { method: "POST" });
 }
 
-export default function AdminUnifiedCommandCenter({ users, products, orders, currencyFormatter }: Props) {
+export default function AdminUnifiedCommandCenter({ products }: Props) {
 	const [approvingProductId, setApprovingProductId] = useState<string | null>(null);
 
 	const handleApproveProduct = async (productId: string) => {

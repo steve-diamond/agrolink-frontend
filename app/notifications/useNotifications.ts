@@ -11,7 +11,7 @@ export function useNotifications() {
       try {
         const res = await api.get('/notifications');
         setNotifications(res.data);
-      } catch (e) {
+      } catch {
         setNotifications([]);
       } finally {
         setLoading(false);
