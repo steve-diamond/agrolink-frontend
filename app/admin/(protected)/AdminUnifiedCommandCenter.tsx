@@ -41,7 +41,6 @@ type Props = {
   products: InputProduct[];
   orders: InputOrder[];
   currencyFormatter: Intl.NumberFormat;
-  onApproveProduct: (id: string) => void;
 };
 
 const FARMER_CATEGORIES = ["Arable", "Livestock", "Horticultural", "Poultry", "Fish", "Organic", "Dairy", "Mixed"];
@@ -97,7 +96,7 @@ function normalizeOrderStatus(raw?: string): (typeof ORDER_STATUSES)[number] | "
   return "Unknown";
 }
 
-export default function AdminUnifiedCommandCenter({ users, products, orders, currencyFormatter, onApproveProduct }: Props) {
+export default function AdminUnifiedCommandCenter({ users, products, orders, currencyFormatter }: Props) {
   const farmers = useMemo(() => users.filter((u) => u.role === "farmer"), [users]);
   const verifiedFarmersCount = useMemo(() => farmers.filter((f) => f.approved).length, [farmers]);
   const pendingProducts = useMemo(() => products.filter((p) => !p.approved), [products]);
@@ -141,15 +140,7 @@ export default function AdminUnifiedCommandCenter({ users, products, orders, cur
     return "bg-slate-700 text-slate-300";
   }
 
-  const [approvingProductId, setApprovingProductId] = useState<string | null>(null);
-  const handleApproveProduct = async (id: string) => {
-    setApprovingProductId(id);
-    try {
-      await onApproveProduct(id);
-    } finally {
-      setApprovingProductId(null);
-    }
-  };
+  // Approval logic should be handled in the client component
 
   const farmerCategoryData = useMemo(() => {
     return FARMER_CATEGORIES.map((cat) => ({
