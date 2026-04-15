@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { visionPoints } from "@/lib/visionPoints";
+import { visionPoints } from "@lib/visionPoints";
 
 export default function VisionPage() {
   return (

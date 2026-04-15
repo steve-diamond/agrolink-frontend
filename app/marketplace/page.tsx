@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getProducts, Product } from "@/services/productService";
-import API from "@/services/api";
-import { useLocalizedCopy } from "@/services/useLocalizedCopy";
+import { getProducts, Product } from "@services/productService";
+import API from "@services/api";
+import { useLocalizedCopy } from "@services/useLocalizedCopy";
 
 type MarketplaceCategoryValue = "all" | "seeds" | "fertilizers" | "equipment" | "livestock";
 

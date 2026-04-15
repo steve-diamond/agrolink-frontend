@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import API from "@/services/api";
+import API from "@services/api";
 
 type YesNo = "yes" | "no";
 

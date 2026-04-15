@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import API from "@/services/api";
+import API from "@services/api";
 
 function PaymentSuccessContent() {
   const params = useSearchParams();

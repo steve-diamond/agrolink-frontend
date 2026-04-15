@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import API from "@/services/api";
-import { useLocalizedCopy } from "@/services/useLocalizedCopy";
+import API from "@services/api";
+import { useLocalizedCopy } from "@services/useLocalizedCopy";
 import AuthShell from "../_components/AuthShell";
 import PasswordEyeIcon from "../_components/PasswordEyeIcon";
 import BuyerOnboardingPanel from "./_components/BuyerOnboardingPanel";

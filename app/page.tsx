@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 // Removed duplicate import
 import Link from "next/link";
-import FarmerLogoCarousel from "@/components/FarmerLogoCarousel";
+import FarmerLogoCarousel from "@components/FarmerLogoCarousel";
 import Image from "next/image";
-import { getStoredLanguage, listenToLanguageChanges, type UiLanguage } from "@/services/uiLanguage";
+import { getStoredLanguage, listenToLanguageChanges, type UiLanguage } from "@services/uiLanguage";
 
 const valueCards = [
   {

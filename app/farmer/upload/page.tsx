@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { createProduct } from "@/services/productService";
-import { enqueueCreateProduct, flushOfflineQueue, getPendingQueueCount } from "@/services/offlineQueue";
-import { useLocalizedCopy } from "@/services/useLocalizedCopy";
-import { getCopy } from "@/services/uiCopy";
-import { getStoredLanguage } from "@/services/uiLanguage";
+import { createProduct } from "@services/productService";
+import { enqueueCreateProduct, flushOfflineQueue, getPendingQueueCount } from "@services/offlineQueue";
+import { useLocalizedCopy } from "@services/useLocalizedCopy";
+import { getCopy } from "@services/uiCopy";
+import { getStoredLanguage } from "@services/uiLanguage";
 
 type ProductForm = {
   name: string;

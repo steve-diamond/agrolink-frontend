@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { findVisionPointBySlug, visionPoints } from "@/lib/visionPoints";
+import { findVisionPointBySlug, visionPoints } from "@lib/visionPoints";
 
 type VisionDetailPageProps = {
   params: Promise<{ slug: string }>;

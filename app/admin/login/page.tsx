@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import API from "@/services/api";
+import API from "@services/api";
 import AuthShell from "../../(auth)/_components/AuthShell";
 import Link from "next/link";
 import PasswordEyeIcon from "../../(auth)/_components/PasswordEyeIcon";

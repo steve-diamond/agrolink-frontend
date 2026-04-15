@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { emitLanguageChanged, getStoredLanguage, setStoredLanguage, type UiLanguage } from "@/services/uiLanguage";
+import { emitLanguageChanged, getStoredLanguage, setStoredLanguage, type UiLanguage } from "@services/uiLanguage";
 
 const options: Array<{ label: string; value: UiLanguage }> = [
   { label: "EN", value: "en" },

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthShell from "../../(auth)/_components/AuthShell";
 import PasswordEyeIcon from "../../(auth)/_components/PasswordEyeIcon";
-import API from "@/services/api";
+import API from "@services/api";
 
 type AdminResetPasswordClientProps = {
   token: string;
