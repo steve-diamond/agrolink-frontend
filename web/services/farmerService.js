@@ -1,0 +1,2 @@
+// farmerService placeholder
+export default {};

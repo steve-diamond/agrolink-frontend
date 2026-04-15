@@ -21,3 +21,4 @@ Agrolink frontend is built with Next.js 15, React, and Tailwind CSS. It uses the
 ## Data Flow
 - API calls to backend (Node.js/Express)
 - Client-side state managed with React hooks
+import API from "../../lib/api";

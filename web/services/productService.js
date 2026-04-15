@@ -1,0 +1,2 @@
+// productService placeholder
+export default {};

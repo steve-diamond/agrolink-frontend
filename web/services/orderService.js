@@ -1,0 +1,2 @@
+// orderService placeholder
+export default {};
