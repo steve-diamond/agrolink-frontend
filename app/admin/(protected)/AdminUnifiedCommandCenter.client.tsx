@@ -1,4 +1,3 @@
-
 "use client";
 import React from "react";
 
@@ -48,26 +47,49 @@ type Props = {
 
 
 
-
-
-
 import { useState } from "react";
+
+async function approveProduct(productId: string) {
+	// Replace with your actual API call logic
+	await fetch(`/api/admin/products/${productId}/approve`, { method: "POST" });
+}
 
 export default function AdminUnifiedCommandCenter({ users, products, orders, currencyFormatter }: Props) {
 	const [approvingProductId, setApprovingProductId] = useState<string | null>(null);
-	const handleApproveProduct = async (id: string) => {
-		setApprovingProductId(id);
+
+	const handleApproveProduct = async (productId: string) => {
 		try {
-			// Example: call your API endpoint to approve the product
-			await fetch(`/api/admin/products/${id}/approve`, { method: "POST" });
-			// Optionally, refresh data or update state here
+			setApprovingProductId(productId);
+			await approveProduct(productId);
+		} catch (error) {
+			console.error(error);
 		} finally {
 			setApprovingProductId(null);
 		}
 	};
+
+	// Example rendering for pending products:
 	return (
 		<section className="mt-4 rounded-2xl border border-slate-700/80 bg-slate-900/75 p-4 text-slate-100">
-			{/* ...existing JSX code... (unchanged) */}
+			<h2 className="text-xl font-bold mb-4">Pending Product Approvals</h2>
+			<ul>
+				{products.filter(p => !p.approved).map(product => {
+					const isApproving = approvingProductId === product._id;
+					return (
+						<li key={product._id} className="mb-2 flex items-center gap-4">
+							<span>{product.name}</span>
+							<button
+								className="px-3 py-1 rounded bg-green-700 text-white disabled:opacity-50"
+								onClick={() => handleApproveProduct(product._id)}
+								disabled={isApproving}
+							>
+								{isApproving ? "Approving..." : "Approve"}
+							</button>
+						</li>
+					);
+				})}
+			</ul>
+			{/* ...rest of your dashboard... */}
 		</section>
 	);
 }
