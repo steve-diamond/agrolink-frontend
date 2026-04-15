@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
+import Image from "next/image";
 
 
 
@@ -77,6 +78,15 @@ export default function AdminUnifiedCommandCenter() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Brand Header & Vision */}
+      <header className="flex items-center gap-4 mb-6">
+        <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={48} height={48} className="rounded-lg shadow bg-white" priority />
+        <div>
+          <span className="text-2xl font-extrabold text-green-900 tracking-tight block">DOS AGROLINK</span>
+          <p className="text-xs font-bold tracking-[0.18em] text-amber-700 mt-1">Empowering Farmers. Connecting Markets. Transforming Agriculture.</p>
+          <p className="text-sm text-slate-700 max-w-xl mt-1">Our vision is to build a thriving, transparent, and inclusive agri-ecosystem where every farmer, buyer, and partner can prosper through innovation, trust, and collaboration.</p>
+        </div>
+      </header>
       {/* Summary */}
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-xl bg-gray-900 text-white">
