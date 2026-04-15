@@ -1,6 +1,7 @@
 # Database Schema
 
 ## Overview
+
 The backend uses MongoDB with Mongoose models. Key collections:
 
 - Users
@@ -9,8 +10,8 @@ The backend uses MongoDB with Mongoose models. Key collections:
 - Wallets
 - Warehouses
 
-
 ## Users
+
 ```js
 {
   _id: ObjectId,
@@ -27,6 +28,7 @@ The backend uses MongoDB with Mongoose models. Key collections:
 ```
 
 ## Products (Produce)
+
 ```js
 {
   _id: ObjectId,
@@ -43,6 +45,7 @@ The backend uses MongoDB with Mongoose models. Key collections:
 ```
 
 ## Orders
+
 ```js
 {
   _id: ObjectId,
@@ -60,6 +63,7 @@ The backend uses MongoDB with Mongoose models. Key collections:
 ```
 
 ## Loans
+
 ```js
 {
   _id: ObjectId,
@@ -73,6 +77,7 @@ The backend uses MongoDB with Mongoose models. Key collections:
 ```
 
 ## Wallets
+
 ```js
 {
   _id: ObjectId,
@@ -90,6 +95,7 @@ The backend uses MongoDB with Mongoose models. Key collections:
 ```
 
 ## Logistics (Deliveries)
+
 ```js
 {
   _id: ObjectId,
@@ -102,6 +108,7 @@ The backend uses MongoDB with Mongoose models. Key collections:
 ```
 
 ## Onboarding (Agents)
+
 ```js
 {
   _id: ObjectId,
