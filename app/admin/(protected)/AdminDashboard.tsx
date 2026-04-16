@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Bar, Pie } from "react-chartjs-2";
@@ -14,12 +15,40 @@ import {
   LinearScale
 } from "chart.js";
 
+// Type definitions
+type Farmer = {
+  _id: string;
+  name: string;
+  category: string;
+  verified?: boolean;
+  // add other properties as needed
+};
+
+type Product = {
+  _id: string;
+  name: string;
+  price: number;
+  approved?: boolean;
+  image?: string;
+  description?: string;
+  // add other properties as needed
+};
+
+type Order = {
+  _id: string;
+  productId: string;
+  buyer: string;
+  quantity: number;
+  status: string;
+  // add other properties as needed
+};
+
 ChartJS.register(Title, Tooltip, Legend, BarElement, ArcElement, CategoryScale, LinearScale);
 
 export default function AdminDashboard() {
-  const [farmers, setFarmers] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
+  const [farmers, setFarmers] = useState<Farmer[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
 
   useEffect(() => {
