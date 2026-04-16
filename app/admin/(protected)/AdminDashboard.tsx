@@ -2,6 +2,7 @@
 
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaUserFriends, FaCheckCircle, FaHourglassHalf, FaShoppingCart, FaLeaf, FaBoxOpen, FaChartBar, FaCog, FaBell, FaSearch } from "react-icons/fa";
@@ -125,7 +126,7 @@ export default function AdminDashboard() {
           <NavItem icon={<FaCog />} label="Settings" href="/admin/(protected)/settings" />
         </nav>
         <div className="mt-10 flex items-center gap-3">
-          <img src="/admin-avatar.png" alt="Admin" className="w-10 h-10 rounded-full border-2 border-green-300" />
+          <Image src="/admin-avatar.png" alt="Admin" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-green-300" />
           <span className="font-semibold">Admin</span>
         </div>
       </aside>
@@ -151,7 +152,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="relative group">
-              <img src="/admin-avatar.png" alt="Admin" className="w-10 h-10 rounded-full border-2 border-green-300 cursor-pointer" tabIndex={0} />
+              <Image src="/admin-avatar.png" alt="Admin" width={40} height={40} className="w-10 h-10 rounded-full border-2 border-green-300 cursor-pointer" tabIndex={0} />
               {/* User Dropdown */}
               <div className="hidden group-focus-within:block absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-10">
                 <div className="p-4 text-sm text-gray-700">Signed in as <b>Admin</b></div>
@@ -188,7 +189,7 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {products.filter(p => !p.approved).map(product => (
               <div key={product._id} className="bg-white shadow rounded-lg p-4 flex flex-col">
-                <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded mb-3" />
+                <Image src={product.image || "/placeholder.png"} alt={product.name} width={320} height={128} className="w-full h-32 object-cover rounded mb-3" />
                 <h3 className="text-lg font-bold">{product.name}</h3>
                 <p className="text-green-700 font-bold text-lg">₦{product.price.toLocaleString()}</p>
                 <p className="text-xs text-gray-500 mb-2">Board name</p>
@@ -221,7 +222,7 @@ export default function AdminDashboard() {
                 >
                   ×
                 </button>
-                <img src={modalProduct.image} alt={modalProduct.name} className="w-full h-40 object-cover rounded mb-4" />
+                <Image src={modalProduct.image || "/placeholder.png"} alt={modalProduct.name} width={400} height={160} className="w-full h-40 object-cover rounded mb-4" />
                 <h3 id="modal-title" className="text-xl font-bold mb-2">{modalProduct.name}</h3>
                 <p className="text-green-700 font-bold text-lg mb-2">₦{modalProduct.price.toLocaleString()}</p>
                 <p className="text-gray-700 mb-2">{modalProduct.description}</p>
@@ -338,7 +339,7 @@ function KpiCard({ icon, label, value }: { icon: React.ReactNode; label: string;
   const raf = useRef<number>();
 
   React.useEffect(() => {
-    let start = 0;
+    const start = 0;
     const duration = 800;
     const startTime = performance.now();
     function animate(now: number) {
@@ -353,7 +354,11 @@ function KpiCard({ icon, label, value }: { icon: React.ReactNode; label: string;
       }
     }
     raf.current = requestAnimationFrame(animate);
-    return () => raf.current && cancelAnimationFrame(raf.current);
+    return () => {
+      if (raf.current) {
+        cancelAnimationFrame(raf.current);
+      }
+    };
     // eslint-disable-next-line
   }, [target]);
 
@@ -394,5 +399,4 @@ function OrderStatusBadge({ status }: { status: string }) {
       </span>
     </span>
   );
-}
 }
