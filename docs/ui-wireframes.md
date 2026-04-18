@@ -5,10 +5,7 @@
 - Dashboard: Overview of sales, wallet, and notifications
 - Produce Management: List, add, edit, and remove produce
 - Loan Application: Form to request loans, list of loan statuses
-- Orders: List of orders from buyers
-- Wallet: Balance and transaction history
-
-## Buyers
+- Orders: List of orders fro
 
 - Marketplace: Browse/search/filter produce, add to cart
 - Checkout: Order summary and payment

@@ -5,6 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import API from "@services/api";
+import { getLoans, Loan, repayLoan } from "@services/loanService";
+import { getShipments, Shipment } from "@services/logisticsService";
+import { getStorage, Storage } from "@services/warehouseService";
+import { getFarmingTips, FarmingTip } from "@services/farmingTipsService";
 
 type AuthUser = {
   _id: string;
@@ -32,14 +36,27 @@ function formatNaira(value: number) {
   return `N${Math.round(value).toLocaleString()}`;
 }
 
-function FarmerDashboard({ user }: { user: AuthUser }) {
+
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loans, setLoans] = useState<Loan[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [storage, setStorage] = useState<Storage[]>([]);
+  const [farmingTips, setFarmingTips] = useState<FarmingTip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [repayLoading, setRepayLoading] = useState(false);
+  const [repayMessage, setRepayMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([API.get("/api/products"), API.get("/api/orders")])
-      .then(([productsRes, ordersRes]) => {
+    Promise.all([
+      API.get("/api/products"),
+      API.get("/api/orders"),
+      getLoans(user._id),
+      getShipments(user._id),
+      getStorage(user._id),
+      getFarmingTips(),
+    ])
+      .then(([productsRes, ordersRes, loansRes, shipmentsRes, storageRes, tipsRes]) => {
         const allProducts = Array.isArray(productsRes.data)
           ? productsRes.data
           : Array.isArray(productsRes.data?.products)
@@ -54,10 +71,18 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
 
         setProducts(allProducts.filter((item: any) => item?.farmer === user._id || item?.owner === user._id));
         setOrders(allOrders);
+        setLoans(loansRes);
+        setShipments(shipmentsRes);
+        setStorage(storageRes);
+        setFarmingTips(tipsRes);
       })
       .catch(() => {
         setProducts([]);
         setOrders([]);
+        setLoans([]);
+        setShipments([]);
+        setStorage([]);
+        setFarmingTips([]);
       })
       .finally(() => setLoading(false));
   }, [user._id]);
@@ -68,9 +93,11 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
     return total;
   }, [orders]);
 
-  const activeLoans = 2;
+  const activeLoans = loans.filter((loan) => loan.status === "active").length;
+  const mostRecentActiveLoan = loans.filter((loan) => loan.status === "active").sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
   const pendingOrders = orders.filter((order) => !String(order.status || "").toLowerCase().includes("completed")).length;
-  const storedKg = products.reduce((sum, product) => sum + Number(product.quantity || 0), 0) * 25;
+  const storedKg = storage.reduce((sum, s) => sum + Number(s.quantityKg || 0), 0);
+  const mostRecentInTransit = shipments.filter((s) => s.status === "in_transit").sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
   return (
     <main className="dash-page">
@@ -102,15 +129,52 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
       <section className="dash-grid-two">
         <article className="dash-card">
           <h3>My Loan</h3>
-          <p className="dash-amount">{formatNaira(100000)}</p>
-          <p className="dash-muted">Due: May 15, 2026</p>
-          <Link href="/loan-application" className="dash-btn-primary">Pay Now</Link>
+          {mostRecentActiveLoan ? (
+            <>
+              <p className="dash-amount">{formatNaira(mostRecentActiveLoan.amount)}</p>
+              <p className="dash-muted">Due: {new Date(mostRecentActiveLoan.dueDate).toLocaleDateString()}</p>
+            </>
+          ) : (
+            <p className="dash-muted">No active loans</p>
+          )}
+          {mostRecentActiveLoan && (
+            <button
+              className="dash-btn-primary"
+              disabled={repayLoading}
+              onClick={async () => {
+                setRepayLoading(true);
+                setRepayMessage(null);
+                try {
+                  const res = await repayLoan(mostRecentActiveLoan._id);
+                  setRepayMessage(res.message);
+                  if (res.success) {
+                    // Refresh loans
+                    const updatedLoans = await getLoans(user._id);
+                    setLoans(updatedLoans);
+                  }
+                } catch (err) {
+                  setRepayMessage("Repayment failed. Please try again.");
+                } finally {
+                  setRepayLoading(false);
+                }
+              }}
+            >
+              {repayLoading ? "Processing..." : "Pay Now"}
+            </button>
+          )}
+          {repayMessage && <p className="dash-muted mt-2">{repayMessage}</p>}
         </article>
 
         <article className="dash-card">
           <h3>Logistics Tracker</h3>
-          <p>In Transit: Abuja to Kano</p>
-          <p className="dash-muted">Arrival: Apr 22</p>
+          {mostRecentInTransit ? (
+            <>
+              <p>In Transit: {mostRecentInTransit.from} to {mostRecentInTransit.to}</p>
+              <p className="dash-muted">Arrival: {new Date(mostRecentInTransit.estimatedArrival).toLocaleDateString()}</p>
+            </>
+          ) : (
+            <p className="dash-muted">No active shipments</p>
+          )}
           <Link href="/logistics" className="dash-btn-primary">Track Shipment</Link>
         </article>
       </section>
@@ -126,9 +190,11 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
         <article className="dash-card">
           <h3>Farming Tips</h3>
           <ul className="dash-tips">
-            <li>Boost maize yield with split fertilizer timing.</li>
-            <li>Use early harvest sorting for better pricing.</li>
-            <li>Bundle logistics with nearby farmers.</li>
+            {farmingTips.length > 0 ? (
+              farmingTips.slice(0, 3).map((tip) => <li key={tip._id}>{tip.text}</li>)
+            ) : (
+              <li>No tips available</li>
+            )}
           </ul>
           <Link href="/vision" className="dash-btn-secondary">Read More</Link>
         </article>
