@@ -236,7 +236,7 @@ export default function AdminDashboard() {
                         await axios.put(`/api/products/${modalProduct._id}/approve`, {}, { headers: { Authorization: token } });
                         setProducts(prev => prev.map(p => p._id === modalProduct._id ? { ...p, approved: true } : p));
                         setModalProduct(null);
-                      } catch (e) {
+                      } catch {
                         alert("Failed to approve product.");
                       } finally {
                         setApproving(false);
@@ -359,7 +359,7 @@ function KpiCard({ icon, label, value }: { icon: React.ReactNode; label: string;
         cancelAnimationFrame(raf.current);
       }
     };
-    // eslint-disable-next-line
+
   }, [target]);
 
   return (

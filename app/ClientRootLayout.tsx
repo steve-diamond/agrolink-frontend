@@ -1,10 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@services/api";
-import NavBar from "@components/NavBar";
-import SiteFooter from "@components/SiteFooter";
-import ClientErrorBoundary from "@components/ClientErrorBoundary";
-import ServiceWorkerRegistration from "@components/ServiceWorkerRegistration";
+
 
 function NotificationToast({ notification, onClose }: { notification: any, onClose: () => void }) {
   useEffect(() => {

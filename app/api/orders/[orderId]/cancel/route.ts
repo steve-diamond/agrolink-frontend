@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // In-memory mock DB for demonstration (replace with real DB logic)
-let orders: any[] = globalThis.orders || [];
+const orders: any[] = globalThis.orders || [];
 globalThis.orders = orders;
 
 export async function POST(req: NextRequest, { params }: { params: { orderId: string } }) {

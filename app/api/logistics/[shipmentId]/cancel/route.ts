@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, type RouteHandlerContext } from "next/server";
 
 // In-memory mock DB for demonstration (replace with real DB logic)
-let shipments: any[] = globalThis.shipments || [];
+const shipments: any[] = globalThis.shipments || [];
 globalThis.shipments = shipments;
 
-export async function POST(req: NextRequest, { params }: { params: { shipmentId: string } }) {
-  const { shipmentId } = params;
+export async function POST(req: NextRequest, context: RouteHandlerContext) {
+  const { shipmentId } = context.params;
   // Find and update the shipment status
   const idx = shipments.findIndex((s) => s._id === shipmentId);
   if (idx === -1) {

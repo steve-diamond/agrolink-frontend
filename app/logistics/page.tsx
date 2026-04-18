@@ -18,7 +18,7 @@ export default function LogisticsPage() {
     try {
       await fetch(`/api/logistics/${shipmentId}/cancel`, { method: "POST" });
       setShipments((prev) => prev.map((s) => s._id === shipmentId ? { ...s, status: "cancelled" } : s));
-    } catch (err) {
+    } catch {
       alert("Failed to cancel shipment. Please try again.");
     } finally {
       setCancellingId(null);

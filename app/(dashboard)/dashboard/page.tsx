@@ -8,7 +8,7 @@ import API from "@services/api";
 import { getLoans, Loan, repayLoan } from "@services/loanService";
 import { getShipments, Shipment } from "@services/logisticsService";
 import { getStorage, Storage } from "@services/warehouseService";
-import { getFarmingTips, FarmingTip } from "@services/farmingTipsService";
+import { getFarmingTips } from "@services/farmingTipsService";
 
 type AuthUser = {
   _id: string;
@@ -17,11 +17,7 @@ type AuthUser = {
   role: "farmer" | "buyer" | "admin";
 };
 
-type Product = {
-  _id: string;
-  name: string;
-  quantity: number;
-};
+
 
 type Order = {
   _id: string;
@@ -38,47 +34,36 @@ function formatNaira(value: number) {
 }
 
 function FarmerDashboard({ user }: { user: AuthUser }) {
-  const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loans, setLoans] = useState<Loan[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [storage, setStorage] = useState<Storage[]>([]);
-  const [farmingTips, setFarmingTips] = useState<FarmingTip[]>([]);
+  const [farmingTips, setFarmingTips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [repayLoading, setRepayLoading] = useState(false);
   const [repayMessage, setRepayMessage] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
-      API.get("/api/products"),
       API.get("/api/orders"),
       getLoans(user._id),
       getShipments(user._id),
       getStorage(user._id),
       getFarmingTips(),
     ])
-      .then(([productsRes, ordersRes, loansRes, shipmentsRes, storageRes, tipsRes]) => {
-        const allProducts = Array.isArray(productsRes.data)
-          ? productsRes.data
-          : Array.isArray(productsRes.data?.products)
-          ? productsRes.data.products
-          : [];
-
+      .then(([ordersRes, loansRes, shipmentsRes, storageRes, tipsRes]) => {
         const allOrders = Array.isArray(ordersRes.data)
           ? ordersRes.data
           : Array.isArray(ordersRes.data?.orders)
           ? ordersRes.data.orders
           : [];
-
-        setProducts(allProducts.filter((item: any) => item?.farmer === user._id || item?.owner === user._id));
         setOrders(allOrders);
         setLoans(loansRes);
         setShipments(shipmentsRes);
         setStorage(storageRes);
-        setFarmingTips(tipsRes);
+        setFarmingTips(Array.isArray(tipsRes) ? tipsRes : []);
       })
       .catch(() => {
-        setProducts([]);
         setOrders([]);
         setLoans([]);
         setShipments([]);
@@ -90,8 +75,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
 
   const walletBalance = useMemo(() => {
     const paidOrders = orders.filter((order) => String(order.paymentStatus || "").toLowerCase() === "paid");
-    const total = paidOrders.reduce((sum, order) => sum + Number(order.totalAmount ?? order.totalPrice ?? 0), 0);
-    return total;
+    return paidOrders.reduce((sum, order) => sum + Number(order.totalAmount ?? order.totalPrice ?? 0), 0);
   }, [orders]);
 
   const activeLoans = loans.filter((loan) => loan.status === "active").length;
@@ -153,7 +137,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
                     const updatedLoans = await getLoans(user._id);
                     setLoans(updatedLoans);
                   }
-                } catch (err) {
+                } catch {
                   setRepayMessage("Repayment failed. Please try again.");
                 } finally {
                   setRepayLoading(false);

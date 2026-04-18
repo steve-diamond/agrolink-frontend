@@ -19,7 +19,7 @@ export default function WarehousePage() {
     try {
       await fetch(`/api/warehouse/${storageId}/release`, { method: "POST" });
       setStorage((prev) => prev.map((s) => s._id === storageId ? { ...s, released: true } : s));
-    } catch (err) {
+    } catch {
       alert("Failed to release storage. Please try again.");
     } finally {
       setReleasingId(null);
