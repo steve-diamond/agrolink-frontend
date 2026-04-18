@@ -32,11 +32,12 @@ type Order = {
   paymentStatus?: string;
 };
 
+
 function formatNaira(value: number) {
   return `N${Math.round(value).toLocaleString()}`;
 }
 
-
+function FarmerDashboard({ user }: { user: AuthUser }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loans, setLoans] = useState<Loan[]>([]);

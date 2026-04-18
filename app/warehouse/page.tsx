@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
 import { getStorage, Storage } from "@services/warehouseService";
 
+export default function WarehousePage() {
   const [storage, setStorage] = useState<Storage[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

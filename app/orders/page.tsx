@@ -1,9 +1,20 @@
-    const [userRole, setUserRole] = useState<string>("user");
-    useEffect(() => {
-      if (typeof window !== "undefined") {
-        setUserRole(localStorage.getItem("role") || "user");
-      }
-    }, []);
+
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { saveAs } from "file-saver";
+import Image from "next/image";
+import API from "@services/api";
+
+export default function OrdersPage() {
+  const [userRole, setUserRole] = useState<string>("user");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setUserRole(localStorage.getItem("role") || "user");
+    }
+  }, []);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const handleSelect = (orderId: string, checked: boolean) => {
@@ -21,15 +32,6 @@
     }
     setSelectedIds([]);
   };
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { saveAs } from "file-saver";
-import Image from "next/image";
-import API from "@services/api";
-import { useCallback } from "react";
 
   // Inline editing state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -71,6 +73,7 @@ import { useCallback } from "react";
       alert("Failed to update order. Please try again.");
     }
   };
+
 type OrderProduct = {
   _id: string;
   name: string;
@@ -411,7 +414,11 @@ const statusBadgeClass: Record<Order["status"], string> = {
                       placeholder="Email"
                     />
                   </>
-                ) : <><strong>{order.buyerId?.name}</strong> ({order.buyerId?.email})</>}
+                ) : (
+                  <>
+                    <strong>{order.buyerId?.name}</strong> ({order.buyerId?.email})
+                  </>
+                )}
               </p>
 
               <div className="mt-3 grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2">
@@ -514,69 +521,34 @@ const statusBadgeClass: Record<Order["status"], string> = {
             </button>
           </div>
         )}
-          <article key={order?._id || `order-${index}`} className="card p-4">
-            {(() => {
-              const items = resolveOrderItems(order);
-              const total = order.totalAmount ?? order.totalPrice;
-
-              return (
-                <>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="m-0 text-lg font-bold text-green-950">
-                      {items.length > 1 ? `${items.length} items` : items[0]?.productId?.name ?? "Unknown Product"}
-                    </h2>
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${statusBadgeClass[order.status] ?? "bg-slate-100 text-slate-700"}`}>
-                      {order.status}
-                    </span>
-                  </div>
-
-                  <p className="m-0 mt-2 text-sm text-slate-700">
-                    Buyer: <strong>{order.buyerId?.name}</strong> ({order.buyerId?.email})
-                  </p>
-
-                  <div className="mt-3 grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2">
-              {items.map((item, index) => (
-                <div
-                  key={`${order._id}-${item.productId?._id ?? index}`}
-                  className={`flex justify-between gap-3 rounded-md bg-white px-2 py-2 ${index > 0 ? "border-t border-slate-100" : ""}`}
-                >
-                  <div>
-                    <div className="text-sm font-semibold text-slate-800">{item.productId?.name ?? "Unknown Product"}</div>
-                    <div className="text-xs text-slate-500">{item.productId?.location ?? "No location"}</div>
-                  </div>
-                  <div className="text-right text-sm whitespace-nowrap">
-                    <div>Qty: {item.quantity}</div>
-                    <div className="text-xs text-slate-500">
-                      ₦{Number(item.productId?.price ?? 0).toLocaleString()} each
-                    </div>
-                  </div>
-                </div>
-              ))}
-                  </div>
-
-
-                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-700 items-center">
-                    <p className="m-0">Total Quantity: <strong>{order.quantity}</strong></p>
-                    <p className="m-0">Total: <strong>₦{Number(total).toLocaleString()}</strong></p>
-                    <p className="m-0">Payment: <strong className="uppercase">{order.paymentStatus ?? "pending"}</strong></p>
-                    {order.status === "pending" && (
-                      <button
-                        className="ml-2 px-3 py-1 border border-red-400 text-red-700 rounded hover:bg-red-50 disabled:opacity-50"
-                        disabled={cancellingId === order._id}
-                        onClick={() => handleCancelOrder(order._id)}
-                      >
-                        {cancellingId === order._id ? "Cancelling..." : "Cancel Order"}
-                      </button>
-                    )}
-                  </div>
-
-                  <p className="m-0 mt-2 text-xs text-slate-500">Placed: {new Date(order.createdAt).toLocaleString()}</p>
-                </>
-              );
-            })()}
-          </article>
-        ))}
       </section>
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-4">
+          <button
+            className="px-3 py-1 border rounded disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              className={`px-3 py-1 border rounded ${page === i + 1 ? "bg-green-700 text-white" : ""}`}
+              onClick={() => setPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            className="px-3 py-1 border rounded disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </main>
   );
 }

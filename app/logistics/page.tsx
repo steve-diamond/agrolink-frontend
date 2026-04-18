@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { getShipments, Shipment } from "@services/logisticsService";
 
+export default function LogisticsPage() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
