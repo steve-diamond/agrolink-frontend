@@ -31,7 +31,9 @@ export default function LogisticsPage() {
     let userId = "";
     try {
       if (rawUser) userId = JSON.parse(rawUser)._id;
-    } catch {}
+    } catch {
+      // do nothing
+    }
     getShipments(userId)
       .then(setShipments)
       .finally(() => setLoading(false));

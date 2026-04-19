@@ -32,7 +32,9 @@ export default function WarehousePage() {
     let userId = "";
     try {
       if (rawUser) userId = JSON.parse(rawUser)._id;
-    } catch {}
+    } catch {
+      // do nothing
+    }
     getStorage(userId)
       .then(setStorage)
       .finally(() => setLoading(false));
