@@ -27,7 +27,9 @@ let mockLoans = [
 	},
 ];
 
-export async function GET(request) {
+import { NextRequest } from "next/server";
+
+export async function GET(request: NextRequest) {
 	// Optionally filter by userId (e.g., /api/loan?userId=farmer1)
 	const { searchParams } = new URL(request.url);
 	const userId = searchParams.get("userId");
@@ -39,7 +41,7 @@ export async function GET(request) {
 }
 
 // Repay a loan (mock)
-export async function POST(request) {
+export async function POST(request: NextRequest) {
 	const body = await request.json();
 	const { loanId } = body;
 	let found = false;

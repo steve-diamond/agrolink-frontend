@@ -27,7 +27,9 @@ const mockStorage = [
 	},
 ];
 
-export async function GET(request) {
+import { NextRequest } from "next/server";
+
+export async function GET(request: NextRequest) {
 	// Optionally filter by userId (e.g., /api/warehouse?userId=farmer1)
 	const { searchParams } = new URL(request.url);
 	const userId = searchParams.get("userId");

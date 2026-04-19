@@ -7,6 +7,7 @@ export type Storage = {
   commodity: string;
   warehouse: string;
   createdAt: string;
+  released?: boolean;
 };
 
 export async function getStorage(userId?: string): Promise<Storage[]> {

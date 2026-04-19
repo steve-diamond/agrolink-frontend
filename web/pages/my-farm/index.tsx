@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import API from "@/lib/api";
-import { useAppShell } from "@/components/AppShell";
+import { useAppShell } from "../../components/shared/AppShell";
 
 type Product = {
   _id: string;
@@ -28,13 +28,14 @@ export default function MyFarmPage() {
     const run = async () => {
       setLoading(true);
       try {
-        const response = await API.get("/api/products", {
-          params: { farmer: user._id, limit: 50 },
+        const params = new URLSearchParams({ farmer: user._id, limit: "50" });
+        const response = await fetch(`/api/products?${params.toString()}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
+        const data = await response.json();
         let items: Product[] = [];
-        if (response.data && response.data.data && Array.isArray(response.data.data.items)) {
-          items = response.data.data.items;
+        if (data && data.data && Array.isArray(data.data.items)) {
+          items = data.data.items;
         }
         setProducts(items);
       } catch {

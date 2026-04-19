@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { RouteContext } from "next";
 
 // In-memory mock DB for demonstration (replace with real DB logic)
+declare global {
+  var orders: any[];
+}
 const orders: any[] = globalThis.orders || [];
 globalThis.orders = orders;
 
-export async function POST(
-  req: NextRequest,
-  context: RouteContext<{ orderId: string }>
-) {
-  const { orderId } = context.params;
+export async function POST(req: NextRequest, context: any) {
+  const { orderId } = context?.params || {};
   // Find and update the order status
   const idx = orders.findIndex((o) => o._id === orderId);
   if (idx === -1) {

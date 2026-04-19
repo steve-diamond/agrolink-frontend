@@ -27,8 +27,9 @@ export default function MarketHubPage() {
   useEffect(() => {
     const run = async () => {
       try {
-        const response = await API.get("/api/products", { params: { approved: true, limit: 150 } });
-        const data = response.data;
+        const params = new URLSearchParams({ approved: "true", limit: "150" });
+        const response = await fetch(`/api/products?${params.toString()}`);
+        const data = await response.json();
         let items: Product[] = [];
         if (Array.isArray(data)) {
           items = data;

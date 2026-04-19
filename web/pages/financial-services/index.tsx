@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import API from "@/lib/api";
-import { useAppShell } from "@/components/AppShell";
+import { useAppShell } from "../../components/shared/AppShell";
 
 type Order = {
   _id: string;
@@ -27,14 +27,15 @@ export default function FinancialServicesPage() {
     const run = async () => {
       setLoading(true);
       try {
-        const response = await API.get("/api/orders", {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await fetch("/api/orders", {
+          headers: { Authorization: `Bearer ${token}` }
         });
+        const data = await response.json();
         let items: Order[] = [];
-        if (Array.isArray(response.data)) {
-          items = response.data;
-        } else if (response.data && Array.isArray(response.data.data)) {
-          items = response.data.data;
+        if (Array.isArray(data)) {
+          items = data;
+        } else if (data && Array.isArray(data.data)) {
+          items = data.data;
         }
         setOrders(items);
       } catch {
