@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import "../styles/custom.css";
 // Removed duplicate import
 import Link from "next/link";
 import FarmerLogoCarousel from "@components/FarmerLogoCarousel";
@@ -216,8 +217,7 @@ export default function Home() {
             {localizedHeroSlides.map((slide, index) => (
               <article
                 key={slide.image}
-                className="dos-hero-slide"
-                style={{ animationDelay: `${index * 5}s` }}
+                className={`dos-hero-slide custom-article custom-animation-delay-${index}`}
                 aria-label={`Slide ${index + 1}`}
               >
                 <Image
@@ -244,7 +244,7 @@ export default function Home() {
 
             <div className="dos-hero-progress" aria-hidden="true">
               {localizedHeroSlides.map((slide, index) => (
-                <span key={`${slide.image}-${index}`} style={{ animationDelay: `${index * 5}s` }} />
+                <span key={`${slide.image}-${index}`} className={`custom-animation-delay-${index}`} />
               ))}
             </div>
           </div>

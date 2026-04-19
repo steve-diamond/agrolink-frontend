@@ -65,7 +65,7 @@ export default function LogisticsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <select
+        <select title="Select an option"
           className="border rounded px-3 py-2 text-sm"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}

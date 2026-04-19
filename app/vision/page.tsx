@@ -25,9 +25,9 @@ export default function VisionPage() {
       <section className="grid gap-4 grid-cols-1 md:grid-cols-2 w-full">
         {visionPoints.map((item, index) => (
           <article key={item.slug} className="card overflow-hidden">
-            <div className="relative min-h-[170px]">
+            <div className="relative min-h-42.5">
               <Image src={item.image} alt={item.title} fill className="object-cover" sizes="(max-width: 980px) 100vw, 50vw" />
-              <div className="absolute inset-0 bg-gradient-to-t from-green-950/70 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-green-950/70 to-transparent" />
               <span className="absolute right-3 top-3 rounded-full bg-white/85 px-2 py-1 text-xs font-extrabold text-green-900">
                 {String(index + 1).padStart(2, "0")}
               </span>

@@ -1,0 +1,15 @@
+.custom-article {
+  /* Move any inline styles here if needed */
+}
+
+/* Add animation delay classes for up to 10 slides as an example */
+.custom-animation-delay-0 { animation-delay: 0s; }
+.custom-animation-delay-1 { animation-delay: 5s; }
+.custom-animation-delay-2 { animation-delay: 10s; }
+.custom-animation-delay-3 { animation-delay: 15s; }
+.custom-animation-delay-4 { animation-delay: 20s; }
+.custom-animation-delay-5 { animation-delay: 25s; }
+.custom-animation-delay-6 { animation-delay: 30s; }
+.custom-animation-delay-7 { animation-delay: 35s; }
+.custom-animation-delay-8 { animation-delay: 40s; }
+.custom-animation-delay-9 { animation-delay: 45s; }
