@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import API from "@services/api";
+import API from "@/services/api";
 import AuthShell from "../../_components/AuthShell";
 
 type StatusResponse = {

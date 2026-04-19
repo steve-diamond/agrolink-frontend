@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import API from "@services/api";
+import API from "@/services/api";
 import { useRouter } from "next/navigation";
 import { useLocalizedCopy } from "@services/useLocalizedCopy";
 import AuthShell from "../_components/AuthShell";

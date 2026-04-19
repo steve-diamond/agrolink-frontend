@@ -1,5 +1,5 @@
 "use client";
-import { api } from '../../services/api';
+import API from '@/services/api';
 import { useEffect, useState } from 'react';
 
 export function useNotifications() {
@@ -9,7 +9,7 @@ export function useNotifications() {
   useEffect(() => {
     async function fetchNotifications() {
       try {
-        const res = await api.get('/notifications');
+        const res = await API.get('/notifications');
         setNotifications(res.data);
       } catch {
         setNotifications([]);

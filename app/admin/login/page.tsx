@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
         "Admin login failed";
 
       const statusCode = err?.response?.status;
-      const target = API?.defaults?.baseURL || "unknown-api-base";
+      const target = "custom-api";
 
       setError(message);
       setErrorDetails(

@@ -1,4 +1,4 @@
-import API from "../src/services/api";
+import API from "./api";
 
 export type Shipment = {
   _id: string;

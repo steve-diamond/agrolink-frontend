@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import dosLogo from "../dos logo.jpg";
-import { isRouteActive } from "@lib/navigationActive";
+import { isRouteActive } from "../src/lib/navigationActive";
 import { emitLanguageChanged, getStoredLanguage, listenToLanguageChanges, setStoredLanguage, type UiLanguage } from "@services/uiLanguage";
 
 const languageOptions: Array<{ label: string; value: UiLanguage }> = [

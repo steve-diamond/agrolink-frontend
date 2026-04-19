@@ -1,4 +1,4 @@
-import API from "../src/services/api";
+import API from "./api";
 
 export type Storage = {
   _id: string;

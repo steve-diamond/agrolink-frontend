@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import API from "@services/api";
+import API from "@/services/api";
 
 type YesNo = "yes" | "no";
 
@@ -849,7 +849,6 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
     }
   };
 
-  const stepProgress = useMemo(() => `${Math.round((step / 7) * 100)}%`, [step]);
 
   // Map step to Tailwind width class (w-0 to w-full)
   const stepProgressClass = useMemo(() => {

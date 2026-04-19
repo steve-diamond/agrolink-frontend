@@ -22,8 +22,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@services/*": ["./src/services/*"],
-      "@components/*": ["./components/*"],
-      "@lib/*": ["./lib/*", "./src/lib/*"]
+      "@lib/*": ["./src/lib/*"]
     }
   },
   "include": [

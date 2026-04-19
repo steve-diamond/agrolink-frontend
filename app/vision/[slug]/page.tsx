@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { findVisionPointBySlug, visionPoints } from "@lib/visionPoints";
+import { findVisionPointBySlug, visionPoints } from "@/lib/visionPoints";
 
 type VisionDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -24,9 +24,9 @@ export default async function VisionDetailPage({ params }: VisionDetailPageProps
       <section className="card overflow-hidden w-full flex items-center gap-3 mb-4">
         <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={44} height={44} className="rounded-lg shadow" priority />
         <span className="text-xl font-extrabold text-green-900 tracking-tight">DOS AGROLINK</span>
-        <div className="relative min-h-[250px] sm:min-h-[320px]">
+        <div className="relative min-h-62.5 sm:min-h-80">
           <Image src={point.image} alt={point.title} fill className="object-cover" sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-r from-green-950/80 via-green-900/60 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-green-950/80 via-green-900/60 to-transparent" />
           <div className="relative z-10 max-w-3xl p-6 text-green-50 sm:p-8">
             <p className="text-xs font-bold tracking-[0.2em] text-amber-200">VISION POINT</p>
             <h1 className="mt-2 text-3xl font-extrabold sm:text-5xl">{point.title}</h1>

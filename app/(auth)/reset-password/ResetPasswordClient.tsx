@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthShell from "../_components/AuthShell";
-import API from "@services/api";
+import API from "@/services/api";
 import PasswordEyeIcon from "../_components/PasswordEyeIcon";
 
 type ResetPasswordClientProps = {

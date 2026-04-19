@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import API from "@services/api";
+import API from "@/services/api";
 import AuthShell from "../../../_components/AuthShell";
 
 type StatusResponse = {

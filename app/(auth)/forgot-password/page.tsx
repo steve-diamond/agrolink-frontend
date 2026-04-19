@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import AuthShell from "../_components/AuthShell";
-import API from "@services/api";
+import API from "@/services/api";
 import { useRouter } from "next/navigation";
 
 export default function ForgotPasswordPage() {

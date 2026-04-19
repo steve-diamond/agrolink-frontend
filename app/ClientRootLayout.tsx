@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { api } from "@services/api";
+import API from "@services/api";
 
 
 function NotificationToast({ notification, onClose }: { notification: any, onClose: () => void }) {
@@ -28,7 +28,7 @@ export default function ClientRootLayout({ children }: { children: React.ReactNo
     let mounted = true;
     const poll = async () => {
       try {
-        const res = await api.get("/notifications");
+        const res = await API.get("/notifications");
         const notifs = Array.isArray(res.data) ? res.data : [];
         if (notifs.length > 0) {
           const newest = notifs[0];

@@ -1,4 +1,4 @@
-import API from "../src/services/api";
+import API from "./api";
 
 export type Product = {
   _id: string;
@@ -47,6 +47,6 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
 }
 
 export async function createProduct(data: NewProduct): Promise<Product> {
-  const res = await API.post<Product>("/api/products", data);
+  const res = await API.post("/api/products", data);
   return res.data;
 }
