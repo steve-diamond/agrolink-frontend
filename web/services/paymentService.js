@@ -1,2 +1,3 @@
 // paymentService placeholder
-export default {};
+const paymentService = {};
+export default paymentService;

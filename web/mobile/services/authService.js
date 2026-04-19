@@ -1,2 +1,3 @@
 // authService placeholder (mobile)
-export default {};
+const authService = {};
+export default authService;

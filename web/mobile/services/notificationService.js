@@ -8,7 +8,7 @@ export const fetchNotifications = async () => {
     const res = await api.get('/notifications');
     await AsyncStorage.setItem('notifications', JSON.stringify(res.data));
     return res.data;
-  } catch (e) {
+  } catch {
     // fallback to offline
     const offline = await AsyncStorage.getItem('notifications');
     return offline ? JSON.parse(offline) : [];

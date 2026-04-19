@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const saveOfflineData = async (key, data) => {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(data));
-  } catch (e) {
+  } catch {
     // handle error
   }
 };
@@ -14,7 +14,7 @@ export const getOfflineData = async (key) => {
   try {
     const value = await AsyncStorage.getItem(key);
     return value ? JSON.parse(value) : null;
-  } catch (e) {
+  } catch {
     // handle error
     return null;
   }
@@ -23,7 +23,7 @@ export const getOfflineData = async (key) => {
 export const removeOfflineData = async (key) => {
   try {
     await AsyncStorage.removeItem(key);
-  } catch (e) {
+  } catch {
     // handle error
   }
 };

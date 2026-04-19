@@ -30,7 +30,12 @@ export default function FinancialServicesPage() {
         const response = await API.get("/api/orders", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const items = Array.isArray(response.data) ? response.data : response.data?.data || [];
+        let items: Order[] = [];
+        if (Array.isArray(response.data)) {
+          items = response.data;
+        } else if (response.data && Array.isArray(response.data.data)) {
+          items = response.data.data;
+        }
         setOrders(items);
       } catch {
         setOrders([]);
@@ -42,10 +47,14 @@ export default function FinancialServicesPage() {
     run();
   }, [user, token]);
 
-  const totalValue = useMemo(
-    () => orders.reduce((sum, order) => sum + Number(order.totalAmount ?? order.totalPrice ?? 0), 0),
-    [orders]
-  );
+  const totalValue = useMemo(() => {
+    return orders.reduce((sum, order) => {
+      let value = 0;
+      if (typeof order.totalAmount === "number") value = order.totalAmount;
+      else if (typeof order.totalPrice === "number") value = order.totalPrice;
+      return sum + value;
+    }, 0);
+  }, [orders]);
 
   if (!user) {
     return (

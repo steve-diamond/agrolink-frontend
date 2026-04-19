@@ -1,2 +1,3 @@
 // farmerService placeholder
-export default {};
+const farmerService = {};
+export default farmerService;

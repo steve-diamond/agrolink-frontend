@@ -29,15 +29,15 @@ export default function MarketHubPage() {
       try {
         const response = await API.get("/api/products", { params: { approved: true, limit: 150 } });
         const data = response.data;
-        const items = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.data)
-          ? data.data
-          : Array.isArray(data?.products)
-          ? data.products
-          : [];
-
-        setProducts(items as Product[]);
+        let items: Product[] = [];
+        if (Array.isArray(data)) {
+          items = data;
+        } else if (data && Array.isArray(data.data)) {
+          items = data.data;
+        } else if (data && Array.isArray(data.products)) {
+          items = data.products;
+        }
+        setProducts(items);
       } catch {
         setError("Live market feed unavailable. Showing benchmark prices.");
       } finally {
@@ -52,18 +52,16 @@ export default function MarketHubPage() {
     if (!products.length) {
       return FALLBACK;
     }
-
     const top = [...products]
-      .filter((item) => Number(item.price) > 0)
-      .sort((a, b) => Number(b.price || 0) - Number(a.price || 0))
+      .filter((item) => typeof item.price === "number" && item.price > 0)
+      .sort((a, b) => (typeof b.price === "number" ? b.price : 0) - (typeof a.price === "number" ? a.price : 0))
       .slice(0, 3)
       .map((item) => ({
         crop: item.category || item.name || "Produce",
         location: item.location || "Nigeria",
-        price: Number(item.price || 0),
+        price: typeof item.price === "number" ? item.price : 0,
         trend: "live backend feed",
       }));
-
     return top.length ? top : FALLBACK;
   }, [products]);
 

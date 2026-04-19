@@ -3,19 +3,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import { Language, SUPPORTED_LANGUAGES, UI_COPY } from "@/lib/i18n";
 import API from "@/lib/api";
 import { AuthUser, clearSession, getStoredToken, getStoredUser, saveSession } from "@/lib/clientAuth";
 
-type AppShellContextValue = {
-  language: Language;
-  setLanguage: (language: Language) => void;
-  user: AuthUser | null;
-  token: string | null;
-  setSession: (token: string, user: AuthUser) => void;
-  logout: () => void;
-};
+
 
 const AppShellContext = createContext<AppShellContextValue>({
   language: "en",
@@ -55,23 +48,24 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         setUser(null);
         setToken(null);
       });
-  }, [token]);
+  }, [token, setToken, setUser]);
 
-  const setSession = (nextToken: string, nextUser: AuthUser) => {
+
+  const setSession = useCallback((nextToken: string, nextUser: AuthUser) => {
     saveSession(nextToken, nextUser);
     setToken(nextToken);
     setUser(nextUser);
-  };
+  }, [setToken, setUser]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     clearSession();
     setToken(null);
     setUser(null);
-  };
+  }, [setToken, setUser]);
 
   const value = useMemo(
     () => ({ language, setLanguage, user, token, setSession, logout }),
-    [language, user, token]
+    [language, setLanguage, user, token, setSession, logout]
   );
   const copy = UI_COPY[language];
 

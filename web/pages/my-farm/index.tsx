@@ -32,7 +32,10 @@ export default function MyFarmPage() {
           params: { farmer: user._id, limit: 50 },
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
-        const items = response.data?.data?.items || [];
+        let items: Product[] = [];
+        if (response.data && response.data.data && Array.isArray(response.data.data.items)) {
+          items = response.data.data.items;
+        }
         setProducts(items);
       } catch {
         setProducts([]);
@@ -94,7 +97,7 @@ export default function MyFarmPage() {
             <article key={product._id} className="card infoCard">
               <span>{product.category || "Produce"}</span>
               <strong>{product.name}</strong>
-              <p>NGN {Number(product.price || 0).toLocaleString()} · Qty {product.quantity || 0} · {product.approved ? "Approved" : "Pending"}</p>
+              <p>NGN {(typeof product.price === "number" ? product.price : 0).toLocaleString()} · Qty {(typeof product.quantity === "number" ? product.quantity : 0)} · {product.approved ? "Approved" : "Pending"}</p>
             </article>
           ))}
           {!loading && products.length === 0 ? (

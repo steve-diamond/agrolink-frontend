@@ -1,2 +1,3 @@
 // productService placeholder (mobile)
-export default {};
+const productService = {};
+export default productService;

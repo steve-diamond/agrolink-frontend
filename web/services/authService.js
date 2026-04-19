@@ -1,2 +1,3 @@
 // authService placeholder
-export default {};
+const authService = {};
+export default authService;

@@ -14,7 +14,7 @@ export default function OrderTrackingScreen() {
       const data = await orderService.getMyOrders();
       setOrders(data);
       saveOfflineData('orders', data);
-    } catch (e) {
+    } catch {
       // fallback to offline data
       const offline = await getOfflineData('orders');
       if (offline) setOrders(offline);

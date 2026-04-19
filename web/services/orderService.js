@@ -1,2 +1,3 @@
 // orderService placeholder
-export default {};
+const orderService = {};
+export default orderService;

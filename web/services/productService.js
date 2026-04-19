@@ -1,2 +1,3 @@
 // productService placeholder
-export default {};
+const productService = {};
+export default productService;
