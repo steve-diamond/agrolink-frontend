@@ -84,6 +84,8 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
   const storedKg = storage.reduce((sum, s) => sum + Number(s.quantityKg || 0), 0);
   const mostRecentInTransit = shipments.filter((s) => s.status === "in_transit").sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
+  const { pathname } = require('next/navigation').usePathname ? require('next/navigation') : { usePathname: () => '' };
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
   return (
     <main className="dash-page">
       <section className="dash-hero">
@@ -205,10 +207,12 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
       </section>
 
       <section className="dash-links" aria-label="Quick links">
-        <Link href="/marketplace">Marketplace</Link>
-        <Link href="/product-listing">My Listings</Link>
-        <Link href="/investor">Investor Desk</Link>
-        <Link href="/admin/login">Admin</Link>
+        <Link href="/marketplace" className={currentPath === "/marketplace" ? "active-link" : ""}>Marketplace</Link>
+        <Link href="/product-listing" className={currentPath === "/product-listing" ? "active-link" : ""}>My Listings</Link>
+        <Link href="/farmer/upload" className={currentPath === "/farmer/upload" ? "active-link" : ""}>Upload Product</Link>
+        <Link href="/farmer/wallet" className={currentPath === "/farmer/wallet" ? "active-link" : ""}>Wallet</Link>
+        <Link href="/investor" className={currentPath === "/investor" ? "active-link" : ""}>Investor Desk</Link>
+        <Link href="/admin/login" className={currentPath === "/admin/login" ? "active-link" : ""}>Admin</Link>
       </section>
     </main>
   );
