@@ -15,6 +15,8 @@ module.exports = defineConfig([
     'next-env.d.ts',
     'next.config.js',
     'eslint.config.js',
+    // Migrated from .eslintignore
+    'next.config.js',
   ]),
   {
     rules: {

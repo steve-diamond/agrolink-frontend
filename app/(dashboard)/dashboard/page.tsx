@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -84,8 +85,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
   const storedKg = storage.reduce((sum, s) => sum + Number(s.quantityKg || 0), 0);
   const mostRecentInTransit = shipments.filter((s) => s.status === "in_transit").sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
-  const { pathname } = require('next/navigation').usePathname ? require('next/navigation') : { usePathname: () => '' };
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+  const currentPath = usePathname();
   return (
     <main className="dash-page">
       <section className="dash-hero">
