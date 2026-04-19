@@ -21,7 +21,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@services/*": ["./services/*"],
+      "@services/*": ["./src/services/*"],
       "@components/*": ["./components/*"],
       "@lib/*": ["./lib/*", "./src/lib/*"]
     }

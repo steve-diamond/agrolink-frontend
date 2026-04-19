@@ -850,6 +850,23 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   };
 
   const stepProgress = useMemo(() => `${Math.round((step / 7) * 100)}%`, [step]);
+
+  // Map step to Tailwind width class (w-0 to w-full)
+  const stepProgressClass = useMemo(() => {
+    const percent = Math.round((step / 7) * 100);
+    if (percent >= 100) return "w-full";
+    if (percent >= 90) return "w-11/12";
+    if (percent >= 80) return "w-10/12";
+    if (percent >= 70) return "w-9/12";
+    if (percent >= 60) return "w-8/12";
+    if (percent >= 50) return "w-7/12";
+    if (percent >= 40) return "w-6/12";
+    if (percent >= 30) return "w-5/12";
+    if (percent >= 20) return "w-4/12";
+    if (percent >= 10) return "w-3/12";
+    return "w-2/12";
+  }, [step]);
+
   const displayError =
     error && /users\.insertOne\(\)|buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(error)
       ? t("Service is temporarily unavailable. Please try again shortly.", "Service dey temporarily unavailable. Try again shortly.")
@@ -863,7 +880,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
           <span>Step {step} / 7</span>
         </div>
         <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-blue-100">
-          <div className="h-full rounded-full bg-blue-700 transition-all" style={{ width: stepProgress }} />
+          <div className={`h-full rounded-full bg-blue-700 transition-all ${stepProgressClass}`} />
         </div>
         <p className="m-0 mt-2 text-xs text-blue-900">{stepLabels[step - 1]}</p>
         <p className="m-0 mt-1 text-xs text-slate-600">
