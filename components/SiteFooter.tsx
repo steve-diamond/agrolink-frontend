@@ -39,7 +39,7 @@ export default function SiteFooter() {
         <div>
           <h3 className="mb-4 font-bold">Contact Us</h3>
           <p>Email: info@dosagrolink.com.ng</p>
-          <p>Phone: +234 901 234 5678</p>
+          <p>Phone: +2348129490467</p>
           <p>Location: Lagos, Nigeria</p>
           <div className="mt-4 flex space-x-4">
             <a href="#" className="hover:text-yellow-400">Facebook</a>
