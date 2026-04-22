@@ -1,6 +1,6 @@
 
 import { sendTextMessage, sendInteractiveList } from './api';
-import { getMenuTree, WELCOME_MENU } from './menus';
+import { WELCOME_MENU } from './menus';
 import { dbConnect } from '../mongoose';
 import WhatsAppSession from '../../models/whatsappSession';
 
@@ -16,7 +16,7 @@ export async function handleConversation(payload: any) {
   const text = message.text?.body?.trim();
 
   // Load or create session
-  let session = await WhatsAppSession.findOne({ phone_number: from });
+  const session = await WhatsAppSession.findOne({ phone_number: from });
   const now = new Date();
   if (!session || (session.last_active && (now.getTime() - session.last_active.getTime()) > 30 * 60 * 1000)) {
     // New or timed-out session: show welcome
@@ -65,3 +65,5 @@ export async function handleConversation(payload: any) {
 
 // Menu tree and state machine logic should be expanded for each menu state.
 // See detailed comments in the menu tree above for each branch.
+
+// Removed unused getMenuTree function

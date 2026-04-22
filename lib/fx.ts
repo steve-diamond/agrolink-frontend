@@ -1,8 +1,5 @@
-// FX utility for USD/NGN with 24hr cache
-const FX_CACHE_KEY = "fx_usd_ngn_rate";
-const FX_CACHE_TIME = 24 * 60 * 60 * 1000; // 24 hours
 
-import type { NextApiRequest, NextApiResponse } from 'next';
+
 
 let cachedRate: number | null = null;
 let lastFetched = 0;
