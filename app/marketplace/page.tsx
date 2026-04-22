@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { GradeBadge } from "../../components/grading/GradeBadge";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getProducts, Product } from "@services/productService";
@@ -65,6 +66,7 @@ export default function Marketplace() {
   const [selectedCategory, setSelectedCategory] = useState<MarketplaceCategoryValue>("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [gradeFilter, setGradeFilter] = useState<"A"|"B"|"C"|"U"|"all">("all");
 
   const localeByLanguage = {
     en: "en-NG",
@@ -97,15 +99,19 @@ export default function Marketplace() {
     const category = (params.get("category") || "all") as MarketplaceCategoryValue;
     const min = params.get("min") || "";
     const max = params.get("max") || "";
+    const grade = params.get("grade") || "all";
 
     const allowedCategories: MarketplaceCategoryValue[] = ["all", "seeds", "fertilizers", "equipment", "livestock"];
     const safeCategory = allowedCategories.includes(category) ? category : "all";
+    const allowedGrades = ["A","B","C","U","all"];
+    const safeGrade = allowedGrades.includes(grade) ? grade : "all";
 
     setSearchInput(q);
     setDebouncedSearchTerm(q);
     setSelectedCategory(safeCategory);
     setMinPrice(min);
     setMaxPrice(max);
+    setGradeFilter(safeGrade as any);
   }, []);
 
   useEffect(() => {
@@ -131,13 +137,16 @@ export default function Marketplace() {
     if (maxPrice) params.set("max", maxPrice);
     else params.delete("max");
 
+    if (gradeFilter !== "all") params.set("grade", gradeFilter);
+    else params.delete("grade");
+
     const nextQuery = params.toString();
     const currentQuery = window.location.search.replace(/^\?/, "");
 
     if (nextQuery !== currentQuery) {
       router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
     }
-  }, [debouncedSearchTerm, selectedCategory, minPrice, maxPrice, pathname, router]);
+  }, [debouncedSearchTerm, selectedCategory, minPrice, maxPrice, gradeFilter, pathname, router]);
 
   const marketplaceCategoryOptions: Array<{ value: MarketplaceCategoryValue; label: string }> = [
     { value: "all", label: copy.marketplaceCategoryAll },
@@ -188,6 +197,14 @@ export default function Marketplace() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Simulate grade info for demo: randomly assign A/B/C/U
+  function getProductGrade(product: Product): "A"|"B"|"C"|"U" {
+    // TODO: Replace with real grade lookup from product.produce_grade or similar
+    if (product.grade) return product.grade;
+    const hash = product._id.charCodeAt(0) % 4;
+    return (["A","B","C","U"] as const)[hash];
+  }
+
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const name = String(product.name || "").toLowerCase();
@@ -195,6 +212,7 @@ export default function Marketplace() {
       const productPrice = Number(product.price || 0);
       const min = minPrice ? Number(minPrice) : null;
       const max = maxPrice ? Number(maxPrice) : null;
+      const grade = getProductGrade(product);
 
       const matchesSearch =
         !debouncedSearchTerm ||
@@ -204,10 +222,11 @@ export default function Marketplace() {
       const matchesCategory = selectedCategory === "all" || normalizedCategory === selectedCategory;
       const matchesMinPrice = min === null || productPrice >= min;
       const matchesMaxPrice = max === null || productPrice <= max;
+      const matchesGrade = gradeFilter === "all" || grade === gradeFilter;
 
-      return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
+      return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesGrade;
     });
-  }, [products, debouncedSearchTerm, selectedCategory, minPrice, maxPrice]);
+  }, [products, debouncedSearchTerm, selectedCategory, minPrice, maxPrice, gradeFilter]);
 
   const trendingProducts = useMemo(() => {
     return [...filteredProducts]
@@ -279,7 +298,20 @@ export default function Marketplace() {
         <h2 className="text-lg font-bold text-slate-900">{copy.marketplaceSearchTitle}</h2>
         <p className="mt-1 text-sm text-slate-600">{copy.marketplaceSearchDescription}</p>
 
-        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
+                    {/* Grade Filter */}
+                    <select
+                      value={gradeFilter}
+                      onChange={e => setGradeFilter(e.target.value as any)}
+                      aria-label="Grade Filter"
+                      className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
+                    >
+                      <option value="all">All Grades</option>
+                      <option value="A">A (Premium)</option>
+                      <option value="B">B (Standard)</option>
+                      <option value="C">C (Processing)</option>
+                      <option value="U">Ungraded</option>
+                    </select>
           <input
             type="search"
             value={searchInput}
@@ -360,83 +392,97 @@ export default function Marketplace() {
       </section>
 
       <section className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {trendingProducts.map((product: Product) => (
-          <article
-            key={product._id}
-            className="overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            {isValidRemoteImageUrl(product.imageUrl) ? (
-              <Image
-                src={product.imageUrl as string}
-                alt={product.name}
-                width={800}
-                height={480}
-                unoptimized
-                className="h-48 w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-48 items-center justify-center bg-emerald-50 text-sm font-medium text-emerald-700">
-                {copy.noImage}
+
+        {trendingProducts.map((product: Product) => {
+          const grade = getProductGrade(product);
+          return (
+            <article
+              key={product._id}
+              className="overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              {isValidRemoteImageUrl(product.imageUrl) ? (
+                <Image
+                  src={product.imageUrl as string}
+                  alt={product.name}
+                  width={800}
+                  height={480}
+                  unoptimized
+                  className="h-48 w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-48 items-center justify-center bg-emerald-50 text-sm font-medium text-emerald-700">
+                  {copy.noImage}
+                </div>
+              )}
+
+              <div className="space-y-2 p-4">
+                {/* Grade Badge */}
+                <div className="mb-1">
+                  {grade !== "U" ? (
+                    <GradeBadge grade={grade} commodity={product.commodity || product.name || ""} size="sm" />
+                  ) : (
+                    <span className="inline-flex items-center rounded-full px-3 py-1 font-semibold shadow bg-gray-300 text-gray-700 h-6 text-xs" title="Tip: Graded produce sells 15-30% faster. Submit for grading →">
+                      No Grade
+                    </span>
+                  )}
+                </div>
+                <h2 className="line-clamp-1 text-lg font-semibold text-slate-900">{product.name}</h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-semibold text-slate-600">
+                    {localizedCategoryLabelByValue[normalizeCategory(product.category)]}
+                  </span>
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                    {copy.marketplaceVerifiedSeller}
+                  </span>
+                </div>
+                <p className="text-xl font-bold text-emerald-700">{formatCurrency(Number(product.price))}</p>
+                <p className="text-sm text-slate-600">{product.location}</p>
+                <p className="text-xs text-slate-500">⭐ {getSellerRating(product._id)} · {formatCount(getReviewsCount(product._id))} {copy.marketplaceReviewsSuffix}</p>
+                <p className="text-sm text-slate-500">{copy.available}: {formatCount(Number(product.quantity || 0))}</p>
+
+                <label
+                  htmlFor={`quantity-${product._id}`}
+                  className="mt-2 block text-sm font-medium text-slate-700"
+                >
+                  {copy.quantity}
+                </label>
+                <input
+                  id={`quantity-${product._id}`}
+                  type="number"
+                  min={1}
+                  max={Math.max(1, Number(product.quantity || 1))}
+                  value={quantities[product._id] ?? 1}
+                  onChange={(event) => {
+                    const nextQuantity = Number(event.target.value);
+                    setQuantities((current) => ({
+                      ...current,
+                      [product._id]: Number.isFinite(nextQuantity) && nextQuantity > 0 ? nextQuantity : 1,
+                    }));
+                  }}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
+                />
+
+                <button
+                  type="button"
+                  className="mt-2 w-full rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={() => handleBuyNow(product)}
+                  disabled={buyingProductId === product._id}
+                >
+                  {buyingProductId === product._id ? copy.creatingOrder : copy.buyNow}
+                </button>
+
+                <a
+                  href="https://wa.me/2348030001020?text=Hello%20Agrolink%2C%20I%20need%20help%20with%20a%20marketplace%20order."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 block w-full rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-center text-sm font-semibold text-emerald-800 no-underline transition hover:bg-emerald-100"
+                >
+                  {copy.marketplaceWhatsappLiveChat}
+                </a>
               </div>
-            )}
-
-            <div className="space-y-2 p-4">
-              <h2 className="line-clamp-1 text-lg font-semibold text-slate-900">{product.name}</h2>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-semibold text-slate-600">
-                  {localizedCategoryLabelByValue[normalizeCategory(product.category)]}
-                </span>
-                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-                  {copy.marketplaceVerifiedSeller}
-                </span>
-              </div>
-              <p className="text-xl font-bold text-emerald-700">{formatCurrency(Number(product.price))}</p>
-              <p className="text-sm text-slate-600">{product.location}</p>
-              <p className="text-xs text-slate-500">⭐ {getSellerRating(product._id)} · {formatCount(getReviewsCount(product._id))} {copy.marketplaceReviewsSuffix}</p>
-              <p className="text-sm text-slate-500">{copy.available}: {formatCount(Number(product.quantity || 0))}</p>
-
-              <label
-                htmlFor={`quantity-${product._id}`}
-                className="mt-2 block text-sm font-medium text-slate-700"
-              >
-                {copy.quantity}
-              </label>
-              <input
-                id={`quantity-${product._id}`}
-                type="number"
-                min={1}
-                max={Math.max(1, Number(product.quantity || 1))}
-                value={quantities[product._id] ?? 1}
-                onChange={(event) => {
-                  const nextQuantity = Number(event.target.value);
-                  setQuantities((current) => ({
-                    ...current,
-                    [product._id]: Number.isFinite(nextQuantity) && nextQuantity > 0 ? nextQuantity : 1,
-                  }));
-                }}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
-              />
-
-              <button
-                type="button"
-                className="mt-2 w-full rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
-                onClick={() => handleBuyNow(product)}
-                disabled={buyingProductId === product._id}
-              >
-                {buyingProductId === product._id ? copy.creatingOrder : copy.buyNow}
-              </button>
-
-              <a
-                href="https://wa.me/2348030001020?text=Hello%20Agrolink%2C%20I%20need%20help%20with%20a%20marketplace%20order."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 block w-full rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-center text-sm font-semibold text-emerald-800 no-underline transition hover:bg-emerald-100"
-              >
-                {copy.marketplaceWhatsappLiveChat}
-              </a>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </section>
 
       <section className="mt-8 rounded-2xl border border-green-100 bg-white p-5 shadow-sm">

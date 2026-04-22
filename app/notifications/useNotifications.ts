@@ -1,5 +1,5 @@
 "use client";
-import API from '@/services/api';
+import API from 'services/api';
 import { useEffect, useState } from 'react';
 
 export function useNotifications() {

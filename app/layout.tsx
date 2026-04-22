@@ -2,10 +2,10 @@
 import "./globals.css";
 import "../styles/agrolink-dashboard.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import NavBar from "../../components/NavBar";
-import SiteFooter from "../../components/SiteFooter";
-import ClientErrorBoundary from "../../components/ClientErrorBoundary";
-import ServiceWorkerRegistration from "../../components/ServiceWorkerRegistration";
+import NavBar from "components/NavBar";
+import SiteFooter from "components/SiteFooter";
+import ClientErrorBoundary from "components/ClientErrorBoundary";
+import ServiceWorkerRegistration from "components/ServiceWorkerRegistration";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
