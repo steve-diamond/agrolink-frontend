@@ -73,7 +73,7 @@ export default function InputsMarketplacePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data?.products?.map((product: any) => (
+            {data?.products?.map((product: import('components/inputs/ProductCard').ProductCardProps) => (
               <ProductCard key={product.id} {...product} onAddToCart={() => addItem({ ...product, quantity: 1 })} />
             ))}
           </div>

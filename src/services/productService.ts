@@ -28,10 +28,18 @@ export type ProductFilters = {
 
 export function normalizeProductsResponse(raw: unknown): Product[] {
   if (Array.isArray(raw)) return raw as Product[];
-  if (Array.isArray((raw as any)?.data?.items)) return (raw as any).data.items as Product[];
-  if (Array.isArray((raw as any)?.data?.products)) return (raw as any).data.products as Product[];
-  if (Array.isArray((raw as any)?.products)) return (raw as any).products as Product[];
-  if (Array.isArray((raw as any)?.items)) return (raw as any).items as Product[];
+  if (
+    typeof raw === 'object' && raw !== null &&
+    'data' in raw && typeof (raw as { data?: unknown }).data === 'object' && (raw as { data?: unknown }).data !== null
+  ) {
+    const data = (raw as { data?: unknown }).data;
+    if (Array.isArray((data as { items?: unknown[] }).items)) return (data as { items: Product[] }).items;
+    if (Array.isArray((data as { products?: unknown[] }).products)) return (data as { products: Product[] }).products;
+  }
+  if (typeof raw === 'object' && raw !== null) {
+    if (Array.isArray((raw as { products?: unknown[] }).products)) return (raw as { products: Product[] }).products;
+    if (Array.isArray((raw as { items?: unknown[] }).items)) return (raw as { items: Product[] }).items;
+  }
   return [];
 }
 
