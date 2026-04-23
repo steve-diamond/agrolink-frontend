@@ -4,7 +4,7 @@ export interface PaystackInitOptions {
   amount: number; // in kobo
   reference: string;
   callback_url?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export function getPaystackUrl({ email, amount, reference, callback_url, metadata }: PaystackInitOptions) {

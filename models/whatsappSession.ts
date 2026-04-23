@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IWhatsAppSession extends Document {
   phone_number: string;
   current_menu: string;
-  context: any;
+  context: Record<string, unknown>;
   last_active: Date;
 }
 

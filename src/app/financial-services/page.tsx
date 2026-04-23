@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import API from "@/lib/api";
 
 export default function FinancialServicesPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

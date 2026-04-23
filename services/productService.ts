@@ -13,7 +13,20 @@ export type Product = {
   approved?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  // Optionally, add other fields as needed
 };
+
+export function isProduct(obj: unknown): obj is Product {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as any)._id === "string" &&
+    typeof (obj as any).name === "string" &&
+    typeof (obj as any).price === "number" &&
+    typeof (obj as any).quantity === "number" &&
+    typeof (obj as any).location === "string"
+  );
+}
 
 export type NewProduct = Omit<Product, "_id" | "createdAt" | "updatedAt">;
 
@@ -27,12 +40,13 @@ export type ProductFilters = {
 };
 
 export function normalizeProductsResponse(raw: unknown): Product[] {
-  if (Array.isArray(raw)) return raw as Product[];
-  if (Array.isArray((raw as any)?.data?.items)) return (raw as any).data.items as Product[];
-  if (Array.isArray((raw as any)?.data?.products)) return (raw as any).data.products as Product[];
-  if (Array.isArray((raw as any)?.products)) return (raw as any).products as Product[];
-  if (Array.isArray((raw as any)?.items)) return (raw as any).items as Product[];
-  return [];
+  let arr: unknown[] = [];
+  if (Array.isArray(raw)) arr = raw;
+  else if (Array.isArray((raw as any)?.data?.items)) arr = (raw as any).data.items;
+  else if (Array.isArray((raw as any)?.data?.products)) arr = (raw as any).data.products;
+  else if (Array.isArray((raw as any)?.products)) arr = (raw as any).products;
+  else if (Array.isArray((raw as any)?.items)) arr = (raw as any).items;
+  return arr.filter(isProduct);
 }
 
 export async function getProducts(filters: ProductFilters = {}): Promise<Product[]> {

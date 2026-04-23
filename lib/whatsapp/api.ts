@@ -17,7 +17,12 @@ export async function sendTextMessage(to: string, text: string) {
   });
 }
 
-export async function sendInteractiveList(to: string, header: string, body: string, sections: any[]) {
+export interface WhatsAppSection {
+  id: string;
+  title: string;
+}
+
+export async function sendInteractiveList(to: string, header: string, body: string, sections: WhatsAppSection[]) {
   await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -38,7 +43,12 @@ export async function sendInteractiveList(to: string, header: string, body: stri
   });
 }
 
-export async function sendButtonReply(to: string, body: string, buttons: any[]) {
+export interface WhatsAppButton {
+  id: string;
+  title: string;
+}
+
+export async function sendButtonReply(to: string, body: string, buttons: WhatsAppButton[]) {
   await fetch(API_URL, {
     method: 'POST',
     headers: {

@@ -13,7 +13,20 @@ export type Product = {
   approved?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  // Optionally, add other fields as needed
 };
+
+export function isProduct(obj: unknown): obj is Product {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as { _id?: string })._id === "string" &&
+    typeof (obj as { name?: string }).name === "string" &&
+    typeof (obj as { price?: number }).price === "number" &&
+    typeof (obj as { quantity?: number }).quantity === "number" &&
+    typeof (obj as { location?: string }).location === "string"
+  );
+}
 
 export type NewProduct = Omit<Product, "_id" | "createdAt" | "updatedAt">;
 
@@ -28,19 +41,23 @@ export type ProductFilters = {
 
 export function normalizeProductsResponse(raw: unknown): Product[] {
   if (Array.isArray(raw)) return raw as Product[];
-  if (
-    typeof raw === 'object' && raw !== null &&
-    'data' in raw && typeof (raw as { data?: unknown }).data === 'object' && (raw as { data?: unknown }).data !== null
-  ) {
-    const data = (raw as { data?: unknown }).data;
-    if (Array.isArray((data as { items?: unknown[] }).items)) return (data as { items: Product[] }).items;
-    if (Array.isArray((data as { products?: unknown[] }).products)) return (data as { products: Product[] }).products;
-  }
-  if (typeof raw === 'object' && raw !== null) {
-    if (Array.isArray((raw as { products?: unknown[] }).products)) return (raw as { products: Product[] }).products;
-    if (Array.isArray((raw as { items?: unknown[] }).items)) return (raw as { items: Product[] }).items;
-  }
-  return [];
+    let arr: Product[] = [];
+    if (Array.isArray(raw) && raw.every(isProduct)) {
+      arr = raw as Product[];
+    } else if (typeof raw === 'object' && raw !== null) {
+      const maybeObj = raw as Record<string, unknown>;
+      const data = maybeObj.data as Record<string, unknown> | undefined;
+      if (data && Array.isArray(data.items) && data.items.every(isProduct)) {
+        arr = data.items as Product[];
+      } else if (data && Array.isArray(data.products) && data.products.every(isProduct)) {
+        arr = data.products as Product[];
+      } else if (Array.isArray(maybeObj.products) && maybeObj.products.every(isProduct)) {
+        arr = maybeObj.products as Product[];
+      } else if (Array.isArray(maybeObj.items) && maybeObj.items.every(isProduct)) {
+        arr = maybeObj.items as Product[];
+      }
+    }
+    return arr;
 }
 
 export async function getProducts(filters: ProductFilters = {}): Promise<Product[]> {

@@ -26,7 +26,7 @@ export const API = {
     return res.json();
   },
 
-  post: async (endpoint: string, data: any) => {
+  post: async <T = unknown>(endpoint: string, data: T) => {
     const res = await fetch(`${API_URL}${endpoint}` , {
       method: "POST",
       headers: {

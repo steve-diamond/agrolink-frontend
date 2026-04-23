@@ -5,7 +5,7 @@ import { dbConnect } from '../mongoose';
 import WhatsAppSession from '../../models/whatsappSession';
 
 // Stateless handler for WhatsApp webhook events
-export async function handleConversation(payload: any) {
+export async function handleConversation(payload: Record<string, unknown>) {
   await dbConnect();
   // Extract phone number and message
   const entry = payload.entry?.[0];
