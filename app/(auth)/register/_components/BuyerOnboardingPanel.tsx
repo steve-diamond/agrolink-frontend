@@ -510,13 +510,23 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
     }
   };
 
-  const parseRetryAfterSeconds = useCallback((err: any): number => {
-    const payloadValue = Number(err?.response?.data?.retryAfterSeconds);
-    if (Number.isFinite(payloadValue) && payloadValue > 0) return Math.ceil(payloadValue);
+  const parseRetryAfterSeconds = useCallback((err: unknown): number => {
+    if (
+      err &&
+      typeof err === 'object' &&
+      'response' in err &&
+      err.response &&
+      typeof err.response === 'object' &&
+      'data' in err.response &&
+      err.response.data &&
+      typeof err.response.data === 'object'
+    ) {
+      const payloadValue = Number((err.response as { data?: { retryAfterSeconds?: number }, headers?: { [key: string]: string } })?.data?.retryAfterSeconds);
+      if (Number.isFinite(payloadValue) && payloadValue > 0) return Math.ceil(payloadValue);
 
-    const headerValue = Number(err?.response?.headers?.["retry-after"]);
-    if (Number.isFinite(headerValue) && headerValue > 0) return Math.ceil(headerValue);
-
+      const headerValue = Number((err.response as { headers?: { [key: string]: string } })?.headers?.["retry-after"]);
+      if (Number.isFinite(headerValue) && headerValue > 0) return Math.ceil(headerValue);
+    }
     return 0;
   }, []);
 
@@ -670,12 +680,26 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       setOtpVerifyLockUntil(0);
       setError("");
       setSuccess(t("Phone verified successfully.", "Phone don verify successfully."));
-    } catch (err: any) {
+    } catch (err: unknown) {
       setOtpVerified(false);
-      const message = String(err?.response?.data?.message || "");
-      const retryAfterSeconds = parseRetryAfterSeconds(err);
-      if (err?.response?.status === 429 && retryAfterSeconds > 0) {
-        setOtpVerifyLockUntil(Date.now() + retryAfterSeconds * 1000);
+      let message = "";
+      let retryAfterSeconds = 0;
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+      ) {
+        message = String((err.response as { data?: { message?: string } })?.data?.message || "");
+        retryAfterSeconds = parseRetryAfterSeconds(err);
+        if ((err.response as { status?: number })?.status === 429 && retryAfterSeconds > 0) {
+          setOtpVerifyLockUntil(Date.now() + retryAfterSeconds * 1000);
+        }
       }
       if (/expired|invalid|not found/i.test(message)) {
         setOtpRef("");
@@ -732,8 +756,22 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       if (res?.data?.accountName) setField("accountName", String(res.data.accountName));
       setSuccess(t("Account verified successfully.", "Account don verify successfully."));
       setError("");
-    } catch (err: any) {
-      setError(err?.response?.data?.message || t("Unable to verify account now.", "We no fit verify account now."));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+      ) {
+        setError((err.response as { data?: { message?: string } })?.data?.message || t("Unable to verify account now.", "We no fit verify account now."));
+      } else {
+        setError(t("Unable to verify account now.", "We no fit verify account now."));
+      }
     } finally {
       setResolvingAccount(false);
     }
@@ -751,8 +789,22 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       await API.post("/api/onboarding/bvn/verify", { bvn: form.bvn });
       setError("");
       setSuccess(t("BVN verified successfully.", "BVN don verify successfully."));
-    } catch (err: any) {
-      setError(err?.response?.data?.message || t("Unable to verify BVN now.", "We no fit verify BVN now."));
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+      ) {
+        setError((err.response as { data?: { message?: string } })?.data?.message || t("Unable to verify BVN now.", "We no fit verify BVN now."));
+      } else {
+        setError(t("Unable to verify BVN now.", "We no fit verify BVN now."));
+      }
     } finally {
       setVerifyingBvn(false);
     }
