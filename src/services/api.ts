@@ -5,12 +5,14 @@ if (!API_URL) {
 }
 
 
+
 type GetOptions = {
   params?: Record<string, string | number | boolean | undefined | null>;
 };
 
-export const API = {
-  get: async (endpoint: string, options?: GetOptions) => {
+
+const API = {
+  async get<R = unknown>(endpoint: string, options?: GetOptions): Promise<R> {
     let url = `${API_URL}${endpoint}`;
     if (options?.params) {
       const searchParams = new URLSearchParams();
@@ -26,7 +28,7 @@ export const API = {
     return res.json();
   },
 
-  post: async <T = unknown>(endpoint: string, data: T) => {
+  async post<T, R = unknown>(endpoint: string, data: T): Promise<R> {
     const res = await fetch(`${API_URL}${endpoint}` , {
       method: "POST",
       headers: {
@@ -38,5 +40,4 @@ export const API = {
     return res.json();
   }
 };
-
 export default API;

@@ -12,13 +12,13 @@ interface ApiResponse<T> {
 }
 
 const API = {
-  get: async <T = unknown>(endpoint: string): Promise<T> => {
+  get: async <T>(endpoint: string): Promise<T> => {
     const res = await fetch(`${API_URL}${endpoint}`);
     if (!res.ok) throw new Error("API GET failed");
     return res.json() as Promise<T>;
   },
 
-  post: async <T = unknown, R = unknown>(endpoint: string, data: T): Promise<R> => {
+  post: async <T, R>(endpoint: string, data: T): Promise<R> => {
     const res = await fetch(`${API_URL}${endpoint}` , {
       method: "POST",
       headers: {

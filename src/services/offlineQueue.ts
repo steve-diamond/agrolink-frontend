@@ -3,10 +3,13 @@
 const QUEUE_KEY = "agrolink-offline-queue";
 const OFFLINE_QUEUE_EVENT = "agrolink-offline-queue-changed";
 
+
+import { NewProduct } from "../types/product";
+
 type OfflineAction = {
   id: string;
   type: "create-product";
-  payload: Record<string, unknown>;
+  payload: NewProduct;
   createdAt: string;
 };
 
@@ -32,7 +35,7 @@ function writeQueue(items: OfflineAction[]) {
   window.dispatchEvent(new Event(OFFLINE_QUEUE_EVENT));
 }
 
-export function enqueueCreateProduct(payload: Record<string, unknown>) {
+export function enqueueCreateProduct(payload: NewProduct) {
   const items = readQueue();
   items.push({
     id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -62,7 +65,7 @@ export function listenToOfflineQueueChanges(onChange: () => void) {
   };
 }
 
-export async function flushOfflineQueue(createProductFn: (payload: Record<string, unknown>) => Promise<unknown>) {
+export async function flushOfflineQueue(createProductFn: (payload: NewProduct) => Promise<ApiResponse<Product>>) {
   const items = readQueue();
   if (!items.length) {
     return { processed: 0, failed: 0 };
