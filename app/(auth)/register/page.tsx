@@ -647,7 +647,7 @@ export default function RegisterPage() {
   const handleVoiceInput = (field: keyof FarmerForm) => {
     if (typeof window === "undefined") return;
 
-    type SpeechRecognitionType = typeof window extends { SpeechRecognition: infer T } ? T : any;
+    type SpeechRecognitionType = typeof window extends { SpeechRecognition: infer T } ? T : unknown;
     const speechApi =
       (window as Window & { SpeechRecognition?: SpeechRecognitionType }).SpeechRecognition ||
       (window as Window & { webkitSpeechRecognition?: SpeechRecognitionType }).webkitSpeechRecognition;
@@ -677,8 +677,8 @@ export default function RegisterPage() {
     if (typeof window === "undefined") return;
 
     const speechApi =
-      (window as Window & { SpeechRecognition?: any }).SpeechRecognition ||
-      (window as Window & { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+      (window as Window & { SpeechRecognition?: unknown }).SpeechRecognition ||
+      (window as Window & { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition;
 
     if (!speechApi) {
       setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
@@ -816,12 +816,18 @@ export default function RegisterPage() {
       setOtpVerifyLockUntil(0);
       setError("");
       setSuccess(getText("Phone verified successfully.", "Phone don verify successfully."));
-    } catch (err: any) {
+    } catch (err: unknown) {
       setOtpVerified(false);
-      const message = String(err?.response?.data?.message || "");
-      const retryAfterSeconds = parseRetryAfterSeconds(err);
-      if (err?.response?.status === 429 && retryAfterSeconds > 0) {
-        setOtpVerifyLockUntil(Date.now() + retryAfterSeconds * 1000);
+      let message = "";
+      let retryAfterSeconds = 0;
+      if (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object') {
+        // @ts-expect-error: dynamic error shape
+        message = String(err.response.data?.message || "");
+        retryAfterSeconds = parseRetryAfterSeconds(err);
+        // @ts-expect-error: dynamic error shape
+        if (err.response.status === 429 && retryAfterSeconds > 0) {
+          setOtpVerifyLockUntil(Date.now() + retryAfterSeconds * 1000);
+        }
       }
       if (/expired|invalid|not found/i.test(message)) {
         setOtpRef("");
@@ -880,8 +886,13 @@ export default function RegisterPage() {
         setFarmerField("accountName", String(res.data.accountName));
       }
       setSuccess(getText("Account verified successfully.", "Account don verify successfully."));
-    } catch (err: any) {
-      setError(err?.response?.data?.message || getText("Unable to verify account now.", "We no fit verify account now."));
+    } catch (err: unknown) {
+      let message = getText("Unable to verify account now.", "We no fit verify account now.");
+      if (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object') {
+        // @ts-expect-error: dynamic error shape
+        message = err.response.data?.message || message;
+      }
+      setError(message);
     } finally {
       setResolvingAccount(false);
     }
@@ -899,8 +910,13 @@ export default function RegisterPage() {
     try {
       await API.post("/api/onboarding/bvn/verify", { bvn: farmerForm.bvn });
       setSuccess(getText("BVN verified successfully.", "BVN don verify successfully."));
-    } catch (err: any) {
-      setError(err?.response?.data?.message || getText("Unable to verify BVN now.", "We no fit verify BVN now."));
+    } catch (err: unknown) {
+      let message = getText("Unable to verify BVN now.", "We no fit verify BVN now.");
+      if (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object') {
+        // @ts-expect-error: dynamic error shape
+        message = err.response.data?.message || message;
+      }
+      setError(message);
     } finally {
       setVerifyingBvn(false);
     }
