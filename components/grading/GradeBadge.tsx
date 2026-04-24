@@ -4,7 +4,7 @@ import { ShieldCheckIcon, StarIcon } from '@heroicons/react/24/solid';
 
 interface GradeBadgeProps {
   grade: Grade | 'U';
-  commodity: string;
+  commodity: string; // Used for modal/criteria, keep for future extensibility
   size?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
 }

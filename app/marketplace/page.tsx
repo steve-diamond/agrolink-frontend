@@ -283,7 +283,23 @@ export default function Marketplace() {
         typeof error.response.data === 'object' &&
         ('message' in error.response.data || 'error' in error.response.data)
       ) {
-        alert((error as any)?.response?.data?.message || (error as any)?.response?.data?.error || "Payment failed. Please try again.");
+        // Type guard for error object
+        const errObj = error as unknown;
+        let errMsg = "Payment failed. Please try again.";
+        if (
+          errObj &&
+          typeof errObj === 'object' &&
+          'response' in errObj &&
+          errObj.response &&
+          typeof errObj.response === 'object' &&
+          'data' in errObj.response &&
+          errObj.response.data &&
+          typeof errObj.response.data === 'object'
+        ) {
+          const data = (errObj.response as { data?: { message?: string; error?: string } }).data;
+          errMsg = data?.message || data?.error || errMsg;
+        }
+        alert(errMsg);
       } else {
         alert("Payment failed. Please try again.");
       }
@@ -316,7 +332,7 @@ export default function Marketplace() {
                     {/* Grade Filter */}
                     <select
                       value={gradeFilter}
-                      onChange={e => setGradeFilter(e.target.value as any)}
+                      onChange={e => setGradeFilter(e.target.value as "A"|"B"|"C"|"U"|"all")}
                       aria-label="Grade Filter"
                       className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
                     >
