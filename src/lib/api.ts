@@ -5,12 +5,6 @@ if (!API_URL) {
 }
 
 
-interface ApiResponse<T> {
-  success: boolean;
-  message?: string;
-  data?: T;
-}
-
 const API = {
   get: async <T>(endpoint: string): Promise<T> => {
     const res = await fetch(`${API_URL}${endpoint}`);

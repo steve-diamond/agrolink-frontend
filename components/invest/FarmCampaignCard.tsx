@@ -1,4 +1,6 @@
+
 import React from "react";
+import Image from "next/image";
 
 interface FarmCampaignCardProps {
   campaign?: {
@@ -40,7 +42,14 @@ const FarmCampaignCard: React.FC<FarmCampaignCardProps> = ({ campaign }) => {
     <div className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden flex flex-col">
       <div className="relative h-44 w-full bg-gray-100">
         {data.cover_image_url ? (
-          <img src={data.cover_image_url} alt={data.crop_type} className="object-cover w-full h-full" />
+          <Image
+            src={data.cover_image_url}
+            alt={data.crop_type}
+            fill
+            className="object-cover w-full h-full"
+            sizes="100vw"
+            priority
+          />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
         )}
