@@ -32,6 +32,7 @@ export function normalizeProductsResponse(raw: unknown): Product[] {
       arr = maybeObj.items as Product[];
     }
   }
+
   return arr;
 }
 

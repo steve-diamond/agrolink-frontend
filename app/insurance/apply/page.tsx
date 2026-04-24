@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 
 const CROPS = ['Maize', 'Cassava', 'Rice', 'Poultry', 'Fishery', 'Vegetables', 'Mixed'];
 const STATES = ['Lagos', 'Kano', 'Kaduna', 'Ogun', 'Oyo', 'Benue', 'Abia', 'FCT'];
-
+export default function InsuranceApplyPage() {
   const [form, setForm] = useState<InsuranceForm>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
