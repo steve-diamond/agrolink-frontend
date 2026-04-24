@@ -2,9 +2,7 @@
 import React, { useState } from 'react';
 
 interface InsuranceForm {
-  crop?: string;
-  state?: string;
-  [key: string]: string | undefined;
+  [key: string]: string;
 }
 import { useRouter } from 'next/navigation';
 
