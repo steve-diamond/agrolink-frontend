@@ -1,12 +1,17 @@
 "use client";
 import React, { useState } from 'react';
+
+interface InsuranceForm {
+  crop?: string;
+  state?: string;
+  [key: string]: string | undefined;
+}
 import { useRouter } from 'next/navigation';
 
 const CROPS = ['Maize', 'Cassava', 'Rice', 'Poultry', 'Fishery', 'Vegetables', 'Mixed'];
 const STATES = ['Lagos', 'Kano', 'Kaduna', 'Ogun', 'Oyo', 'Benue', 'Abia', 'FCT'];
 
-export default function InsuranceApplyPage() {
-  const [form, setForm] = useState<any>({});
+  const [form, setForm] = useState<InsuranceForm>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -28,8 +33,12 @@ export default function InsuranceApplyPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Application failed');
       router.push('/insurance/apply?success=1');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Application failed');
+      }
     } finally {
       setSubmitting(false);
     }
