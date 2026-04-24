@@ -39,8 +39,22 @@ function BuyerStatusContent() {
         },
       });
       setResult(response.data as StatusResponse);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Unable to find application status right now.");
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+      ) {
+        setError((err.response as { data?: { message?: string } })?.data?.message || "Unable to find application status right now.");
+      } else {
+        setError("Unable to find application status right now.");
+      }
     } finally {
       setLoading(false);
     }
