@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import useSWR from 'swr';
-import PriceCard from 'components/prices/PriceCard';
+import PriceCard, { PriceCardProps } from 'components/prices/PriceCard';
 import dynamic from 'next/dynamic';
 
 const PriceAlertToggle = dynamic(() => import('./PriceAlertToggle'), { ssr: false });
@@ -67,8 +67,8 @@ export default function LiveMarketPricesPage() {
           </div>
         ) : data?.prices?.length ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.prices.map((price: any) => (
-              <PriceCard key={price.id} {...price} />
+            {data.prices.map((price: PriceCardProps & { id?: string | number }) => (
+              <PriceCard key={price.id ?? price.commodity_name + price.state} {...price} />
             ))}
           </div>
         ) : (

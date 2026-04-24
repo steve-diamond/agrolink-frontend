@@ -1,7 +1,6 @@
 import React from 'react';
 
 export interface ProductCardProps {
-  id: string;
   name: string;
   brand?: string;
   price_per_unit: number;
@@ -14,7 +13,6 @@ export interface ProductCardProps {
 }
 
 export default function ProductCard({
-  id,
   name,
   brand,
   price_per_unit,
@@ -28,7 +26,14 @@ export default function ProductCard({
   return (
     <div className="bg-white rounded-2xl shadow-md p-4 flex flex-col">
       <div className="aspect-w-4 aspect-h-3 mb-2">
-        <img src={image_url || '/placeholder.png'} alt={name} className="object-cover rounded-xl w-full h-full" />
+        <Image
+          src={image_url || '/placeholder.png'}
+          alt={name}
+          fill
+          className="object-cover rounded-xl w-full h-full"
+          sizes="100vw"
+          priority
+        />
       </div>
       <div className="font-bold text-lg mb-1">{name}</div>
       {brand && <div className="text-gray-500 text-sm mb-1">{brand}</div>}
