@@ -4,14 +4,21 @@ if (!API_URL) {
   throw new Error("Missing NEXT_PUBLIC_API_URL");
 }
 
+
+interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+
 const API = {
-  get: async (endpoint: string) => {
+  get: async <T = unknown>(endpoint: string): Promise<T> => {
     const res = await fetch(`${API_URL}${endpoint}`);
     if (!res.ok) throw new Error("API GET failed");
-    return res.json();
+    return res.json() as Promise<T>;
   },
 
-  post: async <T = unknown>(endpoint: string, data: T) => {
+  post: async <T = unknown, R = unknown>(endpoint: string, data: T): Promise<R> => {
     const res = await fetch(`${API_URL}${endpoint}` , {
       method: "POST",
       headers: {
@@ -20,7 +27,7 @@ const API = {
       body: JSON.stringify(data)
     });
     if (!res.ok) throw new Error("API POST failed");
-    return res.json();
+    return res.json() as Promise<R>;
   }
 };
 
