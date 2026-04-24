@@ -647,9 +647,10 @@ export default function RegisterPage() {
   const handleVoiceInput = (field: keyof FarmerForm) => {
     if (typeof window === "undefined") return;
 
+    type SpeechRecognitionType = typeof window extends { SpeechRecognition: infer T } ? T : any;
     const speechApi =
-      (window as Window & { SpeechRecognition?: any }).SpeechRecognition ||
-      (window as Window & { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+      (window as Window & { SpeechRecognition?: SpeechRecognitionType }).SpeechRecognition ||
+      (window as Window & { webkitSpeechRecognition?: SpeechRecognitionType }).webkitSpeechRecognition;
 
     if (!speechApi) {
       setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
@@ -661,7 +662,7 @@ export default function RegisterPage() {
     recognition.lang = language === "en" ? "en-NG" : "en-NG";
     recognition.start();
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       const transcript = event.results?.[0]?.[0]?.transcript?.trim() ?? "";
       if (!transcript) return;
       setFarmerField(field, transcript as FarmerForm[keyof FarmerForm]);
@@ -689,7 +690,7 @@ export default function RegisterPage() {
     recognition.lang = language === "en" ? "en-NG" : "en-NG";
     recognition.start();
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       const transcript = event.results?.[0]?.[0]?.transcript?.trim() ?? "";
       if (!transcript) return;
       setAccountForm((prev) => ({ ...prev, name: transcript }));
@@ -733,7 +734,25 @@ export default function RegisterPage() {
     }
   };
 
-  const parseRetryAfterSeconds = useCallback((err: any): number => {
+  const parseRetryAfterSeconds = useCallback((err: unknown): number => {
+    if (
+      err &&
+      typeof err === 'object' &&
+      'response' in err &&
+      err.response &&
+      typeof err.response === 'object' &&
+      'data' in err.response &&
+      err.response.data &&
+      typeof err.response.data === 'object'
+    ) {
+      const payloadValue = Number((err.response as { data?: { retryAfterSeconds?: number }, headers?: { [key: string]: string } })?.data?.retryAfterSeconds);
+      if (Number.isFinite(payloadValue) && payloadValue > 0) return Math.ceil(payloadValue);
+
+      const headerValue = Number((err.response as { headers?: { [key: string]: string } })?.headers?.["retry-after"]);
+      if (Number.isFinite(headerValue) && headerValue > 0) return Math.ceil(headerValue);
+    }
+    return 0;
+  }, []);
     const payloadValue = Number(err?.response?.data?.retryAfterSeconds);
     if (Number.isFinite(payloadValue) && payloadValue > 0) return Math.ceil(payloadValue);
 
