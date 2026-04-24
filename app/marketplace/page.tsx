@@ -111,7 +111,7 @@ export default function Marketplace() {
     setSelectedCategory(safeCategory);
     setMinPrice(min);
     setMaxPrice(max);
-    setGradeFilter(safeGrade as any);
+    setGradeFilter(safeGrade as MarketplaceGradeValue);
   }, []);
 
   useEffect(() => {
