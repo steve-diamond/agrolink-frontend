@@ -27,11 +27,11 @@ function LoginForm() {
     }
   }, [rememberedEmail]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
@@ -46,8 +46,21 @@ function LoginForm() {
 
       alert("Login successful");
       router.push("/dashboard");
-    } catch (error: any) {
-      const message = error?.response?.data?.message || "Login failed";
+    } catch (error: unknown) {
+      let message = "Login failed";
+      if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'data' in error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' &&
+        'message' in error.response.data
+      ) {
+        message = (error.response as { data?: { message?: string } })?.data?.message || message;
+      }
       setError(message);
       alert(message);
     } finally {
