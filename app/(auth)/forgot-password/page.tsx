@@ -28,8 +28,19 @@ export default function ForgotPasswordPage() {
         router.push(`/reset-password?token=${encodeURIComponent(resetToken)}`);
       }
     } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object' && 'data' in err.response && err.response.data && typeof err.response.data === 'object' && 'message' in err.response.data) {
-        setError((err as any).response.data.message || "Unable to process reset request right now.");
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+      ) {
+        // Type guard for error
+        setError((err.response as { data?: { message?: string } })?.data?.message || "Unable to process reset request right now.");
       } else {
         setError("Unable to process reset request right now.");
       }
