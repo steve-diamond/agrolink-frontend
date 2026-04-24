@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { Notification } from '@/types/notification';
 import { useNotifications } from './useNotifications';
 
 export default function NotificationsPage() {
@@ -14,7 +15,7 @@ export default function NotificationsPage() {
           <p>No notifications yet.</p>
         ) : (
           <ul>
-            {notifications.map((n: any) => (
+            {notifications.map((n: Notification) => (
               <li key={n._id || n.id} className="mb-2 border-b pb-2">
                 <div>{n.message}</div>
                 <div className="text-xs text-gray-500">{n.date}</div>
