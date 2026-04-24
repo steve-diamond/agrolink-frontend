@@ -753,14 +753,6 @@ export default function RegisterPage() {
     }
     return 0;
   }, []);
-    const payloadValue = Number(err?.response?.data?.retryAfterSeconds);
-    if (Number.isFinite(payloadValue) && payloadValue > 0) return Math.ceil(payloadValue);
-
-    const headerValue = Number(err?.response?.headers?.["retry-after"]);
-    if (Number.isFinite(headerValue) && headerValue > 0) return Math.ceil(headerValue);
-
-    return 0;
-  }, []);
 
   const resetOtpSession = useCallback(() => {
     setOtpSent(false);
