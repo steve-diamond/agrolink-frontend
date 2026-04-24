@@ -84,8 +84,12 @@ export default function GradingPage() {
       if (!res.ok) throw new Error(data.error || 'Submission failed');
       setBadgeUrl(data.grade_badge_url);
       setStep(5);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      if (e && typeof e === 'object' && 'message' in e) {
+        setError((e as { message?: string }).message || 'Submission failed');
+      } else {
+        setError('Submission failed');
+      }
     } finally {
       setSubmitting(false);
     }
