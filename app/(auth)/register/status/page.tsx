@@ -47,8 +47,22 @@ export default function RegisterStatusPage() {
 
       const res = await API.get(`/api/farmer-applications/status?${params.toString()}`);
       setStatusData(res.data as StatusResponse);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Unable to fetch status now. Please try again.");
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+      ) {
+        setError((err.response as { data?: { message?: string } })?.data?.message || "Unable to fetch status now. Please try again.");
+      } else {
+        setError("Unable to fetch status now. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
