@@ -34,7 +34,6 @@ export function normalizeProductsResponse(raw: unknown): Product[] {
   }
   return arr;
 }
-}
 
 import { ApiResponse } from "../types/common";
 
