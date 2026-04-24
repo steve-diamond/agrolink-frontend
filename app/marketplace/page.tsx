@@ -270,9 +270,23 @@ export default function Marketplace() {
       });
 
       window.location.href = paymentRes.data.data.authorization_url;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      alert(error?.response?.data?.message || error?.response?.data?.error || "Payment failed. Please try again.");
+      if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'data' in error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' &&
+        ('message' in error.response.data || 'error' in error.response.data)
+      ) {
+        alert((error as any)?.response?.data?.message || (error as any)?.response?.data?.error || "Payment failed. Please try again.");
+      } else {
+        alert("Payment failed. Please try again.");
+      }
     } finally {
       setBuyingProductId(null);
     }
