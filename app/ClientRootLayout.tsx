@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import API from "@services/api";
+import { Notification } from "@/types/notification";
 
-
-function NotificationToast({ notification, onClose }: { notification: any, onClose: () => void }) {
+function NotificationToast({ notification, onClose }: { notification: Notification | null, onClose: () => void }) {
   useEffect(() => {
     if (!notification) return;
     const timer = setTimeout(onClose, 5000);
