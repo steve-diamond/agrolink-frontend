@@ -37,8 +37,8 @@ function BuyerStatusContent() {
           email: value,
           phone: value,
         },
-      });
-      setResult(response.data as StatusResponse);
+      }) as { data: StatusResponse };
+      setResult(response.data);
     } catch (err: unknown) {
       if (
         err &&

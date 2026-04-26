@@ -388,7 +388,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   useEffect(() => {
     const loadBanks = async () => {
       try {
-        const res = await API.get("/api/onboarding/banks");
+        const res = await API.get("/api/onboarding/banks") as { data: { banks: string[] } };
         const list = res?.data?.banks;
         if (Array.isArray(list)) setBanks(list);
       } catch {
@@ -503,7 +503,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         mimeType: file.type || "application/octet-stream",
         dataBase64,
         category,
-      });
+      }) as { data: { fileUrl?: string } };
       return String(res?.data?.fileUrl || "");
     } finally {
       setUploadingMedia(false);
@@ -752,7 +752,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       const res = await API.post("/api/onboarding/banks/resolve", {
         bankName: form.bankName,
         accountNumber: form.accountNumber,
-      });
+      }) as { data: { accountName?: string } };
       if (res?.data?.accountName) setField("accountName", String(res.data.accountName));
       setSuccess(t("Account verified successfully.", "Account don verify successfully."));
       setError("");
@@ -864,16 +864,22 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         return;
       }
 
-      const res = await API.post("/api/buyer-applications", payload);
+      const res = await API.post("/api/buyer-applications", payload) as { data: { applicationId?: string; verificationPending?: boolean } };
       localStorage.removeItem(DRAFT_KEY);
       const appId = String(res?.data?.applicationId || uid());
       const verificationPending = res?.data?.verificationPending ? "1" : "0";
       router.push(`/register/buyer/success?name=${encodeURIComponent(form.businessName || accountForm.name)}&appId=${encodeURIComponent(appId)}&queued=0&verificationPending=${verificationPending}`);
     } catch (err: unknown) {
-      const statusCode = err?.response?.status;
-      const errorMessage = String(
-        err?.response?.data?.message || err?.response?.data?.error || err?.message || ""
-      );
+      let statusCode: number | undefined = undefined;
+      let errorMessage = "";
+      if (err && typeof err === "object" && "response" in err && err.response) {
+        // @ts-expect-error: err.response is not typed, but may exist on error objects from axios
+        statusCode = err.response?.status;
+        // @ts-expect-error: err.response is not typed, but may exist on error objects from axios
+        errorMessage = String(err.response?.data?.message || err.response?.data?.error || err.message || "");
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
       const isDbUnavailable =
         /buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(errorMessage) ||
         statusCode === 503;
@@ -895,7 +901,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         return;
       }
 
-      setError(err?.response?.data?.message || err?.response?.data?.error || t("Submission failed. Please try again.", "Submission fail. Try again."));
+      setError(errorMessage || t("Submission failed. Please try again.", "Submission fail. Try again."));
     } finally {
       setLoading(false);
     }

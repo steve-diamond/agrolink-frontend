@@ -460,7 +460,7 @@ export default function RegisterPage() {
   useEffect(() => {
     const loadBanks = async () => {
       try {
-        const res = await API.get("/api/onboarding/banks");
+        const res = await API.get("/api/onboarding/banks") as { data: { banks: string[] } };
         const apiBanks = res?.data?.banks;
         if (Array.isArray(apiBanks) && apiBanks.length) {
           setBanks(apiBanks);
