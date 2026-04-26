@@ -23,8 +23,18 @@ export default function FarmerWalletPage() {
         const res = await axios.get("/api/wallet/balance");
         setBalance(res.data.balance);
         setCurrency(res.data.currency || "NGN");
-      } catch (err: any) {
-        setError(err?.response?.data?.message || "Failed to load wallet");
+      } catch (err: unknown) {
+        if (
+          typeof err === "object" &&
+          err !== null &&
+          "response" in err &&
+          typeof (err as { response?: unknown }).response === "object" &&
+          (err as { response?: { data?: { message?: string } } }).response?.data?.message
+        ) {
+          setError((err as { response: { data: { message?: string } } }).response.data.message || "Failed to load wallet");
+        } else {
+          setError("Failed to load wallet");
+        }
       } finally {
         setLoading(false);
       }
@@ -46,8 +56,18 @@ export default function FarmerWalletPage() {
       setShowWithdraw(false);
       setWithdrawAmount("");
       setBankDetails({ accountName: "", accountNumber: "", bankName: "" });
-    } catch (err: any) {
-      setWithdrawError(err?.response?.data?.message || "Failed to submit withdrawal request");
+    } catch (err: unknown) {
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err &&
+        typeof (err as { response?: unknown }).response === "object" &&
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message
+      ) {
+        setWithdrawError((err as { response: { data: { message?: string } } }).response.data.message || "Failed to submit withdrawal request");
+      } else {
+        setWithdrawError("Failed to submit withdrawal request");
+      }
     } finally {
       setWithdrawing(false);
     }
@@ -91,6 +111,7 @@ export default function FarmerWalletPage() {
                     type="number"
                     min="1"
                     required
+                    placeholder="Enter amount"
                     className="input input-bordered w-full rounded-lg border-slate-300 focus:border-green-500 focus:ring-green-200"
                     value={withdrawAmount}
                     onChange={e => setWithdrawAmount(e.target.value)}
@@ -101,6 +122,7 @@ export default function FarmerWalletPage() {
                   <input
                     type="text"
                     required
+                    placeholder="Account Name"
                     className="input input-bordered w-full rounded-lg border-slate-300 focus:border-green-500 focus:ring-green-200"
                     value={bankDetails.accountName}
                     onChange={e => setBankDetails({ ...bankDetails, accountName: e.target.value })}
@@ -111,6 +133,7 @@ export default function FarmerWalletPage() {
                   <input
                     type="text"
                     required
+                    placeholder="Account Number"
                     className="input input-bordered w-full rounded-lg border-slate-300 focus:border-green-500 focus:ring-green-200"
                     value={bankDetails.accountNumber}
                     onChange={e => setBankDetails({ ...bankDetails, accountNumber: e.target.value })}
@@ -121,6 +144,7 @@ export default function FarmerWalletPage() {
                   <input
                     type="text"
                     required
+                    placeholder="Bank Name"
                     className="input input-bordered w-full rounded-lg border-slate-300 focus:border-green-500 focus:ring-green-200"
                     value={bankDetails.bankName}
                     onChange={e => setBankDetails({ ...bankDetails, bankName: e.target.value })}

@@ -51,7 +51,7 @@ export default function GradingPage() {
     // Find the highest grade where all criteria are checked
     for (const grade of ['A', 'B', 'C'] as Grade[]) {
       const criteria = standards[grade].criteria;
-      const startIdx = standards['A'].criteria.length + (grade === 'B' ? 0 : standards['B'].criteria.length);
+      // const startIdx = standards['A'].criteria.length + (grade === 'B' ? 0 : standards['B'].criteria.length); // Removed unused variable
       const checked = criteria.map((_, i) => criteriaChecked[i + (grade === 'A' ? 0 : grade === 'B' ? standards['A'].criteria.length : standards['A'].criteria.length + standards['B'].criteria.length)]);
       if (checked.every(Boolean)) {
         setSuggestedGrade(grade);

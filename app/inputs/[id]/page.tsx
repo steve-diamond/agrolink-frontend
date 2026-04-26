@@ -3,7 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import useSWR from 'swr';
 import { useRouter } from 'next/navigation';
-import ProductCard from 'components/inputs/ProductCard';
+// import ProductCard from 'components/inputs/ProductCard'; // Removed unused import
 import { useCartStore } from 'store/cart';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
