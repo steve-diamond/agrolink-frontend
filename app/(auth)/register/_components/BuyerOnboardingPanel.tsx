@@ -869,7 +869,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       const appId = String(res?.data?.applicationId || uid());
       const verificationPending = res?.data?.verificationPending ? "1" : "0";
       router.push(`/register/buyer/success?name=${encodeURIComponent(form.businessName || accountForm.name)}&appId=${encodeURIComponent(appId)}&queued=0&verificationPending=${verificationPending}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       const statusCode = err?.response?.status;
       const errorMessage = String(
         err?.response?.data?.message || err?.response?.data?.error || err?.message || ""
@@ -996,14 +996,14 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
             </div>
             <label className="grid gap-1 text-sm font-semibold text-green-950">Proof of business registration (PDF/photo) <span className="text-red-500">*</span>
               <input type="file" accept=".pdf,image/*" onChange={async (e) => {
-                const file = e.target.files?.[0];
+                const file = (e as React.ChangeEvent<HTMLInputElement>).target.files?.[0];
                 if (!file) return;
                 setField("businessProofName", file.name);
                 try {
                   const fileUrl = await uploadMedia(file, "business-proof");
                   if (fileUrl) setField("businessProofUrl", fileUrl);
-                } catch (uploadErr: any) {
-                  setError(uploadErr?.message || t("Upload failed.", "Upload fail."));
+                } catch (uploadErr: unknown) {
+                  setError((uploadErr as Error)?.message || t("Upload failed.", "Upload fail."));
                 }
               }} className="min-h-12 rounded-lg border border-green-200 bg-white px-3 py-2" />
             </label>
@@ -1052,27 +1052,27 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
             </div>
             <label className="grid gap-1 text-sm font-semibold text-green-950">Photo of ID <span className="text-red-500">*</span>
               <input type="file" accept="image/*" onChange={async (e) => {
-                const file = e.target.files?.[0];
+                const file = (e as React.ChangeEvent<HTMLInputElement>).target.files?.[0];
                 if (!file) return;
                 setField("idPhotoName", file.name);
                 try {
                   const fileUrl = await uploadMedia(file, "buyer-id-photo");
                   if (fileUrl) setField("idPhotoUrl", fileUrl);
-                } catch (uploadErr: any) {
-                  setError(uploadErr?.message || t("Upload failed.", "Upload fail."));
+                } catch (uploadErr: unknown) {
+                  setError((uploadErr as Error)?.message || t("Upload failed.", "Upload fail."));
                 }
               }} className="min-h-12 rounded-lg border border-green-200 bg-white px-3 py-2" />
             </label>
             <label className="grid gap-1 text-sm font-semibold text-green-950">Selfie holding ID (optional)
               <input type="file" accept="image/*" onChange={async (e) => {
-                const file = e.target.files?.[0];
+                const file = (e as React.ChangeEvent<HTMLInputElement>).target.files?.[0];
                 if (!file) return;
                 setField("selfieWithIdName", file.name);
                 try {
                   const fileUrl = await uploadMedia(file, "buyer-selfie-id");
                   if (fileUrl) setField("selfieWithIdUrl", fileUrl);
-                } catch (uploadErr: any) {
-                  setError(uploadErr?.message || t("Upload failed.", "Upload fail."));
+                } catch (uploadErr: unknown) {
+                  setError((uploadErr as Error)?.message || t("Upload failed.", "Upload fail."));
                 }
               }} className="min-h-12 rounded-lg border border-green-200 bg-white px-3 py-2" />
             </label>

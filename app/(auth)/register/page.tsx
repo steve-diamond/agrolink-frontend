@@ -1023,7 +1023,7 @@ export default function RegisterPage() {
 
       try {
         await API.post("/api/auth/register", accountPayload);
-      } catch (registerErr: any) {
+      } catch (registerErr: unknown) {
         const registerStatus = registerErr?.response?.status;
         const registerMessage = String(
           registerErr?.response?.data?.message || registerErr?.response?.data?.error || registerErr?.message || ""
@@ -1060,7 +1060,7 @@ export default function RegisterPage() {
       const kycPending = res?.data?.kycPending ? "1" : "0";
       clearDraft();
       router.push(`/register/success?name=${encodeURIComponent(accountForm.name.trim())}&appId=${encodeURIComponent(appId)}&queued=0&kycPending=${kycPending}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       const statusCode = err?.response?.status;
       const errorMessage = String(
         err?.response?.data?.message || err?.response?.data?.error || err?.message || ""
@@ -1267,7 +1267,7 @@ export default function RegisterPage() {
             try {
               const fileUrl = await uploadMedia(file, "id-photo");
               if (fileUrl) setFarmerField("idPhotoUrl", fileUrl);
-            } catch (err: any) {
+            } catch (err: unknown) {
               setError(err?.response?.data?.message || getText("ID upload failed. Try again.", "ID upload fail. Try again."));
             }
           }}
@@ -1289,7 +1289,7 @@ export default function RegisterPage() {
             try {
               const fileUrl = await uploadMedia(file, "selfie-with-id");
               if (fileUrl) setFarmerField("selfieWithIdUrl", fileUrl);
-            } catch (err: any) {
+            } catch (err: unknown) {
               setError(err?.response?.data?.message || getText("Selfie upload failed. Try again.", "Selfie upload fail. Try again."));
             }
           }}
