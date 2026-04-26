@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await API.post<ForgotPasswordResponse>("/api/auth/forgot-password", { email });
+      const res = await API.post("/api/auth/forgot-password", { email }) as { data: ForgotPasswordResponse };
       const resetToken = res?.data?.resetToken;
 
       setSent(true);

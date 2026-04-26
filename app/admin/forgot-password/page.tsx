@@ -23,7 +23,7 @@ export default function AdminForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await API.post<ForgotPasswordResponse>("/api/auth/forgot-password", { email, role: "admin" });
+      const res = await API.post("/api/auth/forgot-password", { email, role: "admin" }) as { data: ForgotPasswordResponse };
       const resetToken = res?.data?.resetToken;
 
       setSent(true);

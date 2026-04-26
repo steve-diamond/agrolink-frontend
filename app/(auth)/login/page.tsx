@@ -37,7 +37,8 @@ function LoginForm() {
     setIsSubmitting(true);
 
     try {
-      const res = await API.post("/api/auth/login", form);
+      type LoginResponse = { token: string; user: unknown };
+      const res = await API.post("/api/auth/login", form) as { data: LoginResponse };
 
       persistRememberedEmail(form.email);
 
