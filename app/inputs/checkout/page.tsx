@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { useCartStore } from 'store/cart';
 import { getPaystackUrl } from 'lib/paystack';
 
@@ -32,7 +33,7 @@ export default function CheckoutPage() {
           <ul className="divide-y">
             {cartItems.map((item) => (
               <li key={item.id} className="py-4 flex items-center gap-4">
-                <img src={item.image_url || '/placeholder.png'} alt={item.name} className="w-16 h-16 rounded object-cover" />
+                <Image src={item.image_url || '/placeholder.png'} alt={item.name} width={64} height={64} className="w-16 h-16 rounded object-cover" />
                 <div className="flex-1">
                   <div className="font-semibold">{item.name}</div>
                   <div className="text-xs text-gray-500">{item.brand}</div>

@@ -36,7 +36,7 @@ const iconMap = {
   U: null,
 };
 
-export const GradeBadge: React.FC<GradeBadgeProps> = ({ grade, commodity, size = 'md', onClick }) => {
+export const GradeBadge: React.FC<Omit<GradeBadgeProps, 'commodity'> & { commodity?: string }> = ({ grade, size = 'md', onClick }) => {
   const badgeColor = colorMap[grade] || colorMap.U;
   const badgeLabel = labelMap[grade] || labelMap.U;
   const icon = iconMap[grade];

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { convertToNGN, convertToUSD, getUSDRate } from "lib/fx";
+import Image from 'next/image';
+import { getUSDRate } from "lib/fx";
 
 // Placeholder for campaign data fetching
 const campaign = {
@@ -41,7 +42,7 @@ export default function CampaignDetailPage() {
       {/* Gallery */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         {campaign.gallery.map((img, i) => (
-          <img key={i} src={img} alt="Farm" className="rounded-lg h-48 w-full object-cover" />
+          <Image key={i} src={img} alt="Farm" width={400} height={192} className="rounded-lg h-48 w-full object-cover" />
         ))}
       </div>
       {/* Farmer Bio & Location */}

@@ -39,7 +39,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [storage, setStorage] = useState<Storage[]>([]);
-  const [farmingTips, setFarmingTips] = useState<any[]>([]);
+  const [farmingTips, setFarmingTips] = useState<{ title: string; content: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [repayLoading, setRepayLoading] = useState(false);
   const [repayMessage, setRepayMessage] = useState<string | null>(null);

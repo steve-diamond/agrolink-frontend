@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Image from 'next/image';
 
 
 export default function AgentGradingPage() {
@@ -95,7 +96,7 @@ export default function AgentGradingPage() {
               <td className="p-2">
                 <div className="flex gap-1">
                   {s.photos?.map((url: string, i: number) => (
-                    <img key={i} src={url} alt="photo" className="h-10 w-10 object-cover rounded" />
+                    <Image key={i} src={url} alt="photo" width={40} height={40} className="h-10 w-10 object-cover rounded" />
                   ))}
                 </div>
               </td>
@@ -112,7 +113,7 @@ export default function AgentGradingPage() {
             <h2 className="text-lg font-bold mb-2">{selected.commodity} - Grade {selected.grade}</h2>
             <div className="mb-2 flex gap-2">
               {selected.photos?.map((url: string, i: number) => (
-                <img key={i} src={url} alt="photo" className="h-16 w-16 object-cover rounded" />
+                <Image key={i} src={url} alt="photo" width={64} height={64} className="h-16 w-16 object-cover rounded" />
               ))}
             </div>
             <div className="mb-2">

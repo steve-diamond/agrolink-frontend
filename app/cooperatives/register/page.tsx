@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const STATES = [
@@ -153,7 +154,7 @@ export default function CooperativeRegisterPage() {
               <label className="block font-medium mb-1">Upload Group Photo (max 2MB)</label>
               <input name="photo" type="file" accept="image/*" className="input" onChange={handlePhoto} />
               {photoPreview && (
-                <img src={photoPreview} alt="Preview" className="mt-2 w-24 h-24 object-cover rounded-lg border" />
+                <Image src={photoPreview || '/placeholder.png'} alt="Preview" width={96} height={96} className="mt-2 w-24 h-24 object-cover rounded-lg border" />
               )}
             </div>
           </div>
@@ -170,7 +171,7 @@ export default function CooperativeRegisterPage() {
               <div className="text-sm mb-1">Members: {form.member_count}</div>
               <div className="text-sm mb-1">Chairman: {form.chairman_name} ({form.chairman_phone}, {form.chairman_email})</div>
               <div className="text-sm mb-1">Secretary: {form.secretary_name} ({form.secretary_phone}, {form.secretary_email})</div>
-              {photoPreview && <img src={photoPreview} alt="Preview" className="mt-2 w-24 h-24 object-cover rounded-lg border" />}
+              {photoPreview && <Image src={photoPreview} alt="Preview" width={96} height={96} className="mt-2 w-24 h-24 object-cover rounded-lg border" />}
             </div>
             <div className="flex items-center gap-2 mt-2">
               <input type="checkbox" required id="confirm" className="mr-2" />

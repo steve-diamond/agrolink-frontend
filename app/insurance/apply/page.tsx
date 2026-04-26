@@ -1,13 +1,14 @@
 "use client";
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface InsuranceForm {
   [key: string]: string;
 }
-import { useRouter } from 'next/navigation';
 
 const CROPS = ['Maize', 'Cassava', 'Rice', 'Poultry', 'Fishery', 'Vegetables', 'Mixed'];
 const STATES = ['Lagos', 'Kano', 'Kaduna', 'Ogun', 'Oyo', 'Benue', 'Abia', 'FCT'];
+
 export default function InsuranceApplyPage() {
   const [form, setForm] = useState<InsuranceForm>({});
   const [submitting, setSubmitting] = useState(false);
@@ -114,7 +115,9 @@ export default function InsuranceApplyPage() {
           </div>
         </div>
         {error && <div className="text-red-600 mt-2">{error}</div>}
-        <button type="submit" className="btn bg-[#2D6A4F] text-white w-full" disabled={submitting}>{submitting ? 'Submitting...' : 'Submit Application'}</button>
+        <button type="submit" className="btn bg-[#2D6A4F] text-white w-full" disabled={submitting}>
+          {submitting ? 'Submitting...' : 'Submit Application'}
+        </button>
       </form>
     </div>
   );

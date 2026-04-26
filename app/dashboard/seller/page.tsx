@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 // import useSWR from 'swr';
 import Link from 'next/link';
 
@@ -21,7 +22,7 @@ export default function SellerDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {data.products.map((product: any) => (
             <div key={product.id} className="bg-white rounded-xl shadow p-4 flex flex-col">
-              <img src={product.image_url || '/placeholder.png'} alt={product.name} className="rounded-xl h-40 object-cover mb-2" />
+              <Image src={product.image_url || '/placeholder.png'} alt={product.name} width={160} height={160} className="rounded-xl h-40 object-cover mb-2" />
               <div className="font-bold">{product.name}</div>
               <div className="text-gray-500 text-sm">{product.brand}</div>
               <div className="text-[#2D6A4F] font-semibold">₦{product.price_per_unit?.toLocaleString()} / {product.unit}</div>

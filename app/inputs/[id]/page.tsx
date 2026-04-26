@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Image from 'next/image';
 import useSWR from 'swr';
 import { useRouter } from 'next/navigation';
 import ProductCard from 'components/inputs/ProductCard';
@@ -19,7 +20,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     <div className="max-w-3xl mx-auto py-10">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1">
-          <img src={product.image_url || '/placeholder.png'} alt={product.name} className="rounded-2xl w-full h-80 object-cover" />
+          <Image src={product.image_url || '/placeholder.png'} alt={product.name} width={320} height={320} className="rounded-2xl w-full h-80 object-cover" />
         </div>
         <div className="flex-1 flex flex-col">
           <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
