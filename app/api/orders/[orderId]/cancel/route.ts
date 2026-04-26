@@ -8,8 +8,11 @@ declare global {
 const orders: Order[] = globalThis.orders || [];
 globalThis.orders = orders;
 
-export async function POST(req: NextRequest, context: { params?: { orderId?: string } }) {
-  const { orderId } = context?.params || {};
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ orderId: string }> }
+) {
+  const { orderId } = await context.params;
   // Find and update the order status
   const idx = orders.findIndex((o) => o._id === orderId);
   if (idx === -1) {

@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await dbConnect();
-  const { id } = context.params;
+  const { id } = await context.params;
   try {
     const product = await InputProduct.findById(id).lean();
     if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
