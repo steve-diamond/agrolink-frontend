@@ -13,13 +13,17 @@ export default function AdminForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  type ForgotPasswordResponse = {
+    resetToken?: string;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const res = await API.post("/api/auth/forgot-password", { email, role: "admin" });
+      const res = await API.post<ForgotPasswordResponse>("/api/auth/forgot-password", { email, role: "admin" });
       const resetToken = res?.data?.resetToken;
 
       setSent(true);
@@ -31,6 +35,8 @@ export default function AdminForgotPasswordPage() {
       if (typeof err === "object" && err !== null && "response" in err) {
         // @ts-expect-error: err.response is not typed, but may exist on error objects from axios
         setError(err.response?.data?.message || "Unable to process admin reset request right now.");
+      } else if (err instanceof Error) {
+        setError(err.message);
       } else {
         setError("Unable to process admin reset request right now.");
       }

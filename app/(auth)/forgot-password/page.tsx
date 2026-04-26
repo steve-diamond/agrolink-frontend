@@ -13,13 +13,17 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  type ForgotPasswordResponse = {
+    resetToken?: string;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const res = await API.post("/api/auth/forgot-password", { email });
+      const res = await API.post<ForgotPasswordResponse>("/api/auth/forgot-password", { email });
       const resetToken = res?.data?.resetToken;
 
       setSent(true);
@@ -28,19 +32,11 @@ export default function ForgotPasswordPage() {
         router.push(`/reset-password?token=${encodeURIComponent(resetToken)}`);
       }
     } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'data' in err.response &&
-        err.response.data &&
-        typeof err.response.data === 'object' &&
-        'message' in err.response.data
-      ) {
-        // Type guard for error
-        setError((err.response as { data?: { message?: string } })?.data?.message || "Unable to process reset request right now.");
+      if (typeof err === "object" && err !== null && "response" in err) {
+        // @ts-expect-error: err.response is not typed, but may exist on error objects from axios
+        setError(err.response?.data?.message || "Unable to process reset request right now.");
+      } else if (err instanceof Error) {
+        setError(err.message);
       } else {
         setError("Unable to process reset request right now.");
       }
