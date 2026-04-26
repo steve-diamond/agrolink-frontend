@@ -1,10 +1,11 @@
 "use client";
+
 import React, { useEffect, useState } from 'react';
-import WhatsAppSession from 'models/whatsappSession';
+import WhatsAppSession, { IWhatsAppSession } from 'models/whatsappSession';
 import { dbConnect } from 'lib/mongoose';
 
 export default function WhatsAppAdminMonitor() {
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<IWhatsAppSession[]>([]);
 
   useEffect(() => {
     (async () => {

@@ -7,7 +7,7 @@ import { sendListingConfirmedSMS } from 'lib/sms.ts';
 export async function POST(req: NextRequest) {
   await dbConnect();
   const body = await req.formData();
-  const sessionId = body.get('sessionId') as string;
+  // const sessionId = body.get('sessionId') as string; // Removed to fix ESLint unused variable warning
   const phoneNumber = body.get('phoneNumber') as string;
   const text = (body.get('text') as string) || '';
   const inputs = text.split('*');

@@ -37,7 +37,9 @@ export default function ClientRootLayout({ children }: { children: React.ReactNo
             lastIdRef.current = newest._id;
           }
         }
-      } catch {}
+      } catch {
+        // ignore
+      }
       if (mounted) setTimeout(poll, 10000);
     };
     poll();

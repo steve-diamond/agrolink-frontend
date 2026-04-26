@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { handleConversation } from 'lib/whatsapp/conversationEngine';
 
 // GET: Meta webhook verification
