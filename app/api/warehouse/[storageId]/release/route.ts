@@ -8,8 +8,11 @@ declare global {
 const storage: StorageRecord[] = globalThis.storage || [];
 globalThis.storage = storage;
 
-export async function POST(req: NextRequest, context: { params?: { storageId?: string } }) {
-  const { storageId } = context?.params || {};
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ storageId: string }> }
+) {
+  const { storageId } = await context.params;
   // Find and update the storage record
   const idx = storage.findIndex((s) => s._id === storageId);
   if (idx === -1) {
