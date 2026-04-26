@@ -4,10 +4,11 @@ import Image from 'next/image';
 
 
 export default function AgentGradingPage() {
-  const [submissions, setSubmissions] = useState<any[]>([]);
+  type Submission = { id: string; [key: string]: unknown };
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selected, setSelected] = useState<any | null>(null);
+  const [selected, setSelected] = useState<Submission | null>(null);
   const [notes, setNotes] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -20,8 +21,13 @@ export default function AgentGradingPage() {
         const json = await res.json();
         if (res.ok) setSubmissions(json.submissions || []);
         else setError(json.error || "Failed to fetch submissions");
-      } catch (err: any) {
-        setError(err.message || "Unknown error");
+      } catch (err: unknown) {
+        if (typeof err === "object" && err !== null && "message" in err) {
+          // @ts-expect-error: err.message may exist on unknown error objects
+          setError(err.message || "Unknown error");
+        } else {
+          setError("Unknown error");
+        }
       }
       setLoading(false);
     }
@@ -45,8 +51,13 @@ export default function AgentGradingPage() {
         setSelected(null);
         setNotes("");
       }
-    } catch (err: any) {
-      setError(err.message || "Unknown error");
+    } catch (err: unknown) {
+      if (typeof err === "object" && err !== null && "message" in err) {
+        // @ts-expect-error: err.message may exist on unknown error objects
+        setError(err.message || "Unknown error");
+      } else {
+        setError("Unknown error");
+      }
     }
     setActionLoading(false);
   }
@@ -67,8 +78,13 @@ export default function AgentGradingPage() {
         setSelected(null);
         setNotes("");
       }
-    } catch (err: any) {
-      setError(err.message || "Unknown error");
+    } catch (err: unknown) {
+      if (typeof err === "object" && err !== null && "message" in err) {
+        // @ts-expect-error: err.message may exist on unknown error objects
+        setError(err.message || "Unknown error");
+      } else {
+        setError("Unknown error");
+      }
     }
     setActionLoading(false);
   }

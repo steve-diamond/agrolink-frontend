@@ -134,10 +134,11 @@ export default function AdminUnifiedCommandCenter() {
             type NormalizedProduct = { name?: string; location?: string; price?: number };
             let product: NormalizedProduct = { name: undefined, location: undefined, price: undefined };
             if (order.productId && typeof order.productId === "object") {
+              const prod = order.productId as { name?: string; location?: string; price?: number };
               product = {
-                name: (order.productId as any).name,
-                location: (order.productId as any).location ?? undefined,
-                price: (order.productId as any).price ?? undefined,
+                name: prod.name,
+                location: prod.location ?? undefined,
+                price: prod.price ?? undefined,
               };
             } else if (typeof order.productId === "string") {
               product = { name: order.productId, location: undefined, price: undefined };
@@ -149,8 +150,8 @@ export default function AdminUnifiedCommandCenter() {
               price: product.price,
             };
             const buyer = order.buyerId || { name: order.buyer || "Unknown", email: "" };
-            const total = (order as any).totalAmount ?? (order as any).totalPrice ?? 0;
-            const paymentStatus = (order as any).paymentStatus ?? "pending";
+            const total = (typeof order.totalAmount === "number" ? order.totalAmount : (typeof order.totalPrice === "number" ? order.totalPrice : 0));
+            const paymentStatus = (typeof order.paymentStatus === "string" ? order.paymentStatus : "pending");
             const createdAt = order.createdAt ? new Date(order.createdAt).toLocaleString() : "-";
             const quantity = order.quantity ?? (order.products ? order.products.reduce((sum, p) => sum + (p.quantity || 0), 0) : "-");
             return (

@@ -47,8 +47,13 @@ export default function AdminResetPasswordClient({ token }: AdminResetPasswordCl
       await API.post("/api/auth/reset-password", { token, password });
       setSuccess(true);
       setTimeout(() => router.push("/admin/login"), 1200);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Unable to reset admin password.");
+    } catch (err: unknown) {
+      if (typeof err === "object" && err !== null && "response" in err) {
+        // @ts-expect-error: err.response is not typed, but may exist on error objects from axios
+        setError(err.response?.data?.message || "Unable to reset admin password.");
+      } else {
+        setError("Unable to reset admin password.");
+      }
     } finally {
       setLoading(false);
     }

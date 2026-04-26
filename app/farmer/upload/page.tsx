@@ -70,7 +70,7 @@ export default function FarmerUploadPage() {
         return;
       }
 
-      const result = await flushOfflineQueue((payload) => createProduct(payload as any));
+      const result = await flushOfflineQueue((payload: ProductForm) => createProduct(payload));
       if (result.processed > 0) {
         const liveCopy = getCopy(getStoredLanguage());
         setSuccess(`${liveCopy.syncedOfflineUploads}: ${result.processed}`);
@@ -166,15 +166,25 @@ export default function FarmerUploadPage() {
       setForm(initialForm);
       setImagePreview("");
       setSuccess("Product uploaded successfully and is now pending admin approval.");
-    } catch (requestError: any) {
-      const details = requestError?.response?.data?.details;
-      const detailedMessage = Array.isArray(details) && details.length > 0 ? details[0] : undefined;
-      setError(
-        detailedMessage ||
-          requestError?.response?.data?.message ||
-          requestError?.response?.data?.error ||
-          "Failed to upload product."
-      );
+    } catch (requestError: unknown) {
+      let details: unknown = undefined;
+      let detailedMessage: unknown = undefined;
+      if (typeof requestError === "object" && requestError !== null && "response" in requestError) {
+        // @ts-expect-error: dynamic error shape from backend
+        details = requestError.response?.data?.details;
+        detailedMessage = Array.isArray(details) && details.length > 0 ? details[0] : undefined;
+        // @ts-expect-error: dynamic error shape from backend
+        setError(
+          detailedMessage ||
+            // @ts-expect-error: dynamic error shape from backend
+            requestError.response?.data?.message ||
+            // @ts-expect-error: dynamic error shape from backend
+            requestError.response?.data?.error ||
+            "Failed to upload product."
+        );
+      } else {
+        setError("Failed to upload product.");
+      }
     } finally {
       setSubmitting(false);
     }

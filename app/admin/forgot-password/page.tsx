@@ -27,8 +27,13 @@ export default function AdminForgotPasswordPage() {
       if (resetToken) {
         router.push(`/admin/reset-password?token=${encodeURIComponent(resetToken)}`);
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Unable to process admin reset request right now.");
+    } catch (err: unknown) {
+      if (typeof err === "object" && err !== null && "response" in err) {
+        // @ts-expect-error: err.response is not typed, but may exist on error objects from axios
+        setError(err.response?.data?.message || "Unable to process admin reset request right now.");
+      } else {
+        setError("Unable to process admin reset request right now.");
+      }
     } finally {
       setLoading(false);
     }

@@ -23,9 +23,26 @@ function ProgressBar({ step }: { step: number }) {
   );
 }
 
+
+type CooperativeForm = {
+  name?: string;
+  cac_reg_number?: string;
+  state?: string;
+  lga?: string;
+  year_founded?: string;
+  primary_commodity?: string;
+  member_count?: string;
+  chairman_name?: string;
+  chairman_phone?: string;
+  chairman_email?: string;
+  secretary_name?: string;
+  secretary_phone?: string;
+  secretary_email?: string;
+};
+
 export default function CooperativeRegisterPage() {
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState<any>({});
+  const [form, setForm] = useState<CooperativeForm>({});
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -33,7 +50,8 @@ export default function CooperativeRegisterPage() {
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,8 +81,13 @@ export default function CooperativeRegisterPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');
       router.push('/cooperatives/register?success=1');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err !== null && 'message' in err) {
+        // @ts-expect-error: err.message may exist on unknown error objects
+        setError(err.message);
+      } else {
+        setError('Registration failed');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -79,33 +102,33 @@ export default function CooperativeRegisterPage() {
           <div className="space-y-4">
             <div>
               <label className="block font-medium mb-1">Cooperative Name</label>
-              <input name="name" required className="input" onChange={handleChange} />
+              <input name="name" required className="input" onChange={handleChange} placeholder="Enter cooperative name" />
             </div>
             <div>
               <label className="block font-medium mb-1">CAC Registration Number</label>
-              <input name="cac_reg_number" required className="input" onChange={handleChange} />
+              <input name="cac_reg_number" required className="input" onChange={handleChange} placeholder="CAC registration number" />
             </div>
             <div className="flex gap-2">
               <div className="flex-1">
                 <label className="block font-medium mb-1">State</label>
-                <select name="state" required className="input" onChange={handleChange}>
+                <select name="state" required className="input" onChange={handleChange} title="Select state">
                   <option value="">Select State</option>
                   {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
               <div className="flex-1">
                 <label className="block font-medium mb-1">LGA</label>
-                <input name="lga" required className="input" onChange={handleChange} />
+                <input name="lga" required className="input" onChange={handleChange} placeholder="Enter LGA" />
               </div>
             </div>
             <div className="flex gap-2">
               <div className="flex-1">
                 <label className="block font-medium mb-1">Year Founded</label>
-                <input name="year_founded" type="number" min="1900" max="2026" required className="input" onChange={handleChange} />
+                <input name="year_founded" type="number" min="1900" max="2026" required className="input" onChange={handleChange} placeholder="Year founded" />
               </div>
               <div className="flex-1">
                 <label className="block font-medium mb-1">Primary Commodity</label>
-                <select name="primary_commodity" required className="input" onChange={handleChange}>
+                <select name="primary_commodity" required className="input" onChange={handleChange} title="Select primary commodity">
                   <option value="">Select</option>
                   {COMMODITIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -113,7 +136,7 @@ export default function CooperativeRegisterPage() {
             </div>
             <div>
               <label className="block font-medium mb-1">Estimated Member Count</label>
-              <input name="member_count" type="number" min="1" required className="input" onChange={handleChange} />
+              <input name="member_count" type="number" min="1" required className="input" onChange={handleChange} placeholder="Estimated member count" />
             </div>
           </div>
         )}
@@ -123,7 +146,7 @@ export default function CooperativeRegisterPage() {
             <div className="flex gap-2">
               <div className="flex-1">
                 <label className="block font-medium mb-1">Chairman Name</label>
-                <input name="chairman_name" required className="input" onChange={handleChange} />
+                <input name="chairman_name" required className="input" onChange={handleChange} placeholder="Chairman name" />
               </div>
               <div className="flex-1">
                 <label className="block font-medium mb-1">Chairman Phone</label>
@@ -133,11 +156,11 @@ export default function CooperativeRegisterPage() {
             <div className="flex gap-2">
               <div className="flex-1">
                 <label className="block font-medium mb-1">Chairman Email</label>
-                <input name="chairman_email" type="email" required className="input" onChange={handleChange} />
+                <input name="chairman_email" type="email" required className="input" onChange={handleChange} placeholder="Chairman email" />
               </div>
               <div className="flex-1">
                 <label className="block font-medium mb-1">Secretary Name</label>
-                <input name="secretary_name" required className="input" onChange={handleChange} />
+                <input name="secretary_name" required className="input" onChange={handleChange} placeholder="Secretary name" />
               </div>
             </div>
             <div className="flex gap-2">
@@ -147,12 +170,12 @@ export default function CooperativeRegisterPage() {
               </div>
               <div className="flex-1">
                 <label className="block font-medium mb-1">Secretary Email</label>
-                <input name="secretary_email" type="email" required className="input" onChange={handleChange} />
+                <input name="secretary_email" type="email" required className="input" onChange={handleChange} placeholder="Secretary email" />
               </div>
             </div>
             <div>
               <label className="block font-medium mb-1">Upload Group Photo (max 2MB)</label>
-              <input name="photo" type="file" accept="image/*" className="input" onChange={handlePhoto} />
+              <input name="photo" type="file" accept="image/*" className="input" onChange={handlePhoto} title="Upload group photo (max 2MB)" />
               {photoPreview && (
                 <Image src={photoPreview || '/placeholder.png'} alt="Preview" width={96} height={96} className="mt-2 w-24 h-24 object-cover rounded-lg border" />
               )}

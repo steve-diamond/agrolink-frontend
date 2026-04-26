@@ -8,14 +8,14 @@ export async function GET(req: NextRequest) {
   const state = searchParams.get('state');
   const commodity = searchParams.get('commodity');
 
-  const filter: any = {};
+  const filter: Record<string, unknown> = {};
   if (state) filter.state = state;
   if (commodity) filter.commodity_name = new RegExp(commodity, 'i');
 
   try {
     const docs = await CommodityPrice.find(filter).sort({ updated_at: -1 }).lean();
     // Group by commodity_name and state, pick latest
-    const grouped: Record<string, any> = {};
+    const grouped: Record<string, unknown> = {};
     let last_updated = null;
     for (const row of docs) {
       const key = `${row.commodity_name}__${row.state}`;
@@ -25,7 +25,12 @@ export async function GET(req: NextRequest) {
       }
     }
     return NextResponse.json({ prices: Object.values(grouped), last_updated });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Failed to fetch prices' }, { status: 500 });
+  } catch (err: unknown) {
+    let message = 'Failed to fetch prices';
+    if (typeof err === 'object' && err !== null && 'message' in err) {
+      // @ts-expect-error: err.message may exist on unknown error objects
+      message = err.message;
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

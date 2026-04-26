@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest, context: any) {
+export async function POST(request: NextRequest, context: { params?: { orderId?: string } }) {
   try {
     const { orderId } = context?.params || {};
     const body = await request.json();

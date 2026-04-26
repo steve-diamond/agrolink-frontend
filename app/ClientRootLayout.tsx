@@ -20,7 +20,7 @@ function NotificationToast({ notification, onClose }: { notification: Notificati
 }
 
 export default function ClientRootLayout({ children }: { children: React.ReactNode }) {
-  const [latestNotification, setLatestNotification] = useState<any>(null);
+  const [latestNotification, setLatestNotification] = useState<Notification | null>(null);
   const lastIdRef = useRef<string | null>(null);
 
   // Poll for notifications every 10s
@@ -29,7 +29,7 @@ export default function ClientRootLayout({ children }: { children: React.ReactNo
     const poll = async () => {
       try {
         const res = await API.get("/notifications");
-        const notifs = Array.isArray(res.data) ? res.data : [];
+        const notifs = Array.isArray(res.data) ? res.data as Notification[] : [];
         if (notifs.length > 0) {
           const newest = notifs[0];
           if (newest && newest._id !== lastIdRef.current) {

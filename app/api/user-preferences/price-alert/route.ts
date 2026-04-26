@@ -16,7 +16,12 @@ export async function POST(req: NextRequest) {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Failed to save preference' }, { status: 500 });
+  } catch (err: unknown) {
+    let message = 'Failed to save preference';
+    if (typeof err === 'object' && err !== null && 'message' in err) {
+      // @ts-expect-error: err.message may exist on unknown error objects
+      message = err.message;
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

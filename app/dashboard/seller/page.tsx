@@ -20,7 +20,15 @@ export default function SellerDashboard() {
         <div>Loading...</div>
       ) : data?.products?.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {data.products.map((product: any) => (
+          {data.products.map((product: {
+            id: string | number;
+            image_url?: string;
+            name: string;
+            brand?: string;
+            price_per_unit?: number;
+            unit?: string;
+            state?: string;
+          }) => (
             <div key={product.id} className="bg-white rounded-xl shadow p-4 flex flex-col">
               <Image src={product.image_url || '/placeholder.png'} alt={product.name} width={160} height={160} className="rounded-xl h-40 object-cover mb-2" />
               <div className="font-bold">{product.name}</div>

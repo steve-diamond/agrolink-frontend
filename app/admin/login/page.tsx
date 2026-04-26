@@ -40,7 +40,7 @@ export default function AdminLoginPage() {
       : [normalizedEmail];
 
     try {
-      let lastError: any = null;
+      let lastError: unknown = null;
 
       for (const attemptEmail of emailAttempts) {
         try {
@@ -64,20 +64,23 @@ export default function AdminLoginPage() {
           localStorage.setItem("user", JSON.stringify(user));
           router.push("/admin");
           return;
-        } catch (attemptErr: any) {
+        } catch (attemptErr: unknown) {
           lastError = attemptErr;
         }
       }
 
       throw lastError || new Error("All admin login attempts failed.");
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Admin login failed";
-
-      const statusCode = err?.response?.status;
+    } catch (err: unknown) {
+      let message = "Admin login failed";
+      let statusCode = undefined;
+      if (typeof err === "object" && err !== null && "response" in err) {
+        // @ts-expect-error: err.response is not typed, but may exist on error objects from axios
+        message = err.response?.data?.message || err.response?.data?.error || err.message || "Admin login failed";
+        // @ts-expect-error: err.response is not typed, but may exist on error objects from axios
+        statusCode = err.response?.status;
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
       const target = "custom-api";
 
       setError(message);

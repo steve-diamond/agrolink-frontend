@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const nafdac = searchParams.get('nafdac');
   const seller_id = searchParams.get('seller_id');
 
-  const filter: any = { is_active: true };
+  const filter: Record<string, unknown> = { is_active: true };
   if (category) filter.category = category;
   if (state) filter.state = state;
   if (nafdac) filter.is_nafdac_approved = true;
@@ -21,8 +21,13 @@ export async function GET(req: NextRequest) {
   try {
     const products = await InputProduct.find(filter).sort({ created_at: -1 }).lean();
     return Response.json({ products });
-  } catch (err: any) {
-    return Response.json({ error: err.message || 'Failed to fetch products' }, { status: 500 });
+  } catch (err: unknown) {
+    let message = 'Failed to fetch products';
+    if (typeof err === 'object' && err !== null && 'message' in err) {
+      // @ts-expect-error: err.message may exist on unknown error objects
+      message = err.message;
+    }
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
@@ -53,7 +58,12 @@ export async function POST(req: NextRequest) {
       nafdac_number: body.nafdac_number,
     });
     return Response.json({ product });
-  } catch (err: any) {
-    return Response.json({ error: err.message || 'Failed to create product' }, { status: 400 });
+  } catch (err: unknown) {
+    let message = 'Failed to create product';
+    if (typeof err === 'object' && err !== null && 'message' in err) {
+      // @ts-expect-error: err.message may exist on unknown error objects
+      message = err.message;
+    }
+    return Response.json({ error: message }, { status: 400 });
   }
 }
