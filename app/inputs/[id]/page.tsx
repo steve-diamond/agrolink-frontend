@@ -1,7 +1,11 @@
-import type { PageProps } from 'next';
+type Params = { id: string };
 
-export default async function Page({ params }: PageProps) {
-  const { id } = await params;
+interface PageProps {
+  params: Params;
+}
+
+export default function Page({ params }: PageProps) {
+  const { id } = params;
   return (
     <div>
       <h1>Input Details</h1>
