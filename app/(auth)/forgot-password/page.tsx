@@ -23,17 +23,24 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await API.post("/api/auth/forgot-password", { email }) as { data: ForgotPasswordResponse };
-      const resetToken = res?.data?.resetToken;
+      const res = await API.post<ForgotPasswordResponse>(
+        "/api/auth/forgot-password",
+        { email }
+      );
+      const resetToken = res.data?.resetToken;
 
       setSent(true);
 
       if (resetToken) {
         router.push(`/reset-password?token=${encodeURIComponent(resetToken)}`);
       }
-    } catch (err) {
-      // Type-safe error handling for axios errors
-      if (err && typeof err === "object" && "response" in err && err.response && typeof err.response === "object" && "data" in err.response && err.response.data && typeof err.response.data === "object" && "message" in err.response.data) {
+    } catch (err: unknown) {
+      if (
+        err && typeof err === "object" &&
+        "response" in err && err.response && typeof err.response === "object" &&
+        "data" in err.response && err.response.data && typeof err.response.data === "object" &&
+        "message" in err.response.data
+      ) {
         setError((err.response.data as { message?: string }).message || "Unable to process reset request right now.");
       } else if (err instanceof Error) {
         setError(err.message);
