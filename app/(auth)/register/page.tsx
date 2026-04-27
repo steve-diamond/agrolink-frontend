@@ -644,34 +644,40 @@ export default function RegisterPage() {
     setAccountForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleVoiceInput = (field: keyof FarmerForm) => {
-    if (typeof window === "undefined") return;
+// Add global type declarations for SpeechRecognition APIs
+declare global {
+  interface Window {
+    SpeechRecognition?: typeof SpeechRecognition;
+    webkitSpeechRecognition?: typeof SpeechRecognition;
+  }
+}
 
-    const speechApi =
-      (window as Window & { SpeechRecognition?: typeof window.SpeechRecognition }).SpeechRecognition ||
-      (window as Window & { webkitSpeechRecognition?: typeof window.SpeechRecognition }).webkitSpeechRecognition;
+const handleVoiceInput = (field: keyof FarmerForm) => {
+  if (typeof window === "undefined") return;
 
-    if (!speechApi) {
-      setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
-      return;
-    }
+  const speechApi = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    setVoiceError("");
-    let recognition: SpeechRecognition;
-    try {
-      recognition = new (speechApi as { new (): SpeechRecognition })();
-    } catch {
-      setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
-      return;
-    }
-    recognition.lang = language === "en" ? "en-NG" : "en-NG";
-    recognition.start();
+  if (!speechApi) {
+    setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
+    return;
+  }
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = event.results?.[0]?.[0]?.transcript?.trim() ?? "";
-      if (!transcript) return;
-      setFarmerField(field, transcript as FarmerForm[keyof FarmerForm]);
-    };
+  setVoiceError("");
+  let recognition: SpeechRecognition;
+  try {
+    recognition = new speechApi();
+  } catch {
+    setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
+    return;
+  }
+  recognition.lang = language === "en" ? "en-NG" : "en-NG";
+  recognition.start();
+
+  recognition.onresult = (event: SpeechRecognitionEvent) => {
+    const transcript = event.results?.[0]?.[0]?.transcript?.trim() ?? "";
+    if (!transcript) return;
+    setFarmerField(field, transcript as FarmerForm[keyof FarmerForm]);
+  };
 
     recognition.onerror = () => {
       setVoiceError(getText("Voice input failed. Please type instead.", "Voice input fail. Abeg type am."));
