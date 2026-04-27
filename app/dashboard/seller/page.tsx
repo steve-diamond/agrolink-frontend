@@ -1,14 +1,31 @@
-import React from 'react';
-import Image from 'next/image';
-// import useSWR from 'swr';
-import Link from 'next/link';
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import API from "@/lib/api";
+import { Product } from "@/types/domain";
+import { ApiResponse } from "@/types/api";
 
 export default function SellerDashboard() {
-  // TODO: Restore SWR data fetching when build is unblocked
-  // const seller_id = 'demo-seller-id';
-  // const { data, isLoading } = useSWR(`/api/inputs/products?seller_id=${seller_id}`, (url) => fetch(url).then(r => r.json()));
-  const data = { products: [] };
-  const isLoading = false;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await API.get<ApiResponse<Product[]>>("/api/products");
+        setProducts(res.data.data);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error(error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   return (
     <div className="max-w-5xl mx-auto py-10">
@@ -16,25 +33,16 @@ export default function SellerDashboard() {
       <div className="mb-6">
         <Link href="/dashboard/seller/upload" className="btn bg-[#2D6A4F] text-white">+ Add New Product</Link>
       </div>
-      {isLoading ? (
+      {loading ? (
         <div>Loading...</div>
-      ) : data?.products?.length ? (
+      ) : products.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {data.products.map((product: {
-            id: string | number;
-            image_url?: string;
-            name: string;
-            brand?: string;
-            price_per_unit?: number;
-            unit?: string;
-            state?: string;
-          }) => (
+          {products.map((product) => (
             <div key={product.id} className="bg-white rounded-xl shadow p-4 flex flex-col">
-              <Image src={product.image_url || '/placeholder.png'} alt={product.name} width={160} height={160} className="rounded-xl h-40 object-cover mb-2" />
+              <Image src={product.imageUrl || '/placeholder.png'} alt={product.name} width={160} height={160} className="rounded-xl h-40 object-cover mb-2" />
               <div className="font-bold">{product.name}</div>
-              <div className="text-gray-500 text-sm">{product.brand}</div>
-              <div className="text-[#2D6A4F] font-semibold">₦{product.price_per_unit?.toLocaleString()} / {product.unit}</div>
-              <div className="text-xs text-gray-400">{product.state}</div>
+              {/* Add brand/unit/price if present in Product type */}
+              <div className="text-[#2D6A4F] font-semibold">₦{product.price?.toLocaleString()}</div>
               <div className="mt-2 flex gap-2">
                 <Link href={`/inputs/${product.id}`} className="btn btn-sm bg-[#40916C] text-white">View</Link>
                 {/* TODO: Add edit/delete actions */}
