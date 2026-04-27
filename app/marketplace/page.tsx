@@ -96,7 +96,8 @@ export default function Marketplace() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q") || "";
-    const category = (params.get("category") || "all") as MarketplaceCategoryValue;
+    const categoryParam = params.get("category") || "all";
+    const category = ["all", "seeds", "fertilizers", "equipment", "livestock"].includes(categoryParam) ? categoryParam as MarketplaceCategoryValue : "all";
     const min = params.get("min") || "";
     const max = params.get("max") || "";
     const grade = params.get("grade") || "all";
@@ -111,7 +112,7 @@ export default function Marketplace() {
     setSelectedCategory(safeCategory);
     setMinPrice(min);
     setMaxPrice(max);
-    setGradeFilter(safeGrade as MarketplaceGradeValue);
+    setGradeFilter(safeGrade as "A"|"B"|"C"|"U"|"all");
   }, []);
 
   useEffect(() => {
@@ -202,7 +203,7 @@ export default function Marketplace() {
     // TODO: Replace with real grade lookup from product.produce_grade or similar
     if (product.grade) return product.grade;
     const hash = product._id.charCodeAt(0) % 4;
-    return (["A","B","C","U"] as const)[hash];
+    return (["A","B","C","U"] as const)[hash]; // This is safe, hash is 0-3
   }
 
   const filteredProducts = useMemo(() => {
@@ -270,39 +271,20 @@ export default function Marketplace() {
       });
 
       window.location.href = paymentRes.data.data.authorization_url;
-    } catch (error: unknown) {
+    } catch (error) {
       console.error(error);
+      let errMsg = "Payment failed. Please try again.";
       if (
-        error &&
-        typeof error === 'object' &&
-        'response' in error &&
-        error.response &&
-        typeof error.response === 'object' &&
-        'data' in error.response &&
-        error.response.data &&
-        typeof error.response.data === 'object' &&
-        ('message' in error.response.data || 'error' in error.response.data)
+        error && typeof error === 'object' &&
+        'response' in error && error.response && typeof error.response === 'object' &&
+        'data' in error.response && error.response.data && typeof error.response.data === 'object'
       ) {
-        // Type guard for error object
-        const errObj = error as unknown;
-        let errMsg = "Payment failed. Please try again.";
-        if (
-          errObj &&
-          typeof errObj === 'object' &&
-          'response' in errObj &&
-          errObj.response &&
-          typeof errObj.response === 'object' &&
-          'data' in errObj.response &&
-          errObj.response.data &&
-          typeof errObj.response.data === 'object'
-        ) {
-          const data = (errObj.response as { data?: { message?: string; error?: string } }).data;
-          errMsg = data?.message || data?.error || errMsg;
-        }
-        alert(errMsg);
-      } else {
-        alert("Payment failed. Please try again.");
+        const data = (error.response as { data?: { message?: string; error?: string } }).data;
+        errMsg = data?.message || data?.error || errMsg;
+      } else if (error instanceof Error) {
+        errMsg = error.message;
       }
+      alert(errMsg);
     } finally {
       setBuyingProductId(null);
     }
@@ -332,7 +314,12 @@ export default function Marketplace() {
                     {/* Grade Filter */}
                     <select
                       value={gradeFilter}
-                      onChange={e => setGradeFilter(e.target.value as "A"|"B"|"C"|"U"|"all")}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                        const value = e.target.value;
+                        if (["A","B","C","U","all"].includes(value)) {
+                          setGradeFilter(value as "A"|"B"|"C"|"U"|"all");
+                        }
+                      }}
                       aria-label="Grade Filter"
                       className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
                     >
@@ -352,7 +339,12 @@ export default function Marketplace() {
 
           <select
             value={selectedCategory}
-            onChange={(event) => setSelectedCategory(event.target.value as MarketplaceCategoryValue)}
+            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+              const value = event.target.value;
+              if (["all", "seeds", "fertilizers", "equipment", "livestock"].includes(value)) {
+                setSelectedCategory(value as MarketplaceCategoryValue);
+              }
+            }}
             aria-label={copy.marketplaceCategoryFilterLabel}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-emerald-200 focus:ring"
           >
@@ -432,7 +424,7 @@ export default function Marketplace() {
             >
               {isValidRemoteImageUrl(product.imageUrl) ? (
                 <Image
-                  src={product.imageUrl as string}
+                  src={typeof product.imageUrl === 'string' ? product.imageUrl : '/placeholder.png'}
                   alt={product.name}
                   width={800}
                   height={480}

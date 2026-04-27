@@ -1,28 +1,31 @@
 "use client";
+
 import React, { useState } from 'react';
 import { GRADING_STANDARDS, Grade } from '../../lib/grading-standards';
 import { GradeBadge, GradeCriteriaModal } from '../../components/grading/GradeBadge';
 import Image from 'next/image';
 
-const COMMODITIES = Object.keys(GRADING_STANDARDS);
+const COMMODITIES: string[] = Object.keys(GRADING_STANDARDS);
 
 export default function GradingPage() {
-  const [step, setStep] = useState(1);
-  const [commodity, setCommodity] = useState('');
+  const [step, setStep] = useState<number>(1);
+  const [commodity, setCommodity] = useState<string>('');
   const [photos, setPhotos] = useState<File[]>([]);
   const [criteriaChecked, setCriteriaChecked] = useState<boolean[]>([]);
   const [suggestedGrade, setSuggestedGrade] = useState<Grade | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [badgeUrl, setBadgeUrl] = useState('');
-  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [badgeUrl, setBadgeUrl] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   // Step 1: Select commodity and upload photos
+
   function handleCommodityChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setCommodity(e.target.value);
     setCriteriaChecked([]);
     setSuggestedGrade(null);
   }
+
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files) return;
@@ -36,6 +39,7 @@ export default function GradingPage() {
   }
 
   // Step 2: Self-assessment checklist
+
   function handleCriteriaChange(idx: number) {
     setCriteriaChecked((prev) => {
       const updated = [...prev];
@@ -45,23 +49,26 @@ export default function GradingPage() {
   }
 
   // Step 3: Suggest grade
+
   function suggestGrade() {
     if (!commodity) return;
     const standards = GRADING_STANDARDS[commodity];
     // Find the highest grade where all criteria are checked
+    let offset = 0;
     for (const grade of ['A', 'B', 'C'] as Grade[]) {
       const criteria = standards[grade].criteria;
-      // const startIdx = standards['A'].criteria.length + (grade === 'B' ? 0 : standards['B'].criteria.length); // Removed unused variable
-      const checked = criteria.map((_, i) => criteriaChecked[i + (grade === 'A' ? 0 : grade === 'B' ? standards['A'].criteria.length : standards['A'].criteria.length + standards['B'].criteria.length)]);
+      const checked = criteria.map((_, i) => criteriaChecked[i + offset]);
       if (checked.every(Boolean)) {
         setSuggestedGrade(grade);
         return;
       }
+      offset += criteria.length;
     }
     setSuggestedGrade('C');
   }
 
   // Step 4: Submit grading
+
   async function handleSubmit() {
     setSubmitting(true);
     setError('');
@@ -84,9 +91,9 @@ export default function GradingPage() {
       if (!res.ok) throw new Error(data.error || 'Submission failed');
       setBadgeUrl(data.grade_badge_url);
       setStep(5);
-    } catch (e: unknown) {
-      if (e && typeof e === 'object' && 'message' in e) {
-        setError((e as { message?: string }).message || 'Submission failed');
+    } catch (e) {
+      if (e instanceof Error) {
+        setError(e.message);
       } else {
         setError('Submission failed');
       }
@@ -96,6 +103,7 @@ export default function GradingPage() {
   }
 
   // UI
+
   return (
     <div className="max-w-xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Produce Quality Grading</h1>
@@ -123,26 +131,32 @@ export default function GradingPage() {
       {step === 2 && commodity && (
         <div>
           <h2 className="font-semibold mb-2">Self-Assessment Checklist</h2>
-          {(['A', 'B', 'C'] as Grade[]).map((grade) => (
-            <div key={grade} className="mb-2">
-              <div className="font-bold">Grade {grade}: {GRADING_STANDARDS[commodity][grade].label}</div>
-              <ul className="ml-4">
-                {GRADING_STANDARDS[commodity][grade].criteria.map((crit, idx) => (
-                  <li key={crit}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={!!criteriaChecked[idx]}
-                        onChange={() => handleCriteriaChange(idx)}
-                        className="mr-2"
-                      />
-                      {crit}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {(['A', 'B', 'C'] as Grade[]).map((grade) => {
+            const criteria = GRADING_STANDARDS[commodity][grade].criteria;
+            let offset = 0;
+            if (grade === 'B') offset = GRADING_STANDARDS[commodity]['A'].criteria.length;
+            if (grade === 'C') offset = GRADING_STANDARDS[commodity]['A'].criteria.length + GRADING_STANDARDS[commodity]['B'].criteria.length;
+            return (
+              <div key={grade} className="mb-2">
+                <div className="font-bold">Grade {grade}: {GRADING_STANDARDS[commodity][grade].label}</div>
+                <ul className="ml-4">
+                  {criteria.map((crit, idx) => (
+                    <li key={crit}>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={!!criteriaChecked[idx + offset]}
+                          onChange={() => handleCriteriaChange(idx + offset)}
+                          className="mr-2"
+                        />
+                        {crit}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
           <button className="bg-blue-600 text-white px-4 py-2 rounded mt-4" onClick={() => { suggestGrade(); setStep(3); }}>
             Next: Suggest Grade
           </button>

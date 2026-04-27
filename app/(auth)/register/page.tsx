@@ -647,10 +647,9 @@ export default function RegisterPage() {
   const handleVoiceInput = (field: keyof FarmerForm) => {
     if (typeof window === "undefined") return;
 
-    type SpeechRecognitionType = typeof window extends { SpeechRecognition: infer T } ? T : unknown;
     const speechApi =
-      (window as Window & { SpeechRecognition?: SpeechRecognitionType }).SpeechRecognition ||
-      (window as Window & { webkitSpeechRecognition?: SpeechRecognitionType }).webkitSpeechRecognition;
+      (window as Window & { SpeechRecognition?: typeof window.SpeechRecognition }).SpeechRecognition ||
+      (window as Window & { webkitSpeechRecognition?: typeof window.SpeechRecognition }).webkitSpeechRecognition;
 
     if (!speechApi) {
       setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
@@ -658,7 +657,13 @@ export default function RegisterPage() {
     }
 
     setVoiceError("");
-    const recognition = new speechApi();
+    let recognition: SpeechRecognition;
+    try {
+      recognition = new (speechApi as { new (): SpeechRecognition })();
+    } catch {
+      setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
+      return;
+    }
     recognition.lang = language === "en" ? "en-NG" : "en-NG";
     recognition.start();
 

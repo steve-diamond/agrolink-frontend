@@ -59,7 +59,7 @@ export default function CooperativeRegisterPage() {
     setPhoto(file);
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => setPhotoPreview(reader.result as string);
+      reader.onload = () => setPhotoPreview(typeof reader.result === 'string' ? reader.result : '');
       reader.readAsDataURL(file);
     } else {
       setPhotoPreview(null);
@@ -72,7 +72,7 @@ export default function CooperativeRegisterPage() {
     setError(null);
     try {
       const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => fd.append(k, v as string));
+      Object.entries(form).forEach(([k, v]) => fd.append(k, typeof v === 'string' ? v : String(v)));
       if (photo) fd.append('photo', photo);
       const res = await fetch('/api/cooperatives/register', {
         method: 'POST',
@@ -81,9 +81,8 @@ export default function CooperativeRegisterPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');
       router.push('/cooperatives/register?success=1');
-    } catch (err: unknown) {
-      if (typeof err === 'object' && err !== null && 'message' in err) {
-        // @ts-expect-error: err.message may exist on unknown error objects
+    } catch (err) {
+      if (err instanceof Error) {
         setError(err.message);
       } else {
         setError('Registration failed');

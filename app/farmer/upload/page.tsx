@@ -166,26 +166,23 @@ export default function FarmerUploadPage() {
       setForm(initialForm);
       setImagePreview("");
       setSuccess("Product uploaded successfully and is now pending admin approval.");
-    } catch (requestError: unknown) {
-      let details: unknown = undefined;
-      let detailedMessage: unknown = undefined;
-      if (typeof requestError === "object" && requestError !== null && "response" in requestError) {
-        // @ts-expect-error: dynamic error shape from backend
-        details = requestError.response?.data?.details;
-        detailedMessage = Array.isArray(details) && details.length > 0 ? details[0] : undefined;
-        // @ts-expect-error: dynamic error shape from backend
-        setError(
-          detailedMessage ||
-            // @ts-expect-error: dynamic error shape from backend
-            requestError.response?.data?.message ||
-            // @ts-expect-error: dynamic error shape from backend
-            requestError.response?.data?.error ||
-            "Failed to upload product."
-        );
-      } else {
-        setError("Failed to upload product.");
+    } catch (requestError) {
+      let errMsg = "Failed to upload product.";
+      if (
+        requestError && typeof requestError === "object" &&
+        "response" in requestError && requestError.response && typeof requestError.response === "object" &&
+        "data" in requestError.response && requestError.response.data && typeof requestError.response.data === "object"
+      ) {
+        const data = (requestError.response as { data?: { details?: string[]; message?: string; error?: string } }).data;
+        const details = data?.details;
+        const detailedMessage = Array.isArray(details) && details.length > 0 ? details[0] : undefined;
+        errMsg = detailedMessage || data?.message || data?.error || errMsg;
+      } else if (requestError instanceof Error) {
+        errMsg = requestError.message;
       }
-    } finally {
+      setError(errMsg);
+    }
+    finally {
       setSubmitting(false);
     }
   };
