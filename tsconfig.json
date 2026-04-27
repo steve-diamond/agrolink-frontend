@@ -5,7 +5,6 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -27,6 +26,9 @@
       "lib/*": ["lib/*"],
       "models/*": ["models/*"]
     }
+      "strict": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true
   },
   "include": [
     "**/*.ts",

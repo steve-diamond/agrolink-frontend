@@ -49,23 +49,21 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <AuthShell
-      eyebrow="Account Recovery"
-      title="Forgot Password"
-      subtitle="Recover your access quickly. Submit your registered email and we will guide you through a secure password reset process."
-      bullets={[
-        "Secure account recovery workflow",
-        "Response from DOS Agrolink support",
-        "Fast assistance for marketplace users",
-      ]}
-      imageA={{ src: "/agropro/images/news1.jpg", alt: "Support representative assisting a customer" }}
-      imageB={{ src: "/agropro/images/service3.jpg", alt: "Agricultural service coordination" }}
-    >
+    <AuthShell>
       <section className="card rounded-2xl p-5 sm:p-7">
         <div className="mb-5">
           <p className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Account Recovery</p>
-          <h2 className="m-0 mt-2 text-2xl font-bold text-green-950">Reset Support Request</h2>
-          <p className="mb-0 mt-1 text-sm text-slate-600">Enter the email linked to your account and send your request to our support team.</p>
+          <h2 className="m-0 mt-2 text-2xl font-bold text-green-950">Forgot Password</h2>
+          <p className="mb-0 mt-1 text-sm text-slate-600">Recover your access quickly. Submit your registered email and we will guide you through a secure password reset process.</p>
+          <ul className="mt-2 mb-0 text-xs text-slate-500 list-disc pl-5">
+            <li>Secure account recovery workflow</li>
+            <li>Response from DOS Agrolink support</li>
+            <li>Fast assistance for marketplace users</li>
+          </ul>
+          <div className="flex gap-2 mt-3">
+            <img src="/agropro/images/news1.jpg" alt="Support representative assisting a customer" className="w-16 h-16 rounded object-cover" />
+            <img src="/agropro/images/service3.jpg" alt="Agricultural service coordination" className="w-16 h-16 rounded object-cover" />
+          </div>
         </div>
 
         {sent ? (

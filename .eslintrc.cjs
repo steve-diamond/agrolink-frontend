@@ -8,6 +8,7 @@ module.exports = {
     'prefer-const': 'error',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     '@next/next/no-img-element': 'warn',
+    '@typescript-eslint/no-explicit-any': 'error',
   },
   settings: {
     react: {
