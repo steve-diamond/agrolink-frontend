@@ -53,7 +53,6 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
       getFarmingTips(),
     ])
       .then(([ordersRes, loansRes, shipmentsRes, storageRes, tipsRes]) => {
-        type OrdersApiResponse = Order[] | { orders: Order[] };
         function isOrdersArray(res: unknown): res is Order[] {
           return Array.isArray(res) && res.every(order => typeof order === 'object' && order !== null && '_id' in order);
         }
@@ -75,7 +74,11 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
         setLoans(loansRes);
         setShipments(shipmentsRes);
         setStorage(storageRes);
-        setFarmingTips(Array.isArray(tipsRes) ? tipsRes : []);
+        setFarmingTips(
+          Array.isArray(tipsRes)
+            ? tipsRes.map((tip) => ({ title: tip._id, content: tip.text }))
+            : []
+        );
       })
       .catch(() => {
         setOrders([]);
@@ -191,7 +194,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
           <h3>Farming Tips</h3>
           <ul className="dash-tips">
             {farmingTips.length > 0 ? (
-              farmingTips.slice(0, 3).map((tip) => <li key={tip._id}>{tip.text}</li>)
+              farmingTips.slice(0, 3).map((tip) => <li key={tip.title}>{tip.content}</li>)
             ) : (
               <li>No tips available</li>
             )}
@@ -238,10 +241,10 @@ function BuyerDashboard({ user }: { user: AuthUser }) {
   useEffect(() => {
     API.get("/api/orders")
       .then((res) => {
-        const data = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data?.orders)
-          ? res.data.orders
+        const data = Array.isArray(res)
+          ? res
+          : Array.isArray((res as { orders?: unknown[] })?.orders)
+          ? (res as { orders: unknown[] }).orders
           : [];
         setOrders(data);
       })
