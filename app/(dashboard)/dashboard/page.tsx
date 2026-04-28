@@ -53,11 +53,24 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
       getFarmingTips(),
     ])
       .then(([ordersRes, loansRes, shipmentsRes, storageRes, tipsRes]) => {
-        const allOrders = Array.isArray(ordersRes)
-          ? ordersRes
-          : Array.isArray((ordersRes as any)?.orders)
-          ? (ordersRes as any).orders
-          : [];
+        type OrdersApiResponse = Order[] | { orders: Order[] };
+        function isOrdersArray(res: unknown): res is Order[] {
+          return Array.isArray(res) && res.every(order => typeof order === 'object' && order !== null && '_id' in order);
+        }
+        function isOrdersObject(res: unknown): res is { orders: Order[] } {
+          return (
+            typeof res === 'object' &&
+            res !== null &&
+            'orders' in res &&
+            Array.isArray((res as { orders: unknown }).orders)
+          );
+        }
+        let allOrders: Order[] = [];
+        if (isOrdersArray(ordersRes)) {
+          allOrders = ordersRes;
+        } else if (isOrdersObject(ordersRes)) {
+          allOrders = ordersRes.orders;
+        }
         setOrders(allOrders);
         setLoans(loansRes);
         setShipments(shipmentsRes);
