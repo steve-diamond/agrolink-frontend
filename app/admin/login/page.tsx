@@ -48,7 +48,7 @@ export default function AdminLoginPage() {
             email: attemptEmail,
             password: form.password,
           });
-          const user = res.data.user;
+          const user = res.user;
 
           if (user?.role !== "admin") {
             localStorage.removeItem("token");

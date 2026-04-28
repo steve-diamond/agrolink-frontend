@@ -12,6 +12,9 @@ export type Order = {
   productId?: string | { _id?: string; name?: string };
   products?: Array<{ quantity: number; productId?: { _id?: string; name?: string } | string }>;
   createdAt?: string;
+  totalAmount?: number;
+  totalPrice?: number;
+  paymentStatus?: string;
 };
 
 export async function getOrders(): Promise<Order[]> {
