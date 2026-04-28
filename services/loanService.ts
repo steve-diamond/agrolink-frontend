@@ -1,3 +1,4 @@
+export * from "../src/services/loanService";
 import API from "../src/services/api";
 
 export type Loan = {

@@ -46,7 +46,7 @@ export default function RegisterStatusPage() {
       if (phone.trim()) params.set("phone", phone.trim());
 
       const res = await API.get(`/api/farmer-applications/status?${params.toString()}`);
-      setStatusData(res.data as StatusResponse);
+      setStatusData(res as StatusResponse);
     } catch (err: unknown) {
       if (
         err &&

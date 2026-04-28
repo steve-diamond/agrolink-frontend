@@ -1,3 +1,4 @@
+export * from "../src/services/logisticsService";
 import API from "../src/services/api";
 
 export type Shipment = {

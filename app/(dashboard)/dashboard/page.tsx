@@ -53,10 +53,10 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
       getFarmingTips(),
     ])
       .then(([ordersRes, loansRes, shipmentsRes, storageRes, tipsRes]) => {
-        const allOrders = Array.isArray(ordersRes.data)
-          ? ordersRes.data
-          : Array.isArray(ordersRes.data?.orders)
-          ? ordersRes.data.orders
+        const allOrders = Array.isArray(ordersRes)
+          ? ordersRes
+          : Array.isArray((ordersRes as any)?.orders)
+          ? (ordersRes as any).orders
           : [];
         setOrders(allOrders);
         setLoans(loansRes);

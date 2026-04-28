@@ -1,3 +1,4 @@
+export * from "../src/services/useLocalizedCopy";
 "use client";
 
 import { useEffect, useState } from "react";

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 // In-memory mock DB for demonstration (replace with real DB logic)
 type Order = { _id: string; status?: string; [key: string]: unknown };
 declare global {
-  var orders: Order[];
+  let orders: Order[];
 }
 const orders: Order[] = globalThis.orders || [];
 globalThis.orders = orders;

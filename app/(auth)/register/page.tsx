@@ -1,4 +1,32 @@
 "use client";
+// Add global type declarations for SpeechRecognition APIs if not present
+declare global {
+  interface Window {
+    SpeechRecognition?: typeof SpeechRecognition;
+    webkitSpeechRecognition?: typeof SpeechRecognition;
+  }
+  // Only declare if not already present
+  let SpeechRecognition: {
+    prototype: SpeechRecognition;
+    new (): SpeechRecognition;
+  };
+  interface SpeechRecognition {
+    lang: string;
+    start(): void;
+    stop(): void;
+    onresult: ((event: SpeechRecognitionEvent) => void) | null;
+    onerror: ((event: Event) => void) | null;
+  }
+  interface SpeechRecognitionEvent {
+    results: {
+      [index: number]: {
+        [index: number]: {
+          transcript: string;
+        };
+      };
+    };
+  }
+}
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -644,49 +672,11 @@ export default function RegisterPage() {
     setAccountForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-// Add global type declarations for SpeechRecognition APIs
-declare global {
-  interface Window {
-    SpeechRecognition?: typeof SpeechRecognition;
-    webkitSpeechRecognition?: typeof SpeechRecognition;
-  }
-}
 
-const handleVoiceInput = (field: keyof FarmerForm) => {
-  if (typeof window === "undefined") return;
 
-  const speechApi = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  if (!speechApi) {
-    setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
-    return;
-  }
-
-  setVoiceError("");
-  let recognition: SpeechRecognition;
-  try {
-    recognition = new speechApi();
-  } catch {
-    setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
-    return;
-  }
-  recognition.lang = language === "en" ? "en-NG" : "en-NG";
-  recognition.start();
-
-  recognition.onresult = (event: SpeechRecognitionEvent) => {
-    const transcript = event.results?.[0]?.[0]?.transcript?.trim() ?? "";
-    if (!transcript) return;
-    setFarmerField(field, transcript as FarmerForm[keyof FarmerForm]);
-  };
-
-    recognition.onerror = () => {
-      setVoiceError(getText("Voice input failed. Please type instead.", "Voice input fail. Abeg type am."));
-    };
-  };
-
-  const handleAccountNameVoiceInput = () => {
+  const handleVoiceInput = (field: keyof FarmerForm) => {
     if (typeof window === "undefined") return;
-
     const speechApi =
       (window as Window & { SpeechRecognition?: unknown }).SpeechRecognition ||
       (window as Window & { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition;
@@ -696,21 +686,30 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
       return;
     }
 
+    // Type guard: ensure speechApi is constructable
+    if (typeof speechApi !== "function") {
+      setVoiceError(getText("Voice input is not available on this phone.", "Voice input no dey this phone."));
+      return;
+    }
+
     setVoiceError("");
-    const recognition = new speechApi();
+    const recognition = new (speechApi as new () => SpeechRecognition)();
     recognition.lang = language === "en" ? "en-NG" : "en-NG";
     recognition.start();
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       const transcript = event.results?.[0]?.[0]?.transcript?.trim() ?? "";
       if (!transcript) return;
-      setAccountForm((prev) => ({ ...prev, name: transcript }));
+      setFarmerField(field, transcript as FarmerForm[keyof FarmerForm]);
     };
 
     recognition.onerror = () => {
       setVoiceError(getText("Voice input failed. Please type instead.", "Voice input fail. Abeg type am."));
     };
   };
+
+  // Voice input for account name field (must be in scope for render)
+  const handleAccountNameVoiceInput = () => handleVoiceInput("accountName");
 
   const fileToBase64 = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -723,6 +722,11 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
       reader.onerror = () => reject(new Error("Unable to read file."));
       reader.readAsDataURL(file);
     });
+
+  interface MediaUploadResponse {
+    fileUrl?: string;
+    [key: string]: unknown;
+  }
 
   const uploadMedia = async (file: File, category: "id-photo" | "selfie-with-id") => {
     if (!networkOnline) {
@@ -738,8 +742,8 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
         mimeType: file.type || "image/jpeg",
         dataBase64,
         category,
-      });
-      return String(res?.data?.fileUrl || "");
+      }) as MediaUploadResponse;
+      return String(res?.fileUrl || "");
     } finally {
       setUploadingMedia(false);
     }
@@ -892,7 +896,7 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
       const res = await API.post("/api/onboarding/banks/resolve", {
         bankName: farmerForm.bankName,
         accountNumber: farmerForm.accountNumber,
-      });
+      }) as { data?: { accountName?: string } };
       if (res?.data?.accountName) {
         setFarmerField("accountName", String(res.data.accountName));
       }
@@ -1035,9 +1039,10 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
       try {
         await API.post("/api/auth/register", accountPayload);
       } catch (registerErr: unknown) {
-        const registerStatus = registerErr?.response?.status;
+        const err = registerErr as { response?: { status?: number; data?: { message?: string; error?: string } }; message?: string };
+        const registerStatus = err.response?.status;
         const registerMessage = String(
-          registerErr?.response?.data?.message || registerErr?.response?.data?.error || registerErr?.message || ""
+          err.response?.data?.message || err.response?.data?.error || err.message || ""
         );
         const isExistingAccount = registerStatus === 409 || /already exists/i.test(registerMessage);
         const isDbUnavailableOnRegister =
@@ -1066,16 +1071,17 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
         }
       }
 
-      const res = await API.post("/api/farmer-applications", { ...applicationPayload, status: "pending" });
+      const res = await API.post("/api/farmer-applications", { ...applicationPayload, status: "pending" }) as { data?: { applicationId?: string; kycPending?: boolean } };
       const appId = res?.data?.applicationId || uid();
       const kycPending = res?.data?.kycPending ? "1" : "0";
       clearDraft();
       router.push(`/register/success?name=${encodeURIComponent(accountForm.name.trim())}&appId=${encodeURIComponent(appId)}&queued=0&kycPending=${kycPending}`);
-    } catch (err: unknown) {
-      const statusCode = err?.response?.status;
-      const errorMessage = String(
-        err?.response?.data?.message || err?.response?.data?.error || err?.message || ""
-      );
+      } catch (err: unknown) {
+        const error = err as { response?: { status?: number; data?: { message?: string; error?: string } }; message?: string };
+        const statusCode = error.response?.status;
+        const errorMessage = String(
+          error.response?.data?.message || error.response?.data?.error || error.message || ""
+        );
       const isDbUnavailable =
         /buffering timed out|server selection timed out|mongodb|mongo|econnrefused/i.test(errorMessage) ||
         statusCode === 503;
@@ -1102,9 +1108,10 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
         return;
       }
 
+      const typedErr = err as { response?: { data?: { message?: string; error?: string } } };
       setError(
-        err?.response?.data?.message ||
-          err?.response?.data?.error ||
+        typedErr?.response?.data?.message ||
+          typedErr?.response?.data?.error ||
           getText("Registration failed. Please try again.", "Registration fail. Try again.")
       );
     } finally {
@@ -1279,7 +1286,8 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
               const fileUrl = await uploadMedia(file, "id-photo");
               if (fileUrl) setFarmerField("idPhotoUrl", fileUrl);
             } catch (err: unknown) {
-              setError(err?.response?.data?.message || getText("ID upload failed. Try again.", "ID upload fail. Try again."));
+              const typedErr = err as { response?: { data?: { message?: string } } };
+              setError(typedErr?.response?.data?.message || getText("ID upload failed. Try again.", "ID upload fail. Try again."));
             }
           }}
           className="min-h-12 rounded-lg border border-green-200 bg-white px-3 py-2"
@@ -1301,7 +1309,8 @@ const handleVoiceInput = (field: keyof FarmerForm) => {
               const fileUrl = await uploadMedia(file, "selfie-with-id");
               if (fileUrl) setFarmerField("selfieWithIdUrl", fileUrl);
             } catch (err: unknown) {
-              setError(err?.response?.data?.message || getText("Selfie upload failed. Try again.", "Selfie upload fail. Try again."));
+              const typedErr = err as { response?: { data?: { message?: string } } };
+              setError(typedErr?.response?.data?.message || getText("Selfie upload failed. Try again.", "Selfie upload fail. Try again."));
             }
           }}
           className="min-h-12 rounded-lg border border-green-200 bg-white px-3 py-2"

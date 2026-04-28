@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import AuthShell from "../_components/AuthShell";
 import API from "@/services/api";
@@ -13,6 +14,10 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+
+  type ForgotPasswordRequest = {
+    email: string;
+  };
   type ForgotPasswordResponse = {
     resetToken?: string;
   };
@@ -23,11 +28,11 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await API.post<ForgotPasswordResponse>(
+      const res = await API.post<ForgotPasswordRequest, ForgotPasswordResponse>(
         "/api/auth/forgot-password",
         { email }
       );
-      const resetToken = res.data?.resetToken;
+      const resetToken = res.resetToken;
 
       setSent(true);
 
@@ -49,7 +54,18 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <AuthShell>
+    <AuthShell
+      eyebrow="Account Recovery"
+      title="Forgot Password"
+      subtitle="Recover your access quickly. Submit your registered email and we will guide you through a secure password reset process."
+      bullets={[
+        "Secure account recovery workflow",
+        "Response from DOS Agrolink support",
+        "Fast assistance for marketplace users",
+      ]}
+      imageA={{ src: "/agropro/images/news1.jpg", alt: "Support representative assisting a customer" }}
+      imageB={{ src: "/agropro/images/service3.jpg", alt: "Agricultural service coordination" }}
+    >
       <section className="card rounded-2xl p-5 sm:p-7">
         <div className="mb-5">
           <p className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Account Recovery</p>
@@ -61,8 +77,8 @@ export default function ForgotPasswordPage() {
             <li>Fast assistance for marketplace users</li>
           </ul>
           <div className="flex gap-2 mt-3">
-            <img src="/agropro/images/news1.jpg" alt="Support representative assisting a customer" className="w-16 h-16 rounded object-cover" />
-            <img src="/agropro/images/service3.jpg" alt="Agricultural service coordination" className="w-16 h-16 rounded object-cover" />
+            <Image src="/agropro/images/news1.jpg" alt="Support representative assisting a customer" width={64} height={64} className="w-16 h-16 rounded object-cover" />
+            <Image src="/agropro/images/service3.jpg" alt="Agricultural service coordination" width={64} height={64} className="w-16 h-16 rounded object-cover" />
           </div>
         </div>
 

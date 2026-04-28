@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 // In-memory mock DB for demonstration (replace with real DB logic)
 type StorageRecord = { _id: string; released?: boolean; [key: string]: unknown };
 declare global {
-  var storage: StorageRecord[];
+  let storage: StorageRecord[];
 }
 const storage: StorageRecord[] = globalThis.storage || [];
 globalThis.storage = storage;
