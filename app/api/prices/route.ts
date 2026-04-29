@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from 'lib/mongoose.ts';
+import { dbConnect } from 'lib/mongoose';
 import CommodityPrice from 'models/CommodityPrice.ts';
 
 export async function GET(req: NextRequest) {

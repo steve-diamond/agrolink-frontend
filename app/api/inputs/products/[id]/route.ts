@@ -1,5 +1,5 @@
-import { dbConnect } from 'lib/mongoose.ts';
-import InputProduct from 'models/InputProduct.ts';
+import { dbConnect } from 'lib/mongoose';
+const InputProduct = require('models/InputProduct');
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(

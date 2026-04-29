@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { dbConnect } from 'lib/mongoose.ts';
+import { dbConnect } from 'lib/mongoose';
 import UserPreference from 'models/UserPreference.ts';
 
 export async function POST(req: NextRequest) {

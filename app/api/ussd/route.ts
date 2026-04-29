@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from 'lib/mongoose.ts';
+import { dbConnect } from 'lib/mongoose';
 import CommodityPrice from 'models/CommodityPrice.ts';
 // import Listing from 'models/Listing.ts'; // Uncomment and implement if Listing model exists
 import { sendListingConfirmedSMS } from 'lib/sms.ts';

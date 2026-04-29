@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from 'lib/mongoose.ts';
+import { dbConnect } from 'lib/mongoose';
 import InsuranceApplication from 'models/InsuranceApplication.ts';
 import { sendSMS } from 'lib/sms.ts';
 
