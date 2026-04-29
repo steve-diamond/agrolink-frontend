@@ -1,3 +1,5 @@
+
+type LoginResponse = { user: { role?: string; [key: string]: any } };
 "use client";
 
 import { useEffect, useState } from "react";
@@ -44,7 +46,8 @@ export default function AdminLoginPage() {
 
       for (const attemptEmail of emailAttempts) {
         try {
-          const res = await API.post("/api/auth/login", {
+
+          const res = await API.post<typeof form, LoginResponse>("/api/auth/login", {
             email: attemptEmail,
             password: form.password,
           });
