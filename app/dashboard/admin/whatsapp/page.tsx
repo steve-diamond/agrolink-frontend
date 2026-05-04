@@ -1,17 +1,34 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import WhatsAppSession, { IWhatsAppSession } from 'models/whatsappSession';
+import WhatsAppSession from 'models/whatsappSession';
+
+type WhatsAppSessionLean = {
+  phone_number: string;
+  current_menu: string;
+  context: Record<string, unknown>;
+  last_active: Date;
+  _id?: string;
+};
 import { dbConnect } from 'lib/mongoose';
 
 export default function WhatsAppAdminMonitor() {
-  const [sessions, setSessions] = useState<IWhatsAppSession[]>([]);
+  const [sessions, setSessions] = useState<WhatsAppSessionLean[]>([]);
 
   useEffect(() => {
     (async () => {
       await dbConnect();
-      const sessions = await WhatsAppSession.find({}).sort({ last_active: -1 }).limit(50).lean();
-      setSessions(sessions || []);
+      const sessionsRaw = await WhatsAppSession.find({}).sort({ last_active: -1 }).limit(50).lean();
+      // Map to WhatsAppSessionLean[] with fallback for missing fields
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mappedSessions: WhatsAppSessionLean[] = (sessionsRaw || []).map((s: any) => ({
+        phone_number: s.phone_number ?? '',
+        current_menu: s.current_menu ?? '',
+        context: s.context ?? {},
+        last_active: s.last_active ? new Date(s.last_active) : new Date(),
+        _id: s._id,
+      }));
+      setSessions(mappedSessions);
     })();
   }, []);
 
@@ -39,7 +56,7 @@ export default function WhatsAppAdminMonitor() {
           {sessions.map(s => (
             <tr key={s.phone_number}>
               <td className="py-2 px-4">+{s.phone_number.slice(0, 3)}****{s.phone_number.slice(-3)}</td>
-              <td className="py-2 px-4">{s.context?.last_message || '-'}</td>
+              <td className="py-2 px-4">{typeof s.context?.last_message === 'string' ? s.context.last_message : '-'}</td>
               <td className="py-2 px-4">{s.current_menu}</td>
               <td className="py-2 px-4">{s.last_active ? new Date(s.last_active).toLocaleString() : '-'}</td>
               <td className="py-2 px-4">

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from 'lib/mongoose';
-import InsuranceApplication from 'models/InsuranceApplication.ts';
-import { sendSMS } from 'lib/sms.ts';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const InsuranceApplication = require('models/InsuranceApplication');
+import { sendSMS } from 'lib/sms';
 
 export async function POST(req: NextRequest) {
   await dbConnect();

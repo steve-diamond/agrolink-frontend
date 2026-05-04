@@ -20,7 +20,7 @@ export default function InputsMarketplacePage() {
   const [nafdac, setNafdac] = useState(false);
   const { data, isLoading } = useSWR(
     `/api/inputs/products?${category ? `category=${category}&` : ''}${state ? `state=${state}&` : ''}minPrice=${price[0]}&maxPrice=${price[1]}${nafdac ? '&nafdac=1' : ''}`,
-    (url) => fetch(url).then((r) => r.json())
+    (url: string) => fetch(url).then((r) => r.json())
   );
   const addItem = useCartStore((s) => s.addItem);
 
@@ -74,7 +74,19 @@ export default function InputsMarketplacePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {data?.products?.map((product: import('components/inputs/ProductCard').ProductCardProps) => (
-              <ProductCard key={product.id} {...product} onAddToCart={() => addItem({ ...product, quantity: 1 })} />
+              <ProductCard
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                key={(product as any).id ?? `${product.name}-${product.seller_name}-${product.state}`}
+                {...product}
+                onAddToCart={() =>
+                  addItem({
+                    ...product,
+                    quantity: 1,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    id: (product as any).id ?? `${product.name}-${product.seller_name}-${product.state}`,
+                  })
+                }
+              />
             ))}
           </div>
         )}

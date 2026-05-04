@@ -199,9 +199,14 @@ export default function Marketplace() {
   }, []);
 
   // Simulate grade info for demo: randomly assign A/B/C/U
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function getProductGrade(product: Product): "A"|"B"|"C"|"U" {
     // TODO: Replace with real grade lookup from product.produce_grade or similar
-    if (product.grade) return product.grade;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((product as any).produce_grade && ["A","B","C","U"].includes((product as any).produce_grade)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (product as any).produce_grade;
+    }
     const hash = product._id.charCodeAt(0) % 4;
     return (["A","B","C","U"] as const)[hash]; // This is safe, hash is 0-3
   }

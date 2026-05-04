@@ -30,7 +30,11 @@ export default function ProductUploadPage() {
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
+    let checked = false;
+    if (type === 'checkbox' && 'checked' in e.target) {
+      checked = (e.target as HTMLInputElement).checked;
+    }
     setForm((f) => ({
       ...f,
       [name]: type === 'checkbox' ? checked : value,

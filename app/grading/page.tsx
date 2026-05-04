@@ -57,7 +57,7 @@ export default function GradingPage() {
     let offset = 0;
     for (const grade of ['A', 'B', 'C'] as Grade[]) {
       const criteria = standards[grade].criteria;
-      const checked = criteria.map((_, i) => criteriaChecked[i + offset]);
+      const checked = criteria.map((_: unknown, i: number) => criteriaChecked[i + offset]);
       if (checked.every(Boolean)) {
         setSuggestedGrade(grade);
         return;
@@ -140,7 +140,7 @@ export default function GradingPage() {
               <div key={grade} className="mb-2">
                 <div className="font-bold">Grade {grade}: {GRADING_STANDARDS[commodity][grade].label}</div>
                 <ul className="ml-4">
-                  {criteria.map((crit, idx) => (
+                  {criteria.map((crit: string, idx: number) => (
                     <li key={crit}>
                       <label>
                         <input

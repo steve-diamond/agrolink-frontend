@@ -29,12 +29,13 @@ export default function ClientRootLayout({ children }: { children: React.ReactNo
     const poll = async () => {
       try {
         const res = await API.get("/notifications");
-        const notifs = Array.isArray(res.data) ? res.data as Notification[] : [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const notifs = Array.isArray(res) ? res as Notification[] : (Array.isArray((res as any).data) ? (res as any).data as Notification[] : []);
         if (notifs.length > 0) {
           const newest = notifs[0];
           if (newest && newest._id !== lastIdRef.current) {
             setLatestNotification(newest);
-            lastIdRef.current = newest._id;
+            lastIdRef.current = newest._id ?? null;
           }
         }
       } catch {

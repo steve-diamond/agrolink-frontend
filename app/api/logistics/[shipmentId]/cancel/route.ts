@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 // In-memory mock DB for demonstration (replace with real DB logic)
 type Shipment = { _id: string; status?: string; [key: string]: unknown };
-declare global {
-  let shipments: Shipment[];
+interface GlobalWithShipments extends globalThis.Global {
+  shipments: Shipment[];
 }
-const shipments: Shipment[] = globalThis.shipments || [];
-globalThis.shipments = shipments;
+const g = globalThis as GlobalWithShipments;
+const shipments: Shipment[] = g.shipments || [];
+g.shipments = shipments;
 
 export async function POST(
   req: NextRequest,

@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 // In-memory mock DB for demonstration (replace with real DB logic)
 type StorageRecord = { _id: string; released?: boolean; [key: string]: unknown };
-declare global {
-  let storage: StorageRecord[];
-}
-const storage: StorageRecord[] = globalThis.storage || [];
-globalThis.storage = storage;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const storage: StorageRecord[] = (globalThis as any).storage || [];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(globalThis as any).storage = storage;
 
 export async function POST(
   req: NextRequest,

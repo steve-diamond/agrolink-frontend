@@ -107,13 +107,15 @@ export default function AgentGradingPage() {
         <tbody>
           {submissions.map((s) => (
             <tr key={s.id} className="border-b">
-              <td className="p-2">{s.commodity}</td>
-              <td className="p-2">{s.grade}</td>
+              <td className="p-2">{typeof s.commodity === 'string' ? s.commodity : '-'}</td>
+              <td className="p-2">{typeof s.grade === 'string' ? s.grade : '-'}</td>
               <td className="p-2">
                 <div className="flex gap-1">
-                  {s.photos?.map((url: string, i: number) => (
-                    <Image key={i} src={url} alt="photo" width={40} height={40} className="h-10 w-10 object-cover rounded" />
-                  ))}
+                  {Array.isArray(s.photos)
+                    ? s.photos.map((url: string, i: number) => (
+                        <Image key={i} src={url} alt="photo" width={40} height={40} className="h-10 w-10 object-cover rounded" />
+                      ))
+                    : null}
                 </div>
               </td>
               <td className="p-2">
@@ -126,11 +128,13 @@ export default function AgentGradingPage() {
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-lg font-bold mb-2">{selected.commodity} - Grade {selected.grade}</h2>
+            <h2 className="text-lg font-bold mb-2">{typeof selected.commodity === 'string' ? selected.commodity : '-'} - Grade {typeof selected.grade === 'string' ? selected.grade : '-'}</h2>
             <div className="mb-2 flex gap-2">
-              {selected.photos?.map((url: string, i: number) => (
-                <Image key={i} src={url} alt="photo" width={64} height={64} className="h-16 w-16 object-cover rounded" />
-              ))}
+              {Array.isArray(selected.photos)
+                ? selected.photos.map((url: string, i: number) => (
+                    <Image key={i} src={url} alt="photo" width={64} height={64} className="h-16 w-16 object-cover rounded" />
+                  ))
+                : null}
             </div>
             <div className="mb-2">
               <strong>Criteria Met:</strong>

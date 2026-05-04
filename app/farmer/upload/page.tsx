@@ -70,7 +70,16 @@ export default function FarmerUploadPage() {
         return;
       }
 
-      const result = await flushOfflineQueue((payload: ProductForm) => createProduct(payload));
+      const result = await flushOfflineQueue((payload: Record<string, unknown>) => {
+        // Convert price and quantity to numbers for NewProduct type
+        const fixedPayload = {
+          ...payload,
+          price: typeof payload.price === 'string' ? Number(payload.price) : payload.price,
+          quantity: typeof payload.quantity === 'string' ? Number(payload.quantity) : payload.quantity,
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return createProduct(fixedPayload as any);
+      });
       if (result.processed > 0) {
         const liveCopy = getCopy(getStoredLanguage());
         setSuccess(`${liveCopy.syncedOfflineUploads}: ${result.processed}`);

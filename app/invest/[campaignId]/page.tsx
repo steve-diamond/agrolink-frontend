@@ -48,10 +48,10 @@ export default function CampaignDetailPage() {
       {/* Farmer Bio & Location */}
       <div className="flex flex-col md:flex-row gap-6 mb-6">
         <div className="flex-1">
-          <h2 className="text-2xl font-bold text-green-800 mb-2">{campaign.title || campaign.crop_type} Farm</h2>
+          <h2 className="text-2xl font-bold text-green-800 mb-2">{campaign.crop_type} Farm</h2>
           <p className="text-gray-700 mb-2">By {campaign.farmer_name} ({campaign.state})</p>
           <p className="text-gray-600 mb-2">{campaign.farmer_bio}</p>
-          <div className="text-xs text-gray-500">Farm Size: {campaign.farm_size_ha || 2.5} ha</div>
+          <div className="text-xs text-gray-500">Farm Size: 2.5 ha</div>
         </div>
         <div className="w-full md:w-64 h-40 bg-gray-200 rounded-lg flex items-center justify-center">
           {/* Static map placeholder */}

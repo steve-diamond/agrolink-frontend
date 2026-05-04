@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from 'lib/mongoose';
-import CommodityPrice from 'models/CommodityPrice.ts';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const CommodityPrice = require('models/CommodityPrice');
 
 export async function GET(req: NextRequest) {
   await dbConnect();
