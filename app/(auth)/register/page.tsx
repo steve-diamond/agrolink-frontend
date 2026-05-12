@@ -672,11 +672,12 @@ export default function RegisterPage() {
     }
 
     setVoiceError("");
-    const recognition = new (speechApi as new () => SpeechRecognition)();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognition = new (speechApi as new () => any)();
     recognition.lang = language === "en" ? "en-NG" : "en-NG";
     recognition.start();
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: { results?: { [i: number]: { [j: number]: { transcript?: string } } } }) => {
       const transcript = event.results?.[0]?.[0]?.transcript?.trim() ?? "";
       if (!transcript) return;
       setFarmerField(field, transcript as FarmerForm[keyof FarmerForm]);
