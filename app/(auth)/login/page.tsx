@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import API from "@/services/api";
 import { useRouter } from "next/navigation";
 import { useLocalizedCopy } from "@services/useLocalizedCopy";
 import AuthShell from "../_components/AuthShell";
@@ -37,33 +36,36 @@ function LoginForm() {
     setIsSubmitting(true);
 
     try {
-      type LoginResponse = { token: string; user: unknown };
-      const res = await API.post("/api/auth/login", form) as { data: LoginResponse };
+      type LoginData = { token: string; user: { role?: string } };
+      type LoginResponse = { status: string; message?: string; data: LoginData };
+
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const json: LoginResponse = await res.json();
+
+      if (!res.ok || json.status !== "success") {
+        setError(json.message || "Login failed");
+        return;
+      }
 
       persistRememberedEmail(form.email);
+      localStorage.setItem("token", json.data.token);
+      localStorage.setItem("user", JSON.stringify(json.data.user));
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
-      alert("Login successful");
-      router.push("/dashboard");
-    } catch (error: unknown) {
-      let message = "Login failed";
-      if (
-        error &&
-        typeof error === 'object' &&
-        'response' in error &&
-        error.response &&
-        typeof error.response === 'object' &&
-        'data' in error.response &&
-        error.response.data &&
-        typeof error.response.data === 'object' &&
-        'message' in error.response.data
-      ) {
-        message = (error.response as { data?: { message?: string } })?.data?.message || message;
+      const role = json.data.user?.role;
+      if (role === "admin") {
+        router.push("/admin");
+      } else if (role === "farmer") {
+        router.push("/farmer");
+      } else {
+        router.push("/dashboard");
       }
-      setError(message);
-      alert(message);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "Login failed");
     } finally {
       setIsSubmitting(false);
     }
