@@ -1,8 +1,4 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 
 
 type GetOptions = {

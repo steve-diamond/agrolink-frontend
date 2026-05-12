@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-<<<<<<< Updated upstream
 interface CachedMongoose {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -10,10 +9,6 @@ declare global {
   // eslint-disable-next-line no-var
   var mongoose: CachedMongoose | undefined;
 }
-=======
-type MongooseCache = { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null };
-let cached = (global as unknown as { mongoose?: MongooseCache }).mongoose;
->>>>>>> Stashed changes
 
 let cached = global.mongoose;
 if (!cached) {
@@ -31,7 +26,6 @@ export async function dbConnect() {
     cache.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
     }).then((m) => m);
-<<<<<<< Updated upstream
   }
   try {
     cache.conn = await cache.promise;
@@ -39,8 +33,6 @@ export async function dbConnect() {
     // Clear the cached promise so the next request gets a fresh attempt
     cache.promise = null;
     throw err;
-=======
->>>>>>> Stashed changes
   }
   return cache.conn;
 }

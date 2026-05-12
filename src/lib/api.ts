@@ -1,8 +1,5 @@
-<<<<<<< Updated upstream
 import type { ApiResponse } from "../../types/api";
 
-=======
->>>>>>> Stashed changes
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 const API = {
