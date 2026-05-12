@@ -1,9 +1,6 @@
 import type { ApiResponse } from "../types/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-if (!API_URL) {
-  throw new Error("Missing NEXT_PUBLIC_API_URL");
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 const API = {
   get: async <T>(endpoint: string): Promise<ApiResponse<T>> => {

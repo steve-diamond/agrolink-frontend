@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // Warehouse Service API route
 // TODO: Replace with real database logic
 const mockStorage = [

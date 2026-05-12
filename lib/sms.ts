@@ -1,13 +1,16 @@
 import AfricasTalking from 'africastalking';
 
-const username = process.env.AT_USERNAME!;
-const apiKey = process.env.AT_API_KEY!;
+function getSMS() {
+  const username = process.env.AT_USERNAME!;
+  const apiKey = process.env.AT_API_KEY!;
+  const at = AfricasTalking({ apiKey, username });
+  return at.SMS;
+}
+
 const senderId = process.env.AT_SENDER_ID || 'DosAgroLink';
 
-const at = AfricasTalking({ apiKey, username });
-const sms = at.SMS;
-
 export async function sendSMS(phone: string, message: string) {
+  const sms = getSMS();
   return sms.send({
     to: [phone],
     message,

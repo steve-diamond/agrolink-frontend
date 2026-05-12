@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // Loan Service API route
 // TODO: Replace with real database logic
 let mockLoans = [

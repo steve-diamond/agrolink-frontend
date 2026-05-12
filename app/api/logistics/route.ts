@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // Logistics Service API route
 // TODO: Replace with real database logic
 const mockShipments = [

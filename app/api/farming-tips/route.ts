@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // Farming Tips API route
 // TODO: Replace with real database logic
 const mockTips = [
