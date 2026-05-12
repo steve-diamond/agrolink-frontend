@@ -27,6 +27,12 @@ export async function dbConnect() {
       bufferCommands: false,
     }).then((m) => m);
   }
-  cache.conn = await cache.promise;
+  try {
+    cache.conn = await cache.promise;
+  } catch (err) {
+    // Clear the cached promise so the next request gets a fresh attempt
+    cache.promise = null;
+    throw err;
+  }
   return cache.conn;
 }

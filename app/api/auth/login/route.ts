@@ -60,9 +60,9 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Login failed';
+    console.error('[/api/auth/login]', err);
     return NextResponse.json(
-      { status: 'error', message },
+      { status: 'error', message: 'Unable to process login. Please try again.' },
       { status: 500 }
     );
   }

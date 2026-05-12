@@ -59,9 +59,9 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Registration failed';
+    console.error('[/api/auth/register]', err);
     return NextResponse.json(
-      { status: 'error', message },
+      { status: 'error', message: 'Unable to complete registration. Please try again.' },
       { status: 500 }
     );
   }
