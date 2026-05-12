@@ -65,7 +65,7 @@ export function listenToOfflineQueueChanges(onChange: () => void) {
   };
 }
 
-export async function flushOfflineQueue(createProductFn: (payload: NewProduct) => Promise<ApiResponse<Product>>) {
+export async function flushOfflineQueue(createProductFn: (payload: NewProduct) => Promise<unknown>) {
   const items = readQueue();
   if (!items.length) {
     return { processed: 0, failed: 0 };

@@ -66,7 +66,7 @@ const FarmCampaignCard: React.FC<FarmCampaignCardProps> = ({ campaign }) => {
           </div>
           <div className="flex justify-between text-xs mt-1">
             <span>₦{data.raised_amount.toLocaleString()} / ₦{data.target_amount.toLocaleString()}</span>
-            <span>{progress}%</span>
+            <span>{percent}%</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 text-xs mb-2">

@@ -12,7 +12,7 @@ export type Shipment = {
 };
 
 export async function getShipments(userId?: string): Promise<Shipment[]> {
-  const res = await API.get("/api/logistics", { params: userId ? { userId } : {} });
-  if (Array.isArray(res.data?.shipments)) return res.data.shipments as Shipment[];
+  const res = await API.get<{ data?: { shipments?: unknown[] } }>("/api/logistics", { params: userId ? { userId } : {} });
+  if (Array.isArray(res.data?.shipments)) return res.data!.shipments as Shipment[];
   return [];
 }

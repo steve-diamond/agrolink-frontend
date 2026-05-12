@@ -10,9 +10,9 @@ export type User = {
 };
 
 export async function getUsers(): Promise<User[]> {
-  const res = await API.get("/api/users");
+  const res = await API.get<{ data?: User[] | { users?: User[]; data?: { items?: User[] } } }>("/api/users");
   if (Array.isArray(res.data)) return res.data as User[];
-  if (Array.isArray(res.data?.users)) return res.data.users as User[];
-  if (Array.isArray(res.data?.data?.items)) return res.data.data.items as User[];
+  if (Array.isArray((res.data as { users?: unknown[] })?.users)) return (res.data as { users: User[] }).users;
+  if (Array.isArray((res.data as { data?: { items?: unknown[] } })?.data?.items)) return (res.data as { data: { items: User[] } }).data.items;
   return [];
 }

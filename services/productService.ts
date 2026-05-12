@@ -11,6 +11,8 @@ export type Product = {
   imageUrl?: string;
   farmer?: string;
   approved?: boolean;
+  grade?: "A" | "B" | "C" | "U";
+  commodity?: string;
   createdAt?: string;
   updatedAt?: string;
   // Optionally, add other fields as needed
@@ -50,17 +52,17 @@ export function normalizeProductsResponse(raw: unknown): Product[] {
 }
 
 export async function getProducts(filters: ProductFilters = {}): Promise<Product[]> {
-  const res = await API.get("/api/products", {
+  const res = await API.get<unknown>("/api/products", {
     params: {
       ...filters,
       approved:
         typeof filters.approved === "boolean" ? String(filters.approved) : undefined,
     },
   });
-  return normalizeProductsResponse(res.data as unknown);
+  return normalizeProductsResponse((res as { data?: unknown }).data);
 }
 
 export async function createProduct(data: NewProduct): Promise<Product> {
-  const res = await API.post<Product>("/api/products", data);
+  const res = await API.post<unknown, { data: Product }>("/api/products", data);
   return res.data;
 }

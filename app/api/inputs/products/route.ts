@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { dbConnect } from 'lib/mongoose';
 import InputProduct from 'models/InputProduct';
 

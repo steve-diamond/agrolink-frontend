@@ -1,4 +1,3 @@
-import type { Record } from 'typescript';
 
 export type Grade = 'A' | 'B' | 'C';
 

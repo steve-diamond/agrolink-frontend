@@ -68,7 +68,7 @@ export const GradeCriteriaModal: React.FC<{
       <div className="bg-white rounded-lg p-6 max-w-md w-full">
         <h2 className="text-lg font-bold mb-2">{commodity} - Grade {grade}: {standard?.label}</h2>
         <ul className="list-disc ml-5 mb-4">
-          {standard?.criteria.map((c, i) => (
+          {standard?.criteria.map((c: string, i: number) => (
             <li key={i}>{c}</li>
           ))}
         </ul>

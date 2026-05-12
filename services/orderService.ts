@@ -18,9 +18,9 @@ export type Order = {
 };
 
 export async function getOrders(): Promise<Order[]> {
-  const res = await API.get("/api/orders");
+  const res = await API.get<{ data?: Order[] | { orders?: Order[]; data?: { items?: Order[] } } }>("/api/orders");
   if (Array.isArray(res.data)) return res.data as Order[];
-  if (Array.isArray(res.data?.orders)) return res.data.orders as Order[];
-  if (Array.isArray(res.data?.data?.items)) return res.data.data.items as Order[];
+  if (Array.isArray((res.data as { orders?: unknown[] })?.orders)) return (res.data as { orders: Order[] }).orders;
+  if (Array.isArray((res.data as { data?: { items?: unknown[] } })?.data?.items)) return (res.data as { data: { items: Order[] } }).data.items;
   return [];
 }

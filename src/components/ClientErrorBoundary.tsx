@@ -1,1 +1,1 @@
-export { default } from "../../../components/ClientErrorBoundary";
+export { default } from "../../components/ClientErrorBoundary";

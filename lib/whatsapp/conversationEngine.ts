@@ -8,12 +8,14 @@ import WhatsAppSession from '../../models/whatsappSession';
 export async function handleConversation(payload: Record<string, unknown>) {
   await dbConnect();
   // Extract phone number and message
-  const entry = payload.entry?.[0];
-  const changes = entry?.changes?.[0];
-  const message = changes?.value?.messages?.[0];
+  const entries = payload.entry as Array<Record<string, unknown>> | undefined;
+  const entry = entries?.[0];
+  const changes = (entry?.changes as Array<Record<string, unknown>> | undefined)?.[0];
+  const messages = ((changes?.value as Record<string, unknown>)?.messages) as Array<Record<string, unknown>> | undefined;
+  const message = messages?.[0];
   if (!message) return;
-  const from = message.from;
-  const text = message.text?.body?.trim();
+  const from = message.from as string;
+  const text = ((message.text as Record<string, unknown> | undefined)?.body as string | undefined)?.trim();
 
   // Load or create session
   const session = await WhatsAppSession.findOne({ phone_number: from });

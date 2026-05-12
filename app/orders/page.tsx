@@ -19,10 +19,11 @@ export default function OrdersPage() {
   useEffect(() => {
     API.get("/api/orders")
       .then((res) => {
-        const data = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data?.orders)
-          ? res.data.orders
+        const r = res as { data?: Order[] | { orders?: Order[] } };
+        const data = Array.isArray(r.data)
+          ? (r.data as Order[])
+          : Array.isArray((r.data as { orders?: Order[] } | undefined)?.orders)
+          ? (r.data as { orders: Order[] }).orders
           : [];
         setOrders(data);
       })

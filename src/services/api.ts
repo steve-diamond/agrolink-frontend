@@ -38,6 +38,25 @@ const API = {
     });
     if (!res.ok) throw new Error("API POST failed");
     return res.json();
-  }
+  },
+
+  async patch<T, R = unknown>(endpoint: string, data: T): Promise<R> {
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: data !== null && data !== undefined ? JSON.stringify(data) : undefined,
+    });
+    if (!res.ok) throw new Error("API PATCH failed");
+    return res.json();
+  },
+
+  async delete<R = unknown>(endpoint: string): Promise<R> {
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("API DELETE failed");
+    return res.json();
+  },
 };
 export default API;

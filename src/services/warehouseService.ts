@@ -11,7 +11,7 @@ export type Storage = {
 };
 
 export async function getStorage(userId?: string): Promise<Storage[]> {
-  const res = await API.get("/api/warehouse", { params: userId ? { userId } : {} });
-  if (Array.isArray(res.data?.storage)) return res.data.storage as Storage[];
+  const res = await API.get<{ data?: { storage?: unknown[] } }>("/api/warehouse", { params: userId ? { userId } : {} });
+  if (Array.isArray(res.data?.storage)) return res.data!.storage as Storage[];
   return [];
 }

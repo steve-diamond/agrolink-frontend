@@ -5,7 +5,7 @@ type Shipment = { _id: string; status?: string; [key: string]: unknown };
 interface GlobalWithShipments extends globalThis.Global {
   shipments: Shipment[];
 }
-const g = globalThis as GlobalWithShipments;
+const g = globalThis as unknown as GlobalWithShipments;
 const shipments: Shipment[] = g.shipments || [];
 g.shipments = shipments;
 

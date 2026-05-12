@@ -24,3 +24,9 @@ export function convertToNGN(usdAmount: number, rate?: number): number {
   return Math.round(usdAmount * rate * 100) / 100;
 }
 
+export function convertToUSD(ngnAmount: number, rate?: number): number {
+  if (!rate && cachedRate) rate = cachedRate;
+  if (!rate) throw new Error('FX rate not loaded');
+  return Math.round((ngnAmount / rate) * 100) / 100;
+}
+

@@ -1,1 +1,1 @@
-export { default } from "../../../components/ServiceWorkerRegistration";
+export { default } from "../../components/ServiceWorkerRegistration";

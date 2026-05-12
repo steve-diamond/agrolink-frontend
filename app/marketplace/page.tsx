@@ -259,12 +259,15 @@ export default function Marketplace() {
       return;
     }
 
+    type OrderApiResponse = { data: { _id: string; totalAmount?: number; totalPrice?: number } };
+    type PaymentApiResponse = { data: { data: { authorization_url: string } } };
+
     try {
       setBuyingProductId(product._id);
 
       const orderRes = await API.post("/api/orders", {
         products: [{ productId: product._id, quantity }],
-      });
+      }) as OrderApiResponse;
 
       const order = orderRes.data;
 
@@ -273,7 +276,7 @@ export default function Marketplace() {
         amount: order.totalAmount ?? order.totalPrice,
         orderId: order._id,
         callback_url: `${window.location.origin}/payment-success`,
-      });
+      }) as PaymentApiResponse;
 
       window.location.href = paymentRes.data.data.authorization_url;
     } catch (error) {
@@ -446,7 +449,7 @@ export default function Marketplace() {
                 {/* Grade Badge */}
                 <div className="mb-1">
                   {grade !== "U" ? (
-                    <GradeBadge grade={grade} commodity={product.commodity || product.name || ""} size="sm" />
+                    <GradeBadge grade={grade} commodity={product.name || ""} size="sm" />
                   ) : (
                     <span className="inline-flex items-center rounded-full px-3 py-1 font-semibold shadow bg-gray-300 text-gray-700 h-6 text-xs" title="Tip: Graded produce sells 15-30% faster. Submit for grading →">
                       No Grade
