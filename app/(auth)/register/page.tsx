@@ -2,8 +2,8 @@
 // Add global type declarations for SpeechRecognition APIs if not present
 declare global {
   interface Window {
-    SpeechRecognition?: typeof SpeechRecognition;
-    webkitSpeechRecognition?: typeof SpeechRecognition;
+    SpeechRecognition?: new (...args: unknown[]) => unknown;
+    webkitSpeechRecognition?: new (...args: unknown[]) => unknown;
   }
 }
 
