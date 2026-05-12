@@ -5,27 +5,6 @@ declare global {
     SpeechRecognition?: typeof SpeechRecognition;
     webkitSpeechRecognition?: typeof SpeechRecognition;
   }
-  // Only declare if not already present
-  let SpeechRecognition: {
-    prototype: SpeechRecognition;
-    new (): SpeechRecognition;
-  };
-  interface SpeechRecognition {
-    lang: string;
-    start(): void;
-    stop(): void;
-    onresult: ((event: SpeechRecognitionEvent) => void) | null;
-    onerror: ((event: Event) => void) | null;
-  }
-  interface SpeechRecognitionEvent {
-    results: {
-      [index: number]: {
-        [index: number]: {
-          transcript: string;
-        };
-      };
-    };
-  }
 }
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
