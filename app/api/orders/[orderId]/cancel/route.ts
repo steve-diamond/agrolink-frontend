@@ -5,7 +5,7 @@ type Order = { _id: string; status?: string; [key: string]: unknown };
 interface GlobalWithOrders extends globalThis.Global {
   orders: Order[];
 }
-const g = globalThis as GlobalWithOrders;
+const g = globalThis as unknown as GlobalWithOrders;
 const orders: Order[] = g.orders || [];
 g.orders = orders;
 
