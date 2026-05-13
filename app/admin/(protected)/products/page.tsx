@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  FaUserFriends, FaShoppingCart, FaLeaf, FaBoxOpen,
+  FaUserFriends, FaUsers, FaShoppingCart, FaLeaf, FaBoxOpen,
   FaChartBar, FaCog, FaBell, FaSearch, FaCheckCircle, FaHourglassHalf
 } from "react-icons/fa";
 import axios from "axios";
@@ -104,6 +104,7 @@ export default function AdminProductsPage() {
         <nav className="flex-1 space-y-2">
           <NavItem icon={<FaChartBar />} label="Dashboard" href="/admin" />
           <NavItem icon={<FaUserFriends />} label="Farmers" href="/admin/farmers" />
+          <NavItem icon={<FaUsers />} label="Buyers" href="/admin/buyers" />
           <NavItem icon={<FaBoxOpen />} label="Products" href="/admin/products" />
           <NavItem icon={<FaShoppingCart />} label="Orders" href="/admin/orders" />
           <NavItem icon={<FaChartBar />} label="Analytics" href="/admin/analytics" />
