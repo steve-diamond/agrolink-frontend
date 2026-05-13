@@ -14,7 +14,7 @@ import API from "@services/api";
 
 // Real API call for approving a product
 const approveProductAPI = async (id: string) => {
-  await API.post(`/api/admin/products/${id}/approve`, {});
+  await API.patch(`/api/admin/products/${id}/approve`, {});
 };
 
 

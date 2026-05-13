@@ -50,8 +50,11 @@ type Props = {
 import { useState } from "react";
 
 async function approveProduct(productId: string) {
-	// Replace with your actual API call logic
-	await fetch(`/api/admin/products/${productId}/approve`, { method: "POST" });
+	const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
+	await fetch(`/api/admin/products/${productId}/approve`, {
+		method: "PATCH",
+		headers: token ? { Authorization: `Bearer ${token}` } : {},
+	});
 }
 
 export default function AdminUnifiedCommandCenter({ products }: Props) {

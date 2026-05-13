@@ -5,6 +5,11 @@ type GetOptions = {
   params?: Record<string, string | number | boolean | undefined | null>;
 };
 
+const getAuthHeaders = (): Record<string, string> => {
+  if (typeof window === 'undefined') return {};
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 const API = {
   async get<R = unknown>(endpoint: string, options?: GetOptions): Promise<R> {
@@ -18,7 +23,7 @@ const API = {
       });
       url += `?${searchParams.toString()}`;
     }
-    const res = await fetch(url);
+    const res = await fetch(url, { headers: getAuthHeaders() });
     if (!res.ok) throw new Error("API GET failed");
     return res.json();
   },
@@ -27,7 +32,8 @@ const API = {
     const res = await fetch(`${API_URL}${endpoint}` , {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
       },
       body: JSON.stringify(data)
     });
@@ -38,7 +44,10 @@ const API = {
   async patch<T, R = unknown>(endpoint: string, data: T): Promise<R> {
     const res = await fetch(`${API_URL}${endpoint}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      },
       body: data !== null && data !== undefined ? JSON.stringify(data) : undefined,
     });
     if (!res.ok) throw new Error("API PATCH failed");
@@ -48,7 +57,10 @@ const API = {
   async delete<R = unknown>(endpoint: string): Promise<R> {
     const res = await fetch(`${API_URL}${endpoint}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      },
     });
     if (!res.ok) throw new Error("API DELETE failed");
     return res.json();
