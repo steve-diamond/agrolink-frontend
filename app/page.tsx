@@ -313,7 +313,7 @@ export default function Home() {
             <Link href="/investor" className="dos-btn-green">Invest Now</Link>
           </div>
           <div className="dos-contact-row">
-            <span>☎ Call: 0800-XXX-XXXX</span>
+            <span>☎ Call: 2348129490467</span>
             <span>✉ Email: info@dosagrolink.com.ng</span>
             <span>◉ SSL Secure</span>
             <span>◎ Certified</span>
