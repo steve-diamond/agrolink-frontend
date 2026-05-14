@@ -15,6 +15,7 @@ import { useLocalizedCopy } from "@services/useLocalizedCopy";
 import AuthShell from "../_components/AuthShell";
 import PasswordEyeIcon from "../_components/PasswordEyeIcon";
 import BuyerOnboardingPanel from "./_components/BuyerOnboardingPanel";
+import SocialAuthButtons from "../_components/SocialAuthButtons";
 
 type UserRole = "buyer" | "farmer";
 type YesNo = "yes" | "no";
@@ -1951,6 +1952,21 @@ export default function RegisterPage() {
           <p className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Create Account</p>
           <h2 className="m-0 mt-2 text-2xl font-bold text-green-950">Get started on Agrolink</h2>
           <p className="mb-0 mt-1 text-sm text-slate-600">Large buttons, fewer typing steps, and draft save for unstable networks.</p>
+        </div>
+
+        {/* ── Quick sign-up / sign-in alternatives ─────────────────── */}
+        <SocialAuthButtons
+          defaultRole={accountForm.role as "buyer" | "farmer"}
+          showDivider={false}
+        />
+
+        {/* Separator before full registration form */}
+        <div className="flex items-center gap-3 my-1">
+          <div className="h-px flex-1 bg-green-100" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+            or complete full registration
+          </span>
+          <div className="h-px flex-1 bg-green-100" />
         </div>
 
         {renderLanguageToggle}

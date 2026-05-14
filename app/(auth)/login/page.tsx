@@ -8,6 +8,7 @@ import { useLocalizedCopy } from "@services/useLocalizedCopy";
 import AuthShell from "../_components/AuthShell";
 import PasswordEyeIcon from "../_components/PasswordEyeIcon";
 import useRememberedEmail from "../_components/useRememberedEmail";
+import SocialAuthButtons from "../_components/SocialAuthButtons";
 
 function LoginForm() {
   const router = useRouter();
@@ -161,6 +162,8 @@ function LoginForm() {
             Don&apos;t have an account?{" "}
             <Link href="/register" className="font-bold text-green-700 no-underline hover:text-green-800">{copy.register}</Link>
           </p>
+
+          <SocialAuthButtons />
         </section>
     </AuthShell>
   );
