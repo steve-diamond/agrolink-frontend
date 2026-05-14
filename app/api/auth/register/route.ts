@@ -3,17 +3,47 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { dbConnect } from 'lib/mongoose';
-import User from 'models/User';
+import User, { type UserRole } from 'models/User';
+
+const ALLOWED_ROLES: UserRole[] = [
+  'farmer', 'buyer', 'cooperative', 'logistics', 'warehouse', 'investor', 'admin',
+];
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password, phone, role } = await req.json();
+    const body = await req.json();
+    const {
+      name, email, password, phone, role,
+      organizationName, metadata, inviteCode,
+    } = body as {
+      name: string;
+      email: string;
+      password: string;
+      phone?: string;
+      role?: string;
+      organizationName?: string;
+      metadata?: Record<string, unknown>;
+      inviteCode?: string;
+    };
 
     if (!name || !email || !password) {
       return NextResponse.json(
         { status: 'error', message: 'Name, email, and password are required.' },
         { status: 400 }
       );
+    }
+
+    const resolvedRole: UserRole = (ALLOWED_ROLES.includes(role as UserRole) ? role : 'buyer') as UserRole;
+
+    // Admin registration requires a valid invite code
+    if (resolvedRole === 'admin') {
+      const adminCode = process.env.ADMIN_INVITE_CODE;
+      if (!adminCode || inviteCode !== adminCode) {
+        return NextResponse.json(
+          { status: 'error', message: 'Invalid or missing admin invite code.' },
+          { status: 403 }
+        );
+      }
     }
 
     await dbConnect();
@@ -26,13 +56,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Admin accounts are pre-approved; all others require admin review
     const user = await User.create({
       name,
       email,
       password,
       phone: phone || '',
-      role: role || 'buyer',
-      approved: false,
+      role: resolvedRole,
+      organizationName: organizationName || undefined,
+      metadata: metadata || undefined,
+      approved: resolvedRole === 'admin',
     });
 
     const secret = process.env.JWT_SECRET;

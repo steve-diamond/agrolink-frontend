@@ -1,12 +1,25 @@
 import mongoose, { Document, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+export type UserRole =
+  | 'farmer'
+  | 'buyer'
+  | 'cooperative'
+  | 'logistics'
+  | 'warehouse'
+  | 'investor'
+  | 'admin'
+  | 'supplier'
+  | 'agent';
+
 export interface IUser extends Document {
   name: string;
   email: string;
   phone?: string;
   password: string;
-  role: 'farmer' | 'buyer' | 'supplier' | 'logistics' | 'admin' | 'agent';
+  role: UserRole;
+  organizationName?: string;
+  metadata?: Record<string, unknown>;
   status: string;
   approved: boolean;
   comparePassword(candidate: string): Promise<boolean>;
@@ -26,9 +39,11 @@ const UserSchema = new mongoose.Schema<IUser>(
     password: { type: String, required: true, minlength: 6, select: false },
     role: {
       type: String,
-      enum: ['farmer', 'buyer', 'supplier', 'logistics', 'admin', 'agent'],
+      enum: ['farmer', 'buyer', 'cooperative', 'logistics', 'warehouse', 'investor', 'admin', 'supplier', 'agent'],
       default: 'buyer',
     },
+    organizationName: { type: String, trim: true },
+    metadata: { type: mongoose.Schema.Types.Mixed },
     status: { type: String, default: 'active' },
     approved: { type: Boolean, default: false },
   },

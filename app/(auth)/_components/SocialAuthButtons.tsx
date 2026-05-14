@@ -37,7 +37,7 @@ type SocialAuthButtonsProps = {
   /** Called on successful auth instead of the default router redirect */
   onSuccess?: (token: string, user: Record<string, unknown>) => void;
   /** Role to assign when a brand-new account is created via social/OTP */
-  defaultRole?: "buyer" | "farmer";
+  defaultRole?: "buyer" | "farmer" | "cooperative" | "logistics" | "warehouse" | "investor";
   /** Show the top "or continue with" divider (default true) */
   showDivider?: boolean;
 };
@@ -99,6 +99,7 @@ export default function SocialAuthButtons({
     const role = user?.role as string;
     if (role === "admin") router.push("/admin");
     else if (role === "farmer") router.push("/farmer");
+    else if (role === "investor") router.push("/investor");
     else router.push("/dashboard");
   };
 

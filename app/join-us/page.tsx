@@ -36,7 +36,8 @@ export default function JoinUsPage() {
       <section className="card p-5">
         <h2 className="text-2xl font-bold text-green-900">Start Here</h2>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/register" className="btn-primary inline-flex items-center px-4 py-2 no-underline">Create Account</Link>
+          <Link href="/register/select-role" className="btn-primary inline-flex items-center px-4 py-2 no-underline">Choose Your Role</Link>
+          <Link href="/register" className="inline-flex items-center rounded-full border border-green-300 px-4 py-2 text-sm font-bold text-green-800 no-underline">Register as Farmer</Link>
           <Link href="/vision" className="inline-flex items-center rounded-full border border-green-300 px-4 py-2 text-sm font-bold text-green-800 no-underline">
             Explore 7-Point Vision
           </Link>

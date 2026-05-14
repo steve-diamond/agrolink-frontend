@@ -62,6 +62,8 @@ function LoginForm() {
         router.push("/admin");
       } else if (role === "farmer") {
         router.push("/farmer");
+      } else if (role === "investor") {
+        router.push("/investor");
       } else {
         router.push("/dashboard");
       }
