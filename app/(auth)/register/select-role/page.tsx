@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import dosLogo from "../../../dos logo.jpg";
 
 const ROLES = [
   {
@@ -130,7 +129,7 @@ export default function SelectRolePage() {
       {/* ── Header ── */}
       <div className="mb-10 text-center">
         <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-green-200 bg-white px-4 py-2 shadow-sm">
-          <Image src={dosLogo} alt="DOS AgroLink" className="h-7 w-7 rounded-full object-cover" />
+          <Image src="/dos-logo.jpg" alt="DOS AgroLink" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
           <span className="text-xs font-bold uppercase tracking-widest text-green-800">
             DOS AgroLink Nigeria
           </span>
