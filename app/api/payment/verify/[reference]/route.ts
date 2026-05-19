@@ -6,9 +6,9 @@ import { dbConnect } from 'lib/mongoose';
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { reference: string } }
+  { params }: { params: Promise<{ reference: string }> }
 ) {
-  const { reference } = params;
+  const { reference } = await params;
 
   if (!reference) {
     return NextResponse.json(
