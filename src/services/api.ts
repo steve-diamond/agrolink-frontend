@@ -24,7 +24,10 @@ const API = {
       url += `?${searchParams.toString()}`;
     }
     const res = await fetch(url, { headers: getAuthHeaders() });
-    if (!res.ok) throw new Error("API GET failed");
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { message?: string };
+      throw new Error(body?.message || "API GET failed");
+    }
     return res.json();
   },
 
@@ -37,7 +40,10 @@ const API = {
       },
       body: JSON.stringify(data)
     });
-    if (!res.ok) throw new Error("API POST failed");
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { message?: string };
+      throw new Error(body?.message || "API POST failed");
+    }
     return res.json();
   },
 
@@ -50,7 +56,10 @@ const API = {
       },
       body: data !== null && data !== undefined ? JSON.stringify(data) : undefined,
     });
-    if (!res.ok) throw new Error("API PATCH failed");
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { message?: string };
+      throw new Error(body?.message || "API PATCH failed");
+    }
     return res.json();
   },
 
@@ -62,7 +71,10 @@ const API = {
         ...getAuthHeaders(),
       },
     });
-    if (!res.ok) throw new Error("API DELETE failed");
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { message?: string };
+      throw new Error(body?.message || "API DELETE failed");
+    }
     return res.json();
   },
 };

@@ -22,6 +22,8 @@ export interface IUser extends Document {
   metadata?: Record<string, unknown>;
   status: string;
   approved: boolean;
+  resetToken?: string | null;
+  resetTokenExpiry?: Date | null;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -46,6 +48,8 @@ const UserSchema = new mongoose.Schema<IUser>(
     metadata: { type: mongoose.Schema.Types.Mixed },
     status: { type: String, default: 'active' },
     approved: { type: Boolean, default: false },
+    resetToken: { type: String, default: null, select: false },
+    resetTokenExpiry: { type: Date, default: null, select: false },
   },
   { timestamps: true }
 );

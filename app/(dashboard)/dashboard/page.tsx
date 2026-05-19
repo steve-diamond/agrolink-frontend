@@ -64,11 +64,21 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
             Array.isArray((res as { orders: unknown }).orders)
           );
         }
+        function isOrdersDataObject(res: unknown): res is { data: Order[] } {
+          return (
+            typeof res === 'object' &&
+            res !== null &&
+            'data' in res &&
+            Array.isArray((res as { data: unknown }).data)
+          );
+        }
         let allOrders: Order[] = [];
         if (isOrdersArray(ordersRes)) {
           allOrders = ordersRes;
         } else if (isOrdersObject(ordersRes)) {
           allOrders = ordersRes.orders;
+        } else if (isOrdersDataObject(ordersRes)) {
+          allOrders = ordersRes.data;
         }
         setOrders(allOrders);
         setLoans(loansRes);
@@ -245,6 +255,8 @@ function BuyerDashboard({ user }: { user: AuthUser }) {
           ? res
           : Array.isArray((res as { orders?: unknown[] })?.orders)
           ? (res as { orders: unknown[] }).orders
+          : Array.isArray((res as { data?: unknown[] })?.data)
+          ? (res as { data: unknown[] }).data
           : [];
         setOrders(data);
       })
