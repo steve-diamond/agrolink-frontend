@@ -1,8 +1,4 @@
-import dns from 'dns';
 import mongoose from 'mongoose';
-
-// Fix for Windows/XAMPP c-ares DNS issue with MongoDB Atlas SRV resolution
-dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 interface CachedMongoose {
   conn: typeof mongoose | null;
@@ -24,6 +20,12 @@ export async function dbConnect() {
   const MONGODB_URI = process.env.MONGODB_URI;
   if (!MONGODB_URI) {
     throw new Error('Please define the MONGODB_URI environment variable inside the Vercel project settings');
+  }
+  // Fix for Windows/XAMPP c-ares DNS issue with MongoDB Atlas SRV resolution
+  // Uses require() so webpack never bundles the Node-only 'dns' module for the client
+  if (typeof window === 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('dns') as typeof import('dns')).setServers(['8.8.8.8', '8.8.4.4']);
   }
   if (cache.conn) return cache.conn;
   if (!cache.promise) {
