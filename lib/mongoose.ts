@@ -1,4 +1,8 @@
+import dns from 'dns';
 import mongoose from 'mongoose';
+
+// Fix for Windows/XAMPP c-ares DNS issue with MongoDB Atlas SRV resolution
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 interface CachedMongoose {
   conn: typeof mongoose | null;
@@ -25,6 +29,8 @@ export async function dbConnect() {
   if (!cache.promise) {
     cache.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 15000,
+      socketTimeoutMS: 15000,
     }).then((m) => m);
   }
   try {
