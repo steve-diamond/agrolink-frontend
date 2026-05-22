@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FaUserFriends, FaUsers, FaCheckCircle, FaHourglassHalf, FaShoppingCart,
-  FaLeaf, FaBoxOpen, FaChartBar, FaCog, FaBell, FaSearch
+  FaLeaf, FaBoxOpen, FaChartBar, FaCog, FaBell, FaSearch, FaBan
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -64,6 +64,7 @@ export default function AdminFarmersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [tab, setTab] = useState<"registered" | "applications">("applications");
 
   useEffect(() => {
@@ -98,6 +99,25 @@ export default function AdminFarmersPage() {
       alert("Failed to approve farmer application.");
     } finally {
       setApprovingId(null);
+    }
+  };
+
+  const handleRejectApp = async (applicationId: string) => {
+    if (!confirm("Reject this farmer application? This marks it as unlawful/invalid.")) return;
+    setRejectingId(applicationId);
+    try {
+      await axios.patch(
+        `/api/admin/farmer-applications/${applicationId}/reject`,
+        {},
+        { headers: getAuthHeader() }
+      );
+      setApplications(prev =>
+        prev.map(a => a.applicationId === applicationId ? { ...a, status: "rejected" } : a)
+      );
+    } catch {
+      alert("Failed to reject farmer application.");
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -261,19 +281,31 @@ export default function AdminFarmersPage() {
                         className={`text-xs rounded-full px-2 py-0.5 capitalize ${
                           app.status === "approved"
                             ? "bg-green-100 text-green-800"
+                            : app.status === "rejected"
+                            ? "bg-red-100 text-red-800"
                             : "bg-amber-100 text-amber-800"
                         }`}
                       >
                         {app.status}
                       </span>
                       {(app.status === "pending" || app.status === "submitted") && (
-                        <button
-                          disabled={approvingId === app.applicationId}
-                          onClick={() => handleApproveApp(app.applicationId)}
-                          className="ml-auto bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 font-semibold disabled:opacity-60"
-                        >
-                          {approvingId === app.applicationId ? "Approving..." : "Approve"}
-                        </button>
+                        <>
+                          <button
+                            disabled={approvingId === app.applicationId || rejectingId === app.applicationId}
+                            onClick={() => handleApproveApp(app.applicationId)}
+                            className="ml-auto bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 font-semibold disabled:opacity-60"
+                          >
+                            {approvingId === app.applicationId ? "Approving..." : "Approve"}
+                          </button>
+                          <button
+                            disabled={approvingId === app.applicationId || rejectingId === app.applicationId}
+                            onClick={() => handleRejectApp(app.applicationId)}
+                            className="inline-flex items-center gap-1 bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 font-semibold disabled:opacity-60"
+                          >
+                            <FaBan className="text-[10px]" />
+                            {rejectingId === app.applicationId ? "Rejecting..." : "Reject"}
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>

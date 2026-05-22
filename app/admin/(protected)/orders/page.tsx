@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FaUserFriends, FaUsers, FaShoppingCart, FaLeaf, FaBoxOpen,
-  FaChartBar, FaCog, FaBell, FaSearch, FaTruck, FaCheckCircle, FaHourglassHalf
+  FaChartBar, FaCog, FaBell, FaSearch, FaTruck, FaCheckCircle, FaHourglassHalf,
+  FaBan, FaThumbsUp
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -77,6 +78,7 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [actioningId, setActioningId] = useState<string | null>(null);
   const PAGE_SIZE = 10;
 
   useEffect(() => {
@@ -99,6 +101,24 @@ export default function AdminOrdersPage() {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleOrderStatus = async (orderId: string, status: string) => {
+    setActioningId(orderId);
+    try {
+      await axios.patch(
+        `/api/admin/orders/${orderId}/status`,
+        { status },
+        { headers: getAuthHeader() }
+      );
+      setOrders(prev =>
+        prev.map(o => o._id === orderId ? { ...o, status } : o)
+      );
+    } catch {
+      alert(`Failed to update order status.`);
+    } finally {
+      setActioningId(null);
+    }
+  };
 
   const statuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
   const statusCounts = statuses.reduce<Record<string, number>>((acc, s) => {
@@ -221,6 +241,7 @@ export default function AdminOrdersPage() {
                     <th className="px-4 py-3 text-left">Amount</th>
                     <th className="px-4 py-3 text-left">Status</th>
                     <th className="px-4 py-3 text-left">Date</th>
+                    <th className="px-4 py-3 text-left">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -239,6 +260,35 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="px-4 py-3 text-gray-400 text-xs">
                         {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          {(order.status === "pending" || order.status === "processing") && (
+                            <button
+                              disabled={actioningId === order._id}
+                              onClick={() => handleOrderStatus(order._id, order.status === "pending" ? "processing" : "shipped")}
+                              title="Approve order"
+                              className="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-2 py-1 rounded disabled:opacity-50"
+                            >
+                              <FaThumbsUp className="text-[10px]" />
+                              {actioningId === order._id ? "..." : "Approve"}
+                            </button>
+                          )}
+                          {order.status !== "cancelled" && order.status !== "delivered" && (
+                            <button
+                              disabled={actioningId === order._id}
+                              onClick={() => handleOrderStatus(order._id, "cancelled")}
+                              title="Cancel unlawful order"
+                              className="inline-flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-2 py-1 rounded disabled:opacity-50"
+                            >
+                              <FaBan className="text-[10px]" />
+                              {actioningId === order._id ? "..." : "Cancel"}
+                            </button>
+                          )}
+                          {(order.status === "cancelled" || order.status === "delivered") && (
+                            <span className="text-xs text-gray-400">—</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
