@@ -63,6 +63,12 @@ body {
   padding: 0.35rem 0 1.2rem;
 }
 
+.marketplace-dot-pattern {
+  background-image: radial-gradient(circle at 20% 50%, #fff 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, #fff 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
 .dos-home-card {
   border: 1px solid var(--dos-earth-300);
   border-radius: 8px;
