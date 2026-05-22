@@ -5,6 +5,7 @@ import "../styles/custom.css";
 // Removed duplicate import
 import Link from "next/link";
 import FarmerLogoCarousel from "../components/FarmerLogoCarousel";
+import FarmStocksTicker from "../components/FarmStocksTicker";
 import Image from "next/image";
 import { getStoredLanguage, listenToLanguageChanges, type UiLanguage } from "@services/uiLanguage";
 
@@ -208,9 +209,10 @@ export default function Home() {
   return (
     <main className="dos-homepage px-2 sm:px-0 py-4 sm:py-6 grid gap-4 sm:gap-6 w-full">
       <header className="flex items-center gap-3 mb-4">
-        <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={56} height={56} className="rounded-xl shadow" priority />
+        <Image src="/dos-agrolink-logo.jpg" alt="DOS Agrolink Logo" width={56} height={56} className="rounded-xl shadow" priority />
         <span className="text-2xl font-extrabold text-green-900 tracking-tight">DOS AGROLINK</span>
       </header>
+      <FarmStocksTicker />
       <section className="dos-home-card">
         <section className="dos-hero">
           <div className="dos-hero-carousel" aria-label="DosAgrolink vision highlights">

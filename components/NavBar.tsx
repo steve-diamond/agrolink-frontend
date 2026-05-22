@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import dosLogo from "../dos logo.jpg";
 import { isRouteActive } from "../src/lib/navigationActive";
 import { emitLanguageChanged, getStoredLanguage, listenToLanguageChanges, setStoredLanguage, type UiLanguage } from "@services/uiLanguage";
 
@@ -60,7 +59,7 @@ export default function NavBar() {
       <header>
         <div className="dos-topbar">
           <Link href="/" className="dos-brand" aria-label="Go to homepage">
-            <Image src={dosLogo} alt="DosAgrolink" width={26} height={26} className="dos-brand-logo" />
+            <Image src="/dos-agrolink-logo.jpg" alt="Dos Agrolink" width={40} height={40} className="dos-brand-logo rounded-full object-cover border-2 border-green-200" />
             <strong>DosAgrolink</strong>
           </Link>
           <nav className="dos-menu" aria-label="Primary">

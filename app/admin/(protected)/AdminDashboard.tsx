@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaUserFriends, FaUsers, FaCheckCircle, FaHourglassHalf, FaShoppingCart, FaLeaf, FaBoxOpen, FaChartBar, FaCog, FaBell, FaSearch } from "react-icons/fa";
+import { FaUserFriends, FaUsers, FaCheckCircle, FaHourglassHalf, FaShoppingCart, FaBoxOpen, FaChartBar, FaCog, FaBell, FaSearch } from "react-icons/fa";
 import axios from "axios";
 import { Bar, Pie } from "react-chartjs-2";
 import {
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <aside className="w-64 bg-linear-to-b from-green-900 to-green-700 text-white flex flex-col py-6 px-4 shadow-lg">
         <div className="flex items-center gap-3 mb-10">
-          <div className="bg-white rounded-full p-1"><FaLeaf className="text-green-700 text-3xl" /></div>
+          <img src="/dos-agrolink-logo.jpg" alt="Dos Agrolink" className="w-10 h-10 rounded-full object-cover border-2 border-white/50" />
           <span className="text-xl font-extrabold tracking-tight">Dos Agrolink</span>
         </div>
         <nav className="flex-1 space-y-2">

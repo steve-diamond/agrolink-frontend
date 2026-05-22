@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import dosLogo from "../../../dos logo.jpg";
 
 type AuthShellProps = {
   eyebrow: string;
@@ -45,7 +44,7 @@ export default function AuthShell({
 
           <div className="relative z-10 grid h-full gap-5">
             <div className="inline-flex w-fit items-center gap-3 rounded-full border border-white/20 bg-white/8 px-3 py-2">
-              <Image src={dosLogo} alt="DOS AGROLINK NIGERIA" className="h-8 w-8 rounded-full border border-white/35 object-cover" />
+              <Image src="/dos-agrolink-logo.jpg" alt="DOS AGROLINK NIGERIA" width={32} height={32} className="h-8 w-8 rounded-full border border-white/35 object-cover" />
               <p className="m-0 text-[11px] font-semibold tracking-[0.14em] text-emerald-100">DOS AGROLINK NIGERIA</p>
             </div>
 

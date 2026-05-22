@@ -1,12 +1,12 @@
 import React from "react";
+import Image from "next/image";
 
 export default function DosAgrolinkHeader() {
   return (
     <header className="flex items-center justify-between w-full px-8 py-6 bg-white shadow-sm">
       <div className="flex items-center gap-4">
-        {/* Logo placeholder */}
-        <div className="w-14 h-16 rounded-xl bg-white shadow-lg flex items-center justify-center">
-          {/* You can replace this with an <img src="/logo.png" ... /> */}
+        <div className="w-14 h-14 rounded-xl overflow-hidden shadow-lg border-2 border-green-100">
+          <Image src="/dos-agrolink-logo.jpg" alt="Dos Agrolink" width={56} height={56} className="object-cover w-full h-full" />
         </div>
         <span className="text-2xl font-extrabold text-green-900 tracking-tight">DOS AGROLINK</span>
       </div>
