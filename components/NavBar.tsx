@@ -1,6 +1,6 @@
 
 "use client";
-import { FaWhatsapp, FaPhone, FaChevronDown } from 'react-icons/fa';
+import { FaWhatsapp, FaPhone } from 'react-icons/fa';
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -129,7 +129,7 @@ export default function NavBar() {
             </div>
             <div className="hidden sm:block leading-tight">
               <span className="block text-base font-extrabold text-white tracking-tight">DOS AGROLINK</span>
-              <span className="block text-[10px] text-green-400 font-semibold tracking-widest uppercase">Nigeria's Agri-Marketplace</span>
+              <span className="block text-[10px] text-green-400 font-semibold tracking-widest uppercase">Nigeria&apos;s Agri-Marketplace</span>
             </div>
           </Link>
 
