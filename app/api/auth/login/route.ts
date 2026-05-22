@@ -60,7 +60,22 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (err: unknown) {
-    console.error('[/api/auth/login]', err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[/api/auth/login]', message);
+
+    // Surface actionable hints in the response (no secrets leaked)
+    if (message.includes('MONGODB_URI')) {
+      return NextResponse.json(
+        { status: 'error', message: 'Server is not configured. Contact support.' },
+        { status: 503 }
+      );
+    }
+    if (message.includes('ECONNREFUSED') || message.includes('timed out') || message.includes('ETIMEDOUT') || message.includes('querySrv')) {
+      return NextResponse.json(
+        { status: 'error', message: 'Database is temporarily unreachable. Try again in a moment.' },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { status: 'error', message: 'Unable to process login. Please try again.' },
       { status: 500 }

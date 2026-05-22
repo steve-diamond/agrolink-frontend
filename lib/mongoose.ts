@@ -25,8 +25,12 @@ export async function dbConnect() {
   if (!cache.promise) {
     cache.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 15000,
-      socketTimeoutMS: 15000,
+      maxPoolSize: 1,          // Keep pool small for serverless
+      minPoolSize: 0,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      family: 4,               // Force IPv4 — avoids DNS/IPv6 issues on Vercel
     }).then((m) => m);
   }
   try {
