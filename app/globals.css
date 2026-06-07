@@ -44,7 +44,7 @@
 @import "tailwindcss";
 
 /* Load the platform design-system tokens from tailwind.config.js */
-@config "./tailwind.config.js";
+@config "../tailwind.config.js";
 /* Highlight active dashboard quick link */
 .dash-links .active-link {
   font-weight: bold;

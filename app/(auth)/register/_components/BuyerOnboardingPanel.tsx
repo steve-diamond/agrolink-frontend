@@ -1,6 +1,6 @@
-import { useAnalytics } from "@/hooks/useAnalytics";
 "use client";
 
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import API from "@/services/api";
