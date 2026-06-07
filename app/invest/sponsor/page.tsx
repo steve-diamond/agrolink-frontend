@@ -1,5 +1,4 @@
 import React from "react";
-import FarmCampaignCard from "components/invest/FarmCampaignCard";
 
 const stats = [
   { label: "₦2.4B invested" },
@@ -18,7 +17,7 @@ export default function SponsorLandingPage() {
   return (
     <main className="bg-white min-h-screen">
       {/* Hero Section */}
-      <section className="text-center py-12 bg-gradient-to-b from-green-50 to-white">
+      <section className="text-center py-12 bg-linear-to-b from-green-50 to-white">
         <h1 className="text-4xl md:text-5xl font-bold text-green-800 mb-4">Grow Wealth. Feed Nigeria.</h1>
         <p className="text-lg md:text-xl text-gray-700 mb-6">Invest from anywhere. Earn returns in USD or Naira. Fund real farms.</p>
         <div className="flex justify-center gap-6 mb-8">
@@ -53,11 +52,8 @@ export default function SponsorLandingPage() {
       {/* Active Farm Campaigns */}
       <section className="max-w-6xl mx-auto py-8">
         <h2 className="text-xl font-bold text-green-800 mb-6">Active Farm Campaigns</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* TODO: Map over real campaigns from Supabase */}
-          {[1,2,3].map((id) => (
-            <FarmCampaignCard key={id} /* campaign={campaign} */ />
-          ))}
+        <div className="rounded-xl border border-dashed border-green-200 bg-green-50 p-6 text-green-900">
+          No active campaigns are published right now. New verified opportunities will appear here once they are approved.
         </div>
       </section>
     </main>

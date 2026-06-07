@@ -1,65 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import API from "@services/api";
-
-type Order = {
-  _id: string;
-  status: string;
-  totalAmount?: number;
-  totalPrice?: number;
-  createdAt?: string;
-  paymentStatus?: string;
-};
+import PullToRefresh from "../../components/PullToRefresh";
+import { useOrders } from "../../lib/hooks/useOrders";
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    API.get("/api/orders")
-      .then((res) => {
-        const r = res as { data?: Order[] | { orders?: Order[] } };
-        const data = Array.isArray(r.data)
-          ? (r.data as Order[])
-          : Array.isArray((r.data as { orders?: Order[] } | undefined)?.orders)
-          ? (r.data as { orders: Order[] }).orders
-          : [];
-        setOrders(data);
-      })
-      .catch(() => setOrders([]))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: orders = [], isPending, refetch } = useOrders();
 
   return (
+    <PullToRefresh onRefresh={() => void refetch()} successMessage="Orders refreshed">
     <main className="p-8">
       <h1 className="text-2xl font-bold mb-4">Orders</h1>
-      {loading ? (
-        <p>Loading orders...</p>
+      {isPending ? (
+        <p role="status" aria-busy="true">Loading orders…</p>
       ) : orders.length === 0 ? (
         <p>No orders found.</p>
       ) : (
-        <table className="min-w-full border">
+        <table className="min-w-full border" aria-label="Your orders">
+          <caption className="sr-only">List of your orders with status, amount, date, and payment information</caption>
           <thead>
             <tr>
-              <th className="border px-4 py-2">Status</th>
-              <th className="border px-4 py-2">Amount</th>
-              <th className="border px-4 py-2">Created At</th>
-              <th className="border px-4 py-2">Payment Status</th>
+              <th scope="col" className="border px-4 py-2">Status</th>
+              <th scope="col" className="border px-4 py-2">Amount</th>
+              <th scope="col" className="border px-4 py-2">Created At</th>
+              <th scope="col" className="border px-4 py-2">Payment Status</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
                 <td className="border px-4 py-2">{order.status}</td>
-                <td className="border px-4 py-2">N{Number(order.totalAmount ?? order.totalPrice ?? 0).toLocaleString()}</td>
+                <td className="border px-4 py-2">N{Number((order as { totalAmount?: number; totalPrice?: number }).totalAmount ?? (order as { totalAmount?: number; totalPrice?: number }).totalPrice ?? 0).toLocaleString()}</td>
                 <td className="border px-4 py-2">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</td>
-                <td className="border px-4 py-2">{order.paymentStatus || "-"}</td>
+                <td className="border px-4 py-2">{(order as { paymentStatus?: string }).paymentStatus || "-"}</td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
     </main>
+    </PullToRefresh>
   );
 }

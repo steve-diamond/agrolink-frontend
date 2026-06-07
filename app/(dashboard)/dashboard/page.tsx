@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import PullToRefresh from "../../../components/PullToRefresh";
 import API from "@services/api";
 import { getLoans, Loan, repayLoan } from "@services/loanService";
 import { getShipments, Shipment } from "@services/logisticsService";
@@ -44,15 +45,16 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
   const [repayLoading, setRepayLoading] = useState(false);
   const [repayMessage, setRepayMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    Promise.all([
-      API.get("/api/orders"),
-      getLoans(user._id),
-      getShipments(user._id),
-      getStorage(user._id),
-      getFarmingTips(),
-    ])
-      .then(([ordersRes, loansRes, shipmentsRes, storageRes, tipsRes]) => {
+  const fetchDashboardData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [ordersRes, loansRes, shipmentsRes, storageRes, tipsRes] = await Promise.all([
+        API.get("/api/orders"),
+        getLoans(user._id),
+        getShipments(user._id),
+        getStorage(user._id),
+        getFarmingTips(),
+      ]);
         function isOrdersArray(res: unknown): res is Order[] {
           return Array.isArray(res) && res.every(order => typeof order === 'object' && order !== null && '_id' in order);
         }
@@ -89,16 +91,19 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
             ? tipsRes.map((tip) => ({ title: tip._id, content: tip.text }))
             : []
         );
-      })
-      .catch(() => {
+    } catch {
         setOrders([]);
         setLoans([]);
         setShipments([]);
         setStorage([]);
         setFarmingTips([]);
-      })
-      .finally(() => setLoading(false));
+        throw new Error("Could not refresh dashboard");
+    } finally {
+      setLoading(false);
+    }
   }, [user._id]);
+
+  useEffect(() => { void fetchDashboardData(); }, [fetchDashboardData]);
 
   const walletBalance = useMemo(() => {
     const paidOrders = orders.filter((order) => String(order.paymentStatus || "").toLowerCase() === "paid");
@@ -113,6 +118,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
 
   const currentPath = usePathname();
   return (
+    <PullToRefresh onRefresh={fetchDashboardData} successMessage="Dashboard refreshed">
     <main className="dash-page">
       <section className="dash-hero">
         <Image src="/agropro/images/banner.jpg" alt="Farmer dashboard" fill className="dash-hero-bg" sizes="100vw" />
@@ -241,6 +247,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
         <Link href="/admin/login" className={currentPath === "/admin/login" ? "active-link" : ""}>Admin</Link>
       </section>
     </main>
+    </PullToRefresh>
   );
 }
 
@@ -248,23 +255,30 @@ function BuyerDashboard({ user }: { user: AuthUser }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    API.get("/api/orders")
-      .then((res) => {
-        const data = Array.isArray(res)
-          ? res
-          : Array.isArray((res as { orders?: unknown[] })?.orders)
-          ? (res as { orders: unknown[] }).orders
-          : Array.isArray((res as { data?: unknown[] })?.data)
-          ? (res as { data: unknown[] }).data
-          : [];
-        setOrders(data);
-      })
-      .catch(() => setOrders([]))
-      .finally(() => setLoading(false));
+  const fetchBuyerOrders = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await API.get("/api/orders");
+      const data = Array.isArray(res)
+        ? res
+        : Array.isArray((res as { orders?: unknown[] })?.orders)
+        ? (res as { orders: unknown[] }).orders
+        : Array.isArray((res as { data?: unknown[] })?.data)
+        ? (res as { data: unknown[] }).data
+        : [];
+      setOrders(data);
+    } catch {
+      setOrders([]);
+      throw new Error("Could not refresh orders");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => { void fetchBuyerOrders(); }, [fetchBuyerOrders]);
+
   return (
+    <PullToRefresh onRefresh={fetchBuyerOrders} successMessage="Dashboard refreshed">
     <main className="dash-page">
       <section className="dash-card">
         <h1 className="dash-title">Welcome back, {user.name}</h1>
@@ -294,6 +308,7 @@ function BuyerDashboard({ user }: { user: AuthUser }) {
 
       {loading ? <p className="dash-muted">Loading...</p> : null}
     </main>
+    </PullToRefresh>
   );
 }
 

@@ -1,4 +1,10 @@
 export const dynamic = 'force-dynamic'
 
-// Notification Service API route placeholder
-export async function GET() { return Response.json({ message: 'Notification Service' }); }
+import { NextResponse } from "next/server";
+
+export async function GET() {
+	return NextResponse.json(
+		{ status: "error", code: "not_implemented", message: "Notification route is not implemented." },
+		{ status: 501 }
+	);
+}

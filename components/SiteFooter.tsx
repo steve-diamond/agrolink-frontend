@@ -23,8 +23,8 @@ export default function SiteFooter() {
   return (
     <footer className="mt-12 bg-green-900 py-10 text-white" aria-label="Site footer">
       <div className="container mx-auto grid grid-cols-1 gap-8 px-6 md:grid-cols-3">
-        <div>
-          <h3 className="mb-4 font-bold">Quick Links</h3>
+        <nav aria-labelledby="footer-links-heading">
+          <h2 id="footer-links-heading" className="mb-4 font-bold">Quick Links</h2>
           <ul className="space-y-2">
             {quickLinks.map((item) => (
               <li key={item.href}>
@@ -34,23 +34,25 @@ export default function SiteFooter() {
               </li>
             ))}
           </ul>
+        </nav>
+
+        <div>
+          <h2 id="footer-contact-heading" className="mb-4 font-bold">Contact Us</h2>
+          <address aria-labelledby="footer-contact-heading" className="not-italic space-y-1">
+            <p><a href="mailto:info@dosagrolink.com.ng" className="hover:text-yellow-400">Email: info@dosagrolink.com.ng</a></p>
+            <p><a href="tel:+2348129490467" className="hover:text-yellow-400">Phone: +234 812 949 0467</a></p>
+            <p>Location: Lagos, Nigeria</p>
+          </address>
+          <nav aria-label="Social media links" className="mt-4 flex space-x-4">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400" aria-label="DosAgrolink on Facebook (opens in new tab)">Facebook</a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400" aria-label="DosAgrolink on LinkedIn (opens in new tab)">LinkedIn</a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400" aria-label="DosAgrolink on Instagram (opens in new tab)">Instagram</a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400" aria-label="DosAgrolink on Twitter (opens in new tab)">Twitter</a>
+          </nav>
         </div>
 
         <div>
-          <h3 className="mb-4 font-bold">Contact Us</h3>
-          <p>Email: info@dosagrolink.com.ng</p>
-          <p>Phone: +2348129490467</p>
-          <p>Location: Lagos, Nigeria</p>
-          <div className="mt-4 flex space-x-4">
-            <a href="#" className="hover:text-yellow-400">Facebook</a>
-            <a href="#" className="hover:text-yellow-400">LinkedIn</a>
-            <a href="#" className="hover:text-yellow-400">Instagram</a>
-            <a href="#" className="hover:text-yellow-400">Twitter</a>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="mb-4 font-bold">Our Partners</h3>
+          <h2 className="mb-4 font-bold">Our Partners</h2>
           <div className="grid grid-cols-2 gap-4">
             {partners.map((partner) => (
               <article key={partner.name} className="overflow-hidden rounded-md border border-green-700 bg-green-950/40">

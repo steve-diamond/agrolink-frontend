@@ -1,4 +1,10 @@
 export const dynamic = 'force-dynamic'
 
-// User Service API route placeholder
-export async function GET() { return Response.json({ message: 'User Service' }); }
+import { NextResponse } from "next/server";
+
+export async function GET() {
+	return NextResponse.json(
+		{ status: "error", code: "not_implemented", message: "User API route is not implemented." },
+		{ status: 501 }
+	);
+}

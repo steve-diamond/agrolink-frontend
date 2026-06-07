@@ -5,19 +5,29 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { FaUserFriends, FaUsers, FaCheckCircle, FaHourglassHalf, FaShoppingCart, FaBoxOpen, FaChartBar, FaCog, FaBell, FaSearch } from "react-icons/fa";
 import axios from "axios";
-import { Bar, Pie } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  ArcElement,
-  CategoryScale,
-  LinearScale
-} from "chart.js";
+import dynamic from "next/dynamic";
+import type { AdminDashboardChartsProps } from "./AdminDashboardCharts";
+import { SkeletonChart } from "@/components/ui/Skeleton";
+
+const AdminDashboardCharts = dynamic<AdminDashboardChartsProps>(
+  () => import("./AdminDashboardCharts"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white shadow rounded-lg p-6">
+          <SkeletonChart bars={8} height="h-48" />
+        </div>
+        <div className="bg-white shadow rounded-lg p-6">
+          <SkeletonChart bars={3} height="h-48" />
+        </div>
+      </div>
+    ),
+  },
+);
 
 // Type definitions
 type Farmer = {
@@ -69,8 +79,6 @@ type BuyerApplication = {
   account: ApplicationAccount;
   createdAt?: string;
 };
-
-ChartJS.register(Title, Tooltip, Legend, BarElement, ArcElement, CategoryScale, LinearScale);
 
 const getAuthHeader = () => {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
@@ -207,7 +215,15 @@ export default function AdminDashboard() {
       {/* Sidebar */}
       <aside className="w-64 bg-linear-to-b from-green-900 to-green-700 text-white flex flex-col py-6 px-4 shadow-lg">
         <div className="flex items-center gap-3 mb-10">
-          <img src="/dos-agrolink-logo.jpg" alt="Dos Agrolink" className="w-10 h-10 rounded-full object-cover border-2 border-white/50" />
+          <OptimizedImage
+            src="/dos-agrolink-logo.jpg"
+            alt="Dos Agrolink"
+            width={40}
+            height={40}
+            priority
+            sizesContext="logo"
+            className="rounded-full object-cover border-2 border-white/50"
+          />
           <span className="text-xl font-extrabold tracking-tight">Dos Agrolink</span>
         </div>
         <nav className="flex-1 space-y-2">
@@ -253,16 +269,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Farmer Applications by Category</h2>
-            <Bar data={farmerChartData} />
-          </div>
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Orders by Status</h2>
-            <Pie data={orderChartData} />
-          </div>
-        </div>
+        <AdminDashboardCharts
+          farmerChartData={farmerChartData}
+          orderChartData={orderChartData}
+        />
 
         {/* Pending Farmer Applications */}
         <section className="mb-8">

@@ -100,30 +100,36 @@ function LoginForm() {
             </p>
           )}
 
-          <form onSubmit={handleSubmit} className="grid gap-3">
-            <label className="grid gap-1 text-sm font-semibold text-green-950">
+          <form onSubmit={handleSubmit} className="grid gap-3" noValidate aria-label="Sign in form">
+            <label htmlFor="login-email" className="grid gap-1 text-sm font-semibold text-green-950">
               {copy.email}
               <input
+                id="login-email"
                 name="email"
                 type="email"
                 placeholder={copy.email}
                 value={form.email}
                 onChange={handleChange}
                 required
+                aria-required="true"
+                aria-describedby={error ? "login-error" : undefined}
                 className="min-h-12 rounded-lg border border-green-200 px-3 outline-none ring-green-200 focus:ring"
               />
             </label>
 
-            <label className="grid gap-1 text-sm font-semibold text-green-950">
+            <label htmlFor="login-password" className="grid gap-1 text-sm font-semibold text-green-950">
               {copy.password}
               <div className="relative">
                 <input
+                  id="login-password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder={copy.password}
                   value={form.password}
                   onChange={handleChange}
                   required
+                  aria-required="true"
+                  aria-describedby={error ? "login-error" : undefined}
                   className="min-h-12 w-full rounded-lg border border-green-200 px-3 pr-20 outline-none ring-green-200 focus:ring"
                 />
                 <button
@@ -153,10 +159,23 @@ function LoginForm() {
               </Link>
             </div>
 
-            {error ? <p className="m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p> : null}
+            {/* aria-live ensures the error is announced without page reload */}
+            <p
+              id="login-error"
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+              className={`m-0 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 ${error ? "block" : "hidden"}`}
+            >
+              {error}
+            </p>
 
-            <button type="submit" disabled={isSubmitting} className="btn-primary touch-target mt-1">
-              {isSubmitting ? "Logging in..." : copy.login}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary touch-target mt-1"
+            >
+              {isSubmitting ? "Logging in…" : copy.login}
             </button>
           </form>
 

@@ -1,5 +1,21 @@
 import QuoteCalculator from 'components/insurance/QuoteCalculator';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import { absoluteUrl, breadcrumbSchema, pageMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'Agricultural Insurance in Nigeria - Protect Your Harvest',
+  description:
+    'Secure NAIC-backed agricultural insurance for Nigerian farmers with affordable plans, transparent coverage, and faster claims support.',
+  path: '/insurance',
+  keywords: [
+    'agricultural insurance nigeria',
+    'farm insurance plans',
+    'crop protection nigeria',
+    'naic insurance',
+    'harvest risk coverage',
+  ],
+});
 
 const plans = [
   {
@@ -49,8 +65,34 @@ const faqs = [
 ];
 
 export default function InsuranceLandingPage() {
+  const insuranceBreadcrumbSchema = breadcrumbSchema([
+    { name: 'Home', url: absoluteUrl('/') },
+    { name: 'Insurance', url: absoluteUrl('/insurance') },
+  ]);
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAF9] pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(insuranceBreadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {/* Hero */}
       <div className="bg-[#2D6A4F] text-white py-12 px-4 text-center">
         <h1 className="text-3xl sm:text-4xl font-bold mb-2">Protect Your Harvest, Secure Your Future</h1>

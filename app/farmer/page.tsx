@@ -198,7 +198,16 @@ export default function FarmerPage() {
               >
                 {repayLoading ? "Processing…" : "Pay Now"}
               </button>
-              {repayMessage && <p className="dash-muted mt-2">{repayMessage}</p>}
+              {repayMessage && (
+                <p
+                  className="dash-muted mt-2"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {repayMessage}
+                </p>
+              )}
             </>
           ) : (
             <>
@@ -255,32 +264,43 @@ export default function FarmerPage() {
           <Link href="/orders">View All</Link>
         </div>
         {loading ? (
-          <p className="dash-muted">Loading transactions…</p>
+          <p className="dash-muted" aria-busy="true">Loading transactions…</p>
         ) : orders.length === 0 ? (
           <p className="dash-muted">No transactions yet.</p>
         ) : (
-          <div className="dash-table">
-            {orders.slice(0, 5).map(order => (
-              <div key={order._id} className="dash-row">
-                <span>{order.status}</span>
-                <span>{formatNaira(Number(order.totalAmount ?? order.totalPrice ?? 0))}</span>
-              </div>
-            ))}
-          </div>
+          <table className="dash-table w-full text-sm" aria-label="Recent transactions">
+            <caption className="sr-only">Your 5 most recent transactions</caption>
+            <thead>
+              <tr>
+                <th scope="col" className="text-left py-1 pr-4">Status</th>
+                <th scope="col" className="text-right py-1">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.slice(0, 5).map(order => (
+                <tr key={order._id} className="dash-row border-t">
+                  <td className="py-1 pr-4">{order.status}</td>
+                  <td className="py-1 text-right">{formatNaira(Number(order.totalAmount ?? order.totalPrice ?? 0))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </section>
 
       {/* Quick Links */}
-      <section className="dash-links" aria-label="Quick links">
-        <Link href="/marketplace" className={currentPath === "/marketplace" ? "active-link" : ""}>Marketplace</Link>
-        <Link href="/product-listing" className={currentPath === "/product-listing" ? "active-link" : ""}>My Listings</Link>
-        <Link href="/farmer/upload" className={currentPath === "/farmer/upload" ? "active-link" : ""}>Upload Product</Link>
-        <Link href="/farmer/wallet" className={currentPath === "/farmer/wallet" ? "active-link" : ""}>Wallet</Link>
-        <Link href="/loan-application" className={currentPath === "/loan-application" ? "active-link" : ""}>Apply for Loan</Link>
-        <Link href="/logistics" className={currentPath === "/logistics" ? "active-link" : ""}>Logistics</Link>
-        <Link href="/warehouse" className={currentPath === "/warehouse" ? "active-link" : ""}>Warehouse</Link>
-        <Link href="/investor" className={currentPath === "/investor" ? "active-link" : ""}>Investor Desk</Link>
-      </section>
+      <nav aria-label="Quick links" className="dash-links">
+        <ul className="contents">
+          <li><Link href="/marketplace" aria-current={currentPath === "/marketplace" ? "page" : undefined} className={currentPath === "/marketplace" ? "active-link" : ""}>Marketplace</Link></li>
+          <li><Link href="/product-listing" aria-current={currentPath === "/product-listing" ? "page" : undefined} className={currentPath === "/product-listing" ? "active-link" : ""}>My Listings</Link></li>
+          <li><Link href="/farmer/upload" aria-current={currentPath === "/farmer/upload" ? "page" : undefined} className={currentPath === "/farmer/upload" ? "active-link" : ""}>Upload Product</Link></li>
+          <li><Link href="/farmer/wallet" aria-current={currentPath === "/farmer/wallet" ? "page" : undefined} className={currentPath === "/farmer/wallet" ? "active-link" : ""}>Wallet</Link></li>
+          <li><Link href="/loan-application" aria-current={currentPath === "/loan-application" ? "page" : undefined} className={currentPath === "/loan-application" ? "active-link" : ""}>Apply for Loan</Link></li>
+          <li><Link href="/logistics" aria-current={currentPath === "/logistics" ? "page" : undefined} className={currentPath === "/logistics" ? "active-link" : ""}>Logistics</Link></li>
+          <li><Link href="/warehouse" aria-current={currentPath === "/warehouse" ? "page" : undefined} className={currentPath === "/warehouse" ? "active-link" : ""}>Warehouse</Link></li>
+          <li><Link href="/investor" aria-current={currentPath === "/investor" ? "page" : undefined} className={currentPath === "/investor" ? "active-link" : ""}>Investor Desk</Link></li>
+        </ul>
+      </nav>
     </main>
   );
 }

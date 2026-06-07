@@ -46,7 +46,7 @@ export default function ProductCard({
       <div className="text-gray-400 text-xs mb-2">{state}</div>
       {is_nafdac_approved && <div className="text-xs text-green-700 font-semibold mb-2">NAFDAC Approved</div>}
       <button
-        className="btn bg-[#2D6A4F] text-white mt-auto"
+        className="px-4 py-2 text-sm font-medium rounded inline-block text-center cursor-pointer bg-[#2D6A4F] text-white mt-auto"
         onClick={onAddToCart}
       >
         Add to Cart

@@ -1,4 +1,10 @@
 export const dynamic = 'force-dynamic'
 
-// Payment Service API route placeholder
-export async function GET() { return Response.json({ message: 'Payment Service' }); }
+import { NextResponse } from "next/server";
+
+export async function GET() {
+	return NextResponse.json(
+		{ status: "error", code: "not_implemented", message: "Payment route is not implemented. Use specific payment endpoints." },
+		{ status: 501 }
+	);
+}

@@ -1,5 +1,50 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap");
+/* Design-system fonts loaded via next/font in app/layout.tsx.
+   CSS variables --font-inter and --font-plus-jakarta are applied to <html>. */
+
+/* ── MapLibre GL — dark-theme popup overrides ─────────────────── */
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+/* Strip default white popup shell; our React content provides its own bg */
+.agrolink-map-popup .maplibregl-popup-content {
+  background: transparent;
+  padding: 0;
+  border-radius: 16px;
+  box-shadow: none;
+}
+.agrolink-map-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: rgb(15 23 42); /* slate-900 */
+}
+.agrolink-map-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: rgb(15 23 42);
+}
+/* Dark map controls */
+.maplibregl-ctrl-group {
+  background: rgb(15 23 42) !important;
+  border: 1px solid rgba(255 255 255 / 0.12) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(0 0 0 / 0.4) !important;
+}
+.maplibregl-ctrl-group button {
+  background: transparent !important;
+  color: rgba(255 255 255 / 0.7) !important;
+}
+.maplibregl-ctrl-group button:hover {
+  background: rgba(255 255 255 / 0.08) !important;
+}
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1) opacity(0.7);
+}
+.maplibregl-ctrl-attrib {
+  background: rgba(15 23 42 / 0.8) !important;
+  color: rgba(255 255 255 / 0.4) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a { color: rgba(255 255 255 / 0.4) !important; }
+
 @import "tailwindcss";
+
+/* Load the platform design-system tokens from tailwind.config.js */
+@config "./tailwind.config.js";
 /* Highlight active dashboard quick link */
 .dash-links .active-link {
   font-weight: bold;
@@ -7,47 +52,441 @@
   text-decoration: underline;
 }
 
-:root {
-  --background: #f2f7ef;
-  --foreground: #152516;
-  --brand-green-900: #173920;
-  --brand-green-700: #1f6b3f;
-  --brand-green-600: #2c8b52;
-  --brand-gold-500: #d3a628;
-  --brand-gold-300: #efd486;
-  --surface: #ffffff;
-  --surface-muted: #eaf2e4;
-  --border-soft: #d4e2cf;
-  --dos-green-900: #154a2a;
-  --dos-green-700: #246b35;
-  --dos-green-500: #2f8a49;
-  --dos-earth-100: #f8f2e3;
-  --dos-earth-200: #efe5cd;
-  --dos-earth-300: #dcccad;
-  --dos-earth-500: #b98734;
-  --dos-teal-500: #2b7c78;
-  --dos-text-strong: #27352b;
-  --dos-text-muted: #4f5d52;
-}
+/* ================================================================
+   DESIGN TOKENS — CSS Custom Properties
+   Single source of truth for the DosAgrolink design system.
+   Organised in @layer base so Tailwind utilities always win
+   in the cascade when needed.
+
+   Usage in components:
+     color: var(--color-fg);
+     padding: var(--space-md);
+     box-shadow: var(--shadow-lg);
+     transition: all var(--duration-normal) var(--ease-smooth);
+   ================================================================ */
+
+@layer base {
+
+  /* ── Light mode (default) ─────────────────────────────────── */
+  :root {
+    color-scheme: light dark;
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  COLOURS                                            │
+       └─────────────────────────────────────────────────────┘ */
+
+    /* Surfaces */
+    --color-bg:              #f2f7ef;
+    --color-bg-subtle:       #edf5e8;
+    --color-bg-muted:        #f7fbf4;
+    --color-surface:         #ffffff;
+    --color-surface-raised:  #ffffff;
+    --color-surface-overlay: rgba(255, 255, 255, 0.92);
+    --color-surface-muted:   #eaf2e4;
+
+    /* Foreground / Text */
+    --color-fg:              #152516;
+    --color-fg-subtle:       #27352b;
+    --color-fg-muted:        #4f5d52;
+    --color-fg-placeholder:  #9aad9e;
+    --color-fg-on-primary:   #ffffff;
+    --color-fg-on-secondary: #ffffff;
+
+    /* Primary — Vibrant Green (#16A34A) */
+    --color-primary-50:      #f0fdf4;
+    --color-primary-100:     #dcfce7;
+    --color-primary-200:     #bbf7d0;
+    --color-primary-300:     #86efac;
+    --color-primary-400:     #4ade80;
+    --color-primary-500:     #22c55e;
+    --color-primary-600:     #16a34a;
+    --color-primary-700:     #15803d;
+    --color-primary-800:     #166534;
+    --color-primary-900:     #14532d;
+    --color-primary-950:     #052e16;
+    --color-primary:         var(--color-primary-600);
+    --color-primary-hover:   var(--color-primary-700);
+    --color-primary-active:  var(--color-primary-800);
+
+    /* Secondary — Warm Orange (#EA580C) */
+    --color-secondary-50:    #fff7ed;
+    --color-secondary-100:   #ffedd5;
+    --color-secondary-200:   #fed7aa;
+    --color-secondary-300:   #fdba74;
+    --color-secondary-400:   #fb923c;
+    --color-secondary-500:   #f97316;
+    --color-secondary-600:   #ea580c;
+    --color-secondary-700:   #c2410c;
+    --color-secondary-800:   #9a3412;
+    --color-secondary-900:   #7c2d12;
+    --color-secondary:       var(--color-secondary-600);
+    --color-secondary-hover: var(--color-secondary-700);
+
+    /* Accent — Teal (#0891B2) */
+    --color-accent-50:       #ecfeff;
+    --color-accent-100:      #cffafe;
+    --color-accent-200:      #a5f3fc;
+    --color-accent-300:      #67e8f9;
+    --color-accent-400:      #22d3ee;
+    --color-accent-500:      #06b6d4;
+    --color-accent-600:      #0891b2;
+    --color-accent-700:      #0e7490;
+    --color-accent-800:      #155e75;
+    --color-accent-900:      #164e63;
+    --color-accent:          var(--color-accent-600);
+    --color-accent-hover:    var(--color-accent-700);
+
+    /* Semantic — Success */
+    --color-success:         #10B981;
+    --color-success-bg:      #ECFDF5;
+    --color-success-border:  #A7F3D0;
+    --color-success-text:    #065F46;
+
+    /* Semantic — Warning */
+    --color-warning:         #F59E0B;
+    --color-warning-bg:      #FFFBEB;
+    --color-warning-border:  #FDE68A;
+    --color-warning-text:    #78350F;
+
+    /* Semantic — Error */
+    --color-error:           #EF4444;
+    --color-error-bg:        #FEF2F2;
+    --color-error-border:    #FECACA;
+    --color-error-text:      #7F1D1D;
+
+    /* Semantic — Info */
+    --color-info:            #0891b2;
+    --color-info-bg:         #ecfeff;
+    --color-info-border:     #a5f3fc;
+    --color-info-text:       #164e63;
+
+    /* Borders */
+    --color-border:          #d4e2cf;
+    --color-border-strong:   #b5cead;
+    --color-border-subtle:   #e8f0e4;
+    --color-border-focus:    var(--color-primary-500);
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  SPACING                                            │
+       └─────────────────────────────────────────────────────┘ */
+    --space-0:    0;
+    --space-px:   1px;
+    --space-xs:   0.25rem;   /*  4px */
+    --space-sm:   0.5rem;    /*  8px */
+    --space-md:   0.75rem;   /* 12px */
+    --space-base: 1rem;      /* 16px */
+    --space-lg:   1.25rem;   /* 20px */
+    --space-xl:   1.5rem;    /* 24px */
+    --space-2xl:  2rem;      /* 32px */
+    --space-3xl:  2.5rem;    /* 40px */
+    --space-4xl:  3rem;      /* 48px */
+    --space-5xl:  4rem;      /* 64px */
+    --space-6xl:  5rem;      /* 80px */
+    --space-7xl:  6rem;      /* 96px */
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  TYPOGRAPHY SCALE                                   │
+       └─────────────────────────────────────────────────────┘ */
+    --text-xs:   0.75rem;    /* 12px */
+    --text-sm:   0.875rem;   /* 14px */
+    --text-base: 1rem;       /* 16px */
+    --text-lg:   1.125rem;   /* 18px */
+    --text-xl:   1.25rem;    /* 20px */
+    --text-2xl:  1.5rem;     /* 24px */
+    --text-3xl:  1.875rem;   /* 30px */
+    --text-4xl:  2.25rem;    /* 36px */
+    --text-5xl:  3rem;       /* 48px */
+    --text-6xl:  3.75rem;    /* 60px */
+
+    --leading-tight:   1.25;
+    --leading-snug:    1.375;
+    --leading-normal:  1.5;
+    --leading-relaxed: 1.75;
+    --leading-loose:   2;
+
+    --tracking-tight:  -0.025em;
+    --tracking-normal:  0em;
+    --tracking-wide:    0.025em;
+    --tracking-wider:   0.05em;
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  SHADOWS  (green-tinted for brand cohesion)         │
+       └─────────────────────────────────────────────────────┘ */
+    --shadow-xs:
+      0 1px 2px 0 rgba(22, 163, 74, 0.04);
+    --shadow-sm:
+      0 1px 3px 0 rgba(22, 163, 74, 0.08),
+      0 1px 2px -1px rgba(22, 163, 74, 0.05);
+    --shadow-md:
+      0 4px 6px -1px rgba(22, 163, 74, 0.08),
+      0 2px 4px -2px rgba(22, 163, 74, 0.04);
+    --shadow-lg:
+      0 10px 15px -3px rgba(22, 163, 74, 0.08),
+      0 4px 6px -4px rgba(22, 163, 74, 0.04);
+    --shadow-xl:
+      0 20px 25px -5px rgba(22, 163, 74, 0.10),
+      0 8px 10px -6px rgba(22, 163, 74, 0.04);
+    --shadow-2xl:
+      0 25px 50px -12px rgba(22, 163, 74, 0.15);
+    --shadow-glow:
+      0 0 20px rgba(22, 163, 74, 0.25),
+      0 0 40px rgba(22, 163, 74, 0.10);
+    --shadow-inner:
+      inset 0 2px 4px 0 rgba(22, 163, 74, 0.05);
+    --shadow-none: none;
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  ANIMATION DURATIONS                                │
+       └─────────────────────────────────────────────────────┘ */
+    --duration-instant: 50ms;
+    --duration-fast:    150ms;
+    --duration-normal:  200ms;
+    --duration-slow:    300ms;
+    --duration-slower:  500ms;
+    --duration-slowest: 700ms;
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  EASING FUNCTIONS                                   │
+       └─────────────────────────────────────────────────────┘ */
+    --ease-linear:   linear;
+    --ease-in:       cubic-bezier(0.4, 0, 1, 1);
+    --ease-out:      cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-smooth:   cubic-bezier(0.4, 0, 0.2, 1);   /* alias */
+    --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-bounce:   cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  Z-INDEX SCALE                                      │
+       └─────────────────────────────────────────────────────┘ */
+    --z-below:    -1;
+    --z-base:      0;
+    --z-raised:   10;
+    --z-dropdown: 1000;
+    --z-sticky:   1020;
+    --z-overlay:  1040;
+    --z-modal:    1050;
+    --z-toast:    1080;
+    --z-tooltip:  1100;
+    --z-max:      9999;
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  BORDER RADIUS                                      │
+       └─────────────────────────────────────────────────────┘ */
+    --radius-none: 0;
+    --radius-xs:   2px;
+    --radius-sm:   4px;
+    --radius-md:   8px;
+    --radius-lg:   12px;
+    --radius-xl:   16px;
+    --radius-2xl:  24px;
+    --radius-3xl:  32px;
+    --radius-full: 9999px;
+
+    /* ┌─────────────────────────────────────────────────────┐
+       │  MISC TOKENS                                        │
+       └─────────────────────────────────────────────────────┘ */
+
+    /* Border widths */
+    --border-thin:   1px;
+    --border-base:   1.5px;
+    --border-thick:  2px;
+    --border-heavy:  3px;
+
+    /* Opacity */
+    --opacity-disabled: 0.5;
+    --opacity-subtle:   0.7;
+    --opacity-overlay:  0.6;
+
+    /* Breakpoint refs — read by JS / component logic */
+    --bp-mobile:   640px;
+    --bp-tablet:   768px;
+    --bp-desktop: 1024px;
+    --bp-wide:    1280px;
+
+    /* ── Legacy aliases ─────────────────────────────────────── */
+    /* Keep these so existing components don't break.           */
+    --background:       var(--color-bg);
+    --foreground:       var(--color-fg);
+    --surface:          var(--color-surface);
+    --surface-muted:    var(--color-surface-muted);
+    --border-soft:      var(--color-border);
+    --brand-green-900:  #173920;
+    --brand-green-700:  #1f6b3f;
+    --brand-green-600:  #2c8b52;
+    --brand-gold-500:   #d3a628;
+    --brand-gold-300:   #efd486;
+    --dos-green-900:    #154a2a;
+    --dos-green-700:    #246b35;
+    --dos-green-500:    #2f8a49;
+    --dos-earth-100:    #f8f2e3;
+    --dos-earth-200:    #efe5cd;
+    --dos-earth-300:    #dcccad;
+    --dos-earth-500:    #b98734;
+    --dos-teal-500:     #2b7c78;
+    --dos-text-strong:  #27352b;
+    --dos-text-muted:   #4f5d52;
+  }
+
+  /* ── Dark mode: OS-level preference ──────────────────────────
+     Activates when the OS is in dark mode and no explicit
+     [data-theme="light"] attribute is set on <html>.           */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+
+      /* Surfaces */
+      --color-bg:              #0d1f12;
+      --color-bg-subtle:       #112018;
+      --color-bg-muted:        #091510;
+      --color-surface:         #1a2e1e;
+      --color-surface-raised:  #1e3523;
+      --color-surface-overlay: rgba(26, 46, 30, 0.92);
+      --color-surface-muted:   #172819;
+
+      /* Text */
+      --color-fg:              #e8f5e4;
+      --color-fg-subtle:       #c8dfc3;
+      --color-fg-muted:        #8aaa84;
+      --color-fg-placeholder:  #4a6347;
+
+      /* Borders */
+      --color-border:          #2a4030;
+      --color-border-strong:   #3a5540;
+      --color-border-subtle:   #1e3226;
+
+      /* Semantic overrides */
+      --color-success-bg:      #052e1c;
+      --color-success-border:  #065F46;
+      --color-success-text:    #6ee7b7;
+      --color-warning-bg:      #2d1a00;
+      --color-warning-border:  #78350F;
+      --color-warning-text:    #fcd34d;
+      --color-error-bg:        #2d0a0a;
+      --color-error-border:    #7F1D1D;
+      --color-error-text:      #fca5a5;
+      --color-info-bg:         #082030;
+      --color-info-border:     #164E63;
+      --color-info-text:       #67e8f9;
+
+      /* Shadows — heavier on dark backgrounds */
+      --shadow-xs:
+        0 1px 2px 0 rgba(0, 0, 0, 0.30);
+      --shadow-sm:
+        0 1px 3px 0 rgba(0, 0, 0, 0.40),
+        0 1px 2px -1px rgba(0, 0, 0, 0.30);
+      --shadow-md:
+        0 4px 6px -1px rgba(0, 0, 0, 0.40),
+        0 2px 4px -2px rgba(0, 0, 0, 0.30);
+      --shadow-lg:
+        0 10px 15px -3px rgba(0, 0, 0, 0.45),
+        0 4px 6px -4px rgba(0, 0, 0, 0.30);
+      --shadow-xl:
+        0 20px 25px -5px rgba(0, 0, 0, 0.50),
+        0 8px 10px -6px rgba(0, 0, 0, 0.30);
+      --shadow-2xl:
+        0 25px 50px -12px rgba(0, 0, 0, 0.60);
+      --shadow-glow:
+        0 0 20px rgba(34, 197, 94, 0.20),
+        0 0 40px rgba(34, 197, 94, 0.08);
+
+      /* Legacy alias overrides */
+      --background:       var(--color-bg);
+      --foreground:       var(--color-fg);
+      --surface:          var(--color-surface);
+      --surface-muted:    var(--color-surface-muted);
+      --border-soft:      var(--color-border);
+      --dos-text-strong:  #c8dfc3;
+      --dos-text-muted:   #8aaa84;
+    }
+  }
+
+  /* ── Dark mode: explicit [data-theme="dark"] toggle ──────────
+     Set document.documentElement.dataset.theme = 'dark' in JS
+     to override the OS preference and force dark mode.         */
+  [data-theme="dark"] {
+    color-scheme: dark;
+
+    /* Surfaces */
+    --color-bg:              #0d1f12;
+    --color-bg-subtle:       #112018;
+    --color-bg-muted:        #091510;
+    --color-surface:         #1a2e1e;
+    --color-surface-raised:  #1e3523;
+    --color-surface-overlay: rgba(26, 46, 30, 0.92);
+    --color-surface-muted:   #172819;
+
+    /* Text */
+    --color-fg:              #e8f5e4;
+    --color-fg-subtle:       #c8dfc3;
+    --color-fg-muted:        #8aaa84;
+    --color-fg-placeholder:  #4a6347;
+
+    /* Borders */
+    --color-border:          #2a4030;
+    --color-border-strong:   #3a5540;
+    --color-border-subtle:   #1e3226;
+
+    /* Semantic overrides */
+    --color-success-bg:      #052e1c;
+    --color-success-border:  #065F46;
+    --color-success-text:    #6ee7b7;
+    --color-warning-bg:      #2d1a00;
+    --color-warning-border:  #78350F;
+    --color-warning-text:    #fcd34d;
+    --color-error-bg:        #2d0a0a;
+    --color-error-border:    #7F1D1D;
+    --color-error-text:      #fca5a5;
+    --color-info-bg:         #082030;
+    --color-info-border:     #164E63;
+    --color-info-text:       #67e8f9;
+
+    /* Shadows */
+    --shadow-xs:
+      0 1px 2px 0 rgba(0, 0, 0, 0.30);
+    --shadow-sm:
+      0 1px 3px 0 rgba(0, 0, 0, 0.40),
+      0 1px 2px -1px rgba(0, 0, 0, 0.30);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.40),
+      0 2px 4px -2px rgba(0, 0, 0, 0.30);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.45),
+      0 4px 6px -4px rgba(0, 0, 0, 0.30);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.50),
+      0 8px 10px -6px rgba(0, 0, 0, 0.30);
+    --shadow-2xl:
+      0 25px 50px -12px rgba(0, 0, 0, 0.60);
+    --shadow-glow:
+      0 0 20px rgba(34, 197, 94, 0.20),
+      0 0 40px rgba(34, 197, 94, 0.08);
+
+    /* Legacy alias overrides */
+    --background:       var(--color-bg);
+    --foreground:       var(--color-fg);
+    --surface:          var(--color-surface);
+    --surface-muted:    var(--color-surface-muted);
+    --border-soft:      var(--color-border);
+    --dos-text-strong:  #c8dfc3;
+    --dos-text-muted:   #8aaa84;
+  }
+
+} /* end @layer base */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Manrope", "Segoe UI", sans-serif;
-  --font-mono: "Sora", "Segoe UI", sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #f2f7ef;
-    --foreground: #152516;
-  }
+  --font-sans:    "Inter",               "ui-sans-serif", "system-ui", sans-serif;
+  --font-heading: "Plus Jakarta Sans",   "ui-sans-serif", sans-serif;
+  --font-mono:    "ui-monospace", "SFMono-Regular", "Menlo", monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-family: "Inter", "ui-sans-serif", system-ui, sans-serif;
   line-height: 1.5;
 }
 
@@ -279,6 +718,7 @@ body {
   border: 1px solid rgba(199, 178, 124, 0.5);
   border-radius: 14px;
   background: rgba(250, 246, 235, 0.76);
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
   box-shadow: 0 16px 28px rgba(35, 44, 31, 0.12);
   padding: 1rem 1.05rem;
@@ -2358,6 +2798,7 @@ button {
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.45);
   background: rgba(13, 46, 19, 0.66);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   padding: 0.55rem 0.65rem;
   color: #effff1;
@@ -2487,7 +2928,7 @@ button {
 }
 
 .vision-footer-strip span {
-  min-width: fit-content;
+  min-width: -webkit-fill-available;
   border-radius: 999px;
   background: #0f5a31;
   color: #e9ffd9;
@@ -2747,7 +3188,7 @@ button {
 }
 
 .dos-header-nav-scroll {
-  scrollbar-width: none;
+  overflow-y: hidden;
 }
 
 .dos-header-nav-scroll::-webkit-scrollbar {
@@ -2894,6 +3335,169 @@ button {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Pull-to-refresh toast banner */
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+.animate-fade-in-down {
+  animation: fade-in-down 0.22s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+
+/* ── Mobile form component animations ────────────────────────────────────── */
+
+/* Success checkmark pop-in */
+@keyframes field-success {
+  0%   { opacity: 0; transform: scale(0.4); }
+  60%  { transform: scale(1.25); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-field-success {
+  animation: field-success 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Error message shake-in */
+@keyframes field-error {
+  0%   { opacity: 0; transform: translateX(-4px); }
+  30%  { transform: translateX(4px); }
+  60%  { transform: translateX(-2px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.animate-field-error {
+  animation: field-error 0.28s ease both;
+}
+
+/* Dropdown slide-down */
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-6px) scaleY(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scaleY(1); }
+}
+
+/* ── Skeleton shimmer ─────────────────────────────────────────────────────── */
+/*
+   CSS variables used by Skeleton.tsx:
+     --sk-base   — fill colour (uses design token, auto dark-mode)
+     --sk-shine  — highlight colour that sweeps across
+     --sk-dur    — animation duration (overridden by SkeletonProvider)
+*/
+:root {
+  --sk-base:  var(--color-border-subtle);
+  --sk-shine: var(--color-surface);
+  --sk-dur:   1.5s;
+}
+
+@keyframes sk-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.sk-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent              0%,
+    var(--sk-shine) 50%,
+    transparent              100%
+  );
+  background-size:     200% 100%;
+  background-repeat:   no-repeat;
+  animation:           sk-shimmer var(--sk-dur) linear infinite;
+}
+
+/* Speed variants via data-speed attribute (set by SkeletonProvider) */
+.sk-shimmer[data-speed="slow"]   { --sk-dur: 2.4s; }
+.sk-shimmer[data-speed="normal"] { --sk-dur: 1.5s; }
+.sk-shimmer[data-speed="fast"]   { --sk-dur: 0.9s; }
+
+/* Table grid — column count is driven by the --sk-cols CSS variable */
+.sk-table-grid {
+  display:               grid;
+  grid-template-columns: repeat(var(--sk-cols, 4), 1fr);
+  gap:                   0.75rem;
+  align-items:           center;
+}
+
+/* Respect user's reduced-motion preference at the CSS level */
+@media (prefers-reduced-motion: reduce) {
+  .sk-shimmer {
+    animation: none;
+    background-image: none;
+  }
+}
+
+/* ── SmartButton micro-animations ─────────────────────────────────────────── */
+
+/* Ripple: expanding circle from the pointer-down point */
+@keyframes btn-ripple {
+  from { transform: scale(0); opacity: 0.45; }
+  to   { transform: scale(1); opacity: 0; }
+}
+
+.btn-ripple {
+  position:         absolute;
+  left:             var(--ripple-x, 0);
+  top:              var(--ripple-y, 0);
+  width:            var(--ripple-size, 0);
+  height:           var(--ripple-size, 0);
+  border-radius:    9999px;
+  background-color: var(--ripple-color, rgba(255,255,255,0.28));
+  pointer-events:   none;
+  transform:        scale(0);
+  animation:        btn-ripple 0.65s ease-out forwards;
+  will-change:      transform, opacity;
+}
+
+/* Loading: subtle ring-pulse around the button */
+@keyframes btn-loading-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.35); }
+  55%      { box-shadow: 0 0 0 5px rgba(255, 255, 255, 0); }
+}
+
+.btn-loading-pulse {
+  animation: btn-loading-pulse 1.3s ease-out infinite;
+}
+
+/* Error: red glow flash */
+@keyframes btn-error-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  50%  { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { box-shadow: none; }
+}
+
+.btn-error-flash {
+  animation: btn-error-flash 0.5s ease-out forwards;
+}
+
+/* Success: green glow burst */
+@keyframes btn-success-burst {
+  0%   { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+  60%  { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: none; }
+}
+
+.btn-success-burst {
+  animation: btn-success-burst 0.55s ease-out forwards;
+}
+
+/* Respect prefers-reduced-motion for button animations */
+@media (prefers-reduced-motion: reduce) {
+  .btn-ripple,
+  .btn-loading-pulse,
+  .btn-error-flash,
+  .btn-success-burst {
+    animation: none;
+  }
+}
+.animate-slide-down {
+  animation: slide-down 0.18s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+  transform-origin: top;
 }
 
 @media (max-width: 980px) {
@@ -3150,4 +3754,455 @@ button {
   .no-print { display: none !important; }
   .print-card { break-inside: avoid; page-break-inside: avoid; }
   .admin-board { background: #ffffff !important; }
+}
+
+/* ================================================================
+   ACCESSIBILITY — DosAgrolink
+   Focus indicators, skip navigation, and keyboard-nav helpers.
+   ================================================================ */
+
+/* ── Skip to main content link ───────────────────────────────────
+   Visually hidden until focused via keyboard. Placed first in
+   the DOM so it is the very first Tab stop.
+   ─────────────────────────────────────────────────────────────── */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: var(--z-max, 9999);
+  white-space: nowrap;
+  text-decoration: none;
+}
+.skip-to-content:focus,
+.skip-to-content:focus-visible {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-primary-600, #16a34a);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  outline: 2px solid var(--color-primary-300, #86efac);
+  outline-offset: 2px;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+}
+
+/* ── Global focus ring ───────────────────────────────────────────
+   2 px primary-colour ring for keyboard navigation.
+   Suppressed for mouse/pointer users via :focus:not(:focus-visible).
+   ─────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary-500, #22c55e);
+  outline-offset: 2px;
+}
+
+/* Reset browser default when :focus-visible is not triggered
+   (pointer / touch interaction). Keeps things clean for mouse users. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Enhanced ring when the user has navigated with Tab at least once.
+   FocusManager adds [data-keyboard-nav] to <html>. */
+[data-keyboard-nav] :focus-visible {
+  outline: 2px solid var(--color-primary-500, #22c55e);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+}
+
+/* Ensure buttons on dark backgrounds get a visible ring */
+[data-keyboard-nav] button:focus-visible,
+[data-keyboard-nav] a:focus-visible,
+[data-keyboard-nav] [role="button"]:focus-visible {
+  outline: 2px solid var(--color-primary-400, #4ade80);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.22);
+}
+
+/* ── aria-disabled elements ──────────────────────────────────────
+   Should never receive focus; mark as non-interactive. */
+[aria-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ── Reduce motion preference ────────────────────────────────────
+   Honour the OS "reduce motion" setting for animations. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── High-contrast mode support ──────────────────────────────────
+   Windows forced-colors (high-contrast) overrides. */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid ButtonText;
+  }
+  .skip-to-content:focus {
+    background: ButtonFace;
+    color: ButtonText;
+    outline: 3px solid ButtonText;
+  }
+}
+
+/* ================================================================
+   ACCESSIBILITY PROVIDER OVERRIDES
+   Applied via data-* attributes on <html>, managed by
+   components/AccessibilityProvider.tsx.
+   These mirror and extend the OS-level media-query rules above,
+   allowing users to override their system settings in-app.
+   ================================================================ */
+
+/* ── 1. Reduced Motion (JS-managed override) ─────────────────────
+   Mirrors `@media (prefers-reduced-motion: reduce)` but is
+   triggered by the in-app toggle rather than the OS setting.     */
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] *::before,
+[data-reduced-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Auto-playing content: when reduced-motion is on, pause carousels
+   and any element marked with [data-autoplay]. */
+[data-reduced-motion="true"] [data-autoplay],
+[data-reduced-motion="true"] .dos-hero-slide,
+[data-reduced-motion="true"] .dos-hero-progress span::before {
+  animation-play-state: paused !important;
+}
+
+/* ── 2. High Contrast (JS-managed override) ──────────────────────
+   Strengthens colour tokens for users who need higher contrast
+   beyond what the default palette provides.                      */
+[data-high-contrast="true"] {
+  --color-fg:              #000000;
+  --color-fg-subtle:       #000000;
+  --color-fg-muted:        #1a1a1a;
+  --color-bg:              #ffffff;
+  --color-surface:         #ffffff;
+  --color-surface-raised:  #ffffff;
+  --color-primary:         #005500;
+  --color-primary-hover:   #003300;
+  --color-primary-active:  #002200;
+  --color-border:          #000000;
+  --color-border-strong:   #000000;
+  --color-border-focus:    #000000;
+  --color-success-text:    #005500;
+  --color-success:         #005500;
+  --color-error-text:      #cc0000;
+  --color-error:           #cc0000;
+  --color-warning-text:    #805000;
+  --color-warning:         #805000;
+  --color-info-text:       #003080;
+  --color-info:            #003080;
+}
+
+[data-high-contrast="true"] :focus-visible {
+  outline: 3px solid #000000;
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+[data-high-contrast="true"] .btn-primary,
+[data-high-contrast="true"] [class*="btn-"] {
+  border: 2px solid currentColor !important;
+}
+
+/* Dark theme + high contrast */
+[data-theme="dark"][data-high-contrast="true"],
+[data-high-contrast="true"]:where([data-theme="dark"] *) {
+  --color-fg:     #ffffff;
+  --color-bg:     #000000;
+  --color-border: #ffffff;
+}
+
+/* ── 3. Font Scale ────────────────────────────────────────────────
+   Scales the root font size, which all rem-based values inherit.
+   Keeps minimum body text at ≥16px (normal = 16px, large = 18px,
+   larger = 20px).                                                  */
+[data-font-scale="large"] {
+  font-size: 112.5%; /* 18px */
+}
+
+[data-font-scale="larger"] {
+  font-size: 125%; /* 20px */
+}
+
+/* ── 4. Colour-Blind Mode ─────────────────────────────────────────
+   CSS filter references the inline SVG <feColorMatrix> definitions
+   rendered by AccessibilityProvider. Applied to <html> so the
+   entire viewport is processed.
+   These are simulation/compensation modes only — the UI should
+   always use icon+text alongside colour for status, never colour
+   alone (see .a11y-status-* utilities below).                     */
+[data-color-blind-mode="protanopia"] {
+  filter: url('#a11y-filter-protanopia');
+}
+
+[data-color-blind-mode="deuteranopia"] {
+  filter: url('#a11y-filter-deuteranopia');
+}
+
+[data-color-blind-mode="tritanopia"] {
+  filter: url('#a11y-filter-tritanopia');
+}
+
+[data-color-blind-mode="achromatopsia"] {
+  filter: grayscale(100%);
+}
+
+/* ── 5. Text Legibility Baseline ──────────────────────────────────
+   WCAG 1.4.8: paragraph max 80 characters, line-height ≥ 1.5.
+   Applied globally; components can override where layout demands. */
+p,
+li,
+dt,
+dd,
+blockquote {
+  max-width: 80ch;
+  line-height: 1.5;
+}
+
+/* Standalone paragraph containers (e.g., article, .prose) */
+article p,
+.prose p,
+.content p {
+  max-width: 75ch;
+}
+
+/* ── 6. Touch Target Enforcement ──────────────────────────────────
+   WCAG 2.5.5 / 2.5.8: interactive controls ≥ 44×44 px.
+   The .touch-target class already provides 52px; these rules add a
+   global minimum for undecorated interactive elements.             */
+button:not([class]),
+[role="button"]:not([class]),
+summary:not([class]) {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Ensure inline interactive elements have adequate spacing */
+a {
+  display: inline-block;
+  min-height: 24px; /* prevents overly tight inline links */
+}
+
+/* ── 7. Zoom & 320px Support ──────────────────────────────────────
+   WCAG 1.4.4 & 1.4.10: layout must be functional at 200% zoom
+   and at 320px viewport width without horizontal scrolling.       */
+@media (max-width: 320px) {
+  .app-shell {
+    width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Prevent fixed-width elements from causing overflow */
+  img,
+  video,
+  iframe,
+  table {
+    max-width: 100%;
+  }
+
+  /* Stack any flex rows that would overflow at 320px */
+  .dos-hero-actions,
+  .dos-cta-actions,
+  .dos-story-metrics {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Prevent overflow at any viewport when zoomed */
+html {
+  overflow-x: clip;
+}
+
+/* ── 8. Status Indicator Utilities (colour-blind safe) ────────────
+   Use these classes alongside colour for status — never colour
+   alone (WCAG 1.4.1).  Each adds an icon prefix via ::before
+   so meaning is conveyed through shape + text, not colour only.  */
+
+/* Generic container */
+.a11y-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.a11y-status::before {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  font-size: 0.625rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* Success — green circle + ✓ */
+.a11y-status--success {
+  color: var(--color-success-text, #065f46);
+}
+.a11y-status--success::before {
+  content: "✓";
+  background: var(--color-success, #10b981);
+  color: #ffffff;
+}
+
+/* Error — red circle + ✕ */
+.a11y-status--error {
+  color: var(--color-error-text, #7f1d1d);
+}
+.a11y-status--error::before {
+  content: "✕";
+  background: var(--color-error, #ef4444);
+  color: #ffffff;
+}
+
+/* Warning — amber circle + ! */
+.a11y-status--warning {
+  color: var(--color-warning-text, #78350f);
+}
+.a11y-status--warning::before {
+  content: "!";
+  background: var(--color-warning, #f59e0b);
+  color: #ffffff;
+}
+
+/* Info — blue circle + i */
+.a11y-status--info {
+  color: var(--color-info-text, #164e63);
+}
+.a11y-status--info::before {
+  content: "i";
+  background: var(--color-info, #0891b2);
+  color: #ffffff;
+  font-style: italic;
+}
+
+/* Pending — grey circle + … */
+.a11y-status--pending {
+  color: var(--color-fg-muted, #4f5d52);
+}
+.a11y-status--pending::before {
+  content: "…";
+  background: #9ca3af;
+  color: #ffffff;
+  font-size: 0.5rem;
+}
+
+/* ── 9. Chart / Data Visualisation Patterns ───────────────────────
+   SVG fill patterns for charts that convey data via texture, not
+   colour alone (WCAG 1.4.1 for non-text content).               */
+
+/* Pattern class applied to <svg> or chart wrapper */
+.a11y-chart-pattern--dots {
+  background-image: radial-gradient(circle, currentColor 1.5px, transparent 1.5px);
+  background-size: 6px 6px;
+}
+
+.a11y-chart-pattern--lines {
+  background-image: repeating-linear-gradient(
+    45deg,
+    currentColor 0,
+    currentColor 1px,
+    transparent 0,
+    transparent 50%
+  );
+  background-size: 6px 6px;
+}
+
+.a11y-chart-pattern--cross {
+  background-image:
+    repeating-linear-gradient(0deg, currentColor 0, currentColor 1px, transparent 0, transparent 50%),
+    repeating-linear-gradient(90deg, currentColor 0, currentColor 1px, transparent 0, transparent 50%);
+  background-size: 6px 6px;
+}
+
+.a11y-chart-pattern--zigzag {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    currentColor 0,
+    currentColor 1px,
+    transparent 0,
+    transparent 50%
+  );
+  background-size: 8px 8px;
+}
+
+/* Hidden SVG filter container rendered by AccessibilityProvider */
+.a11y-svg-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ── 10. Auto-play Pause Button ───────────────────────────────────
+   WCAG 2.2.2: provide a mechanism to pause auto-moving content.
+   Add class .a11y-autoplay-controls to a wrapper that contains
+   [data-autoplay] content; the pause/play toggle button gets this
+   style.                                                          */
+.a11y-pause-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background var(--duration-fast, 150ms) ease,
+              border-color var(--duration-fast, 150ms) ease;
+}
+
+.a11y-pause-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+  border-color: #ffffff;
+}
+
+.a11y-pause-btn:focus-visible {
+  outline: 2px solid var(--color-primary-400, #4ade80);
+  outline-offset: 2px;
+}
+
+/* ── 11. prefers-contrast: more ──────────────────────────────────
+   System-level "increase contrast" setting (macOS / Windows).   */
+@media (prefers-contrast: more) {
+  :root {
+    --color-border:        #000000;
+    --color-border-strong: #000000;
+    --color-fg-muted:      var(--color-fg);
+  }
+
+  :focus-visible {
+    outline-width: 3px;
+  }
 }

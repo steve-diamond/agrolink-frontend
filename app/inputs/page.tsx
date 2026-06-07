@@ -1,9 +1,8 @@
 "use client";
-"use client";
 import React, { useState } from 'react';
-import useSWR from 'swr';
 import ProductCard from 'components/inputs/ProductCard';
 import { useCartStore } from 'store/cart';
+import { useInputProducts } from '../../lib/hooks/useInputProducts';
 
 const CATEGORIES = [
   { label: 'All', value: '' },
@@ -18,10 +17,13 @@ export default function InputsMarketplacePage() {
   const [state, setState] = useState('');
   const [price, setPrice] = useState([0, 500000]);
   const [nafdac, setNafdac] = useState(false);
-  const { data, isLoading } = useSWR(
-    `/api/inputs/products?${category ? `category=${category}&` : ''}${state ? `state=${state}&` : ''}minPrice=${price[0]}&maxPrice=${price[1]}${nafdac ? '&nafdac=1' : ''}`,
-    (url: string) => fetch(url).then((r) => r.json())
-  );
+  const { data: products, isPending } = useInputProducts({
+    category: category || undefined,
+    state: state || undefined,
+    minPrice: price[0],
+    maxPrice: price[1],
+    nafdac,
+  });
   const addItem = useCartStore((s) => s.addItem);
 
   return (
@@ -35,7 +37,7 @@ export default function InputsMarketplacePage() {
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.value}
-                className={`btn ${category === cat.value ? 'bg-[#2D6A4F] text-white' : 'bg-gray-100'}`}
+                className={`w-full px-3 py-1.5 text-sm font-medium rounded text-left cursor-pointer ${category === cat.value ? 'bg-[#2D6A4F] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                 onClick={() => setCategory(cat.value)}
               >
                 {cat.label}
@@ -65,7 +67,7 @@ export default function InputsMarketplacePage() {
         <h1 className="text-2xl font-bold mb-2 text-[#2D6A4F]">Certified Farm Inputs</h1>
         <p className="mb-6 text-gray-600">Buy directly from verified agro-dealers</p>
         {/* Product Grid */}
-        {isLoading ? (
+        {isPending ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="bg-white rounded-2xl shadow p-4 animate-pulse h-48" />
@@ -73,7 +75,7 @@ export default function InputsMarketplacePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data?.products?.map((product: import('components/inputs/ProductCard').ProductCardProps) => (
+            {(products ?? []).map((product: import('components/inputs/ProductCard').ProductCardProps) => (
               <ProductCard
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 key={(product as any).id ?? `${product.name}-${product.seller_name}-${product.state}`}

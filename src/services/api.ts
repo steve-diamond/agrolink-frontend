@@ -1,4 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
+import * as Sentry from "@sentry/nextjs";
 
 
 type GetOptions = {
@@ -26,6 +27,10 @@ const API = {
     const res = await fetch(url, { headers: getAuthHeaders() });
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { message?: string };
+      Sentry.captureMessage("API GET failed", {
+        level: "error",
+        extra: { endpoint, method: "GET", status: res.status, message: body?.message },
+      });
       throw new Error(body?.message || "API GET failed");
     }
     return res.json();
@@ -42,6 +47,10 @@ const API = {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { message?: string };
+      Sentry.captureMessage("API POST failed", {
+        level: "error",
+        extra: { endpoint, method: "POST", status: res.status, message: body?.message },
+      });
       throw new Error(body?.message || "API POST failed");
     }
     return res.json();
@@ -58,6 +67,10 @@ const API = {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { message?: string };
+      Sentry.captureMessage("API PATCH failed", {
+        level: "error",
+        extra: { endpoint, method: "PATCH", status: res.status, message: body?.message },
+      });
       throw new Error(body?.message || "API PATCH failed");
     }
     return res.json();
@@ -73,6 +86,10 @@ const API = {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { message?: string };
+      Sentry.captureMessage("API DELETE failed", {
+        level: "error",
+        extra: { endpoint, method: "DELETE", status: res.status, message: body?.message },
+      });
       throw new Error(body?.message || "API DELETE failed");
     }
     return res.json();

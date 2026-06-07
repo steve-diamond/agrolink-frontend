@@ -45,12 +45,10 @@ export default function ProductUploadPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    // TODO: Replace with actual seller_id from auth
-    const seller_id = 'demo-seller-id';
     const res = await fetch('/api/inputs/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, seller_id, price_per_unit: Number(form.price_per_unit), quantity_available: Number(form.quantity_available) }),
+      body: JSON.stringify({ ...form, price_per_unit: Number(form.price_per_unit), quantity_available: Number(form.quantity_available) }),
     });
     const data = await res.json();
     setLoading(false);
@@ -67,7 +65,7 @@ export default function ProductUploadPage() {
       <form className="space-y-4" onSubmit={handleSubmit}>
         <input name="name" value={form.name} onChange={handleChange} required className="input w-full" placeholder="Product Name" />
         <input name="brand" value={form.brand} onChange={handleChange} className="input w-full" placeholder="Brand (optional)" />
-        <select name="category" value={form.category} onChange={handleChange} required className="input w-full">
+        <select name="category" value={form.category} onChange={handleChange} required className="input w-full" aria-label="Product category">
           <option value="">Select Category</option>
           {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
         </select>

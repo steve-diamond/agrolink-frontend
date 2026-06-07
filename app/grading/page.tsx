@@ -73,24 +73,7 @@ export default function GradingPage() {
     setSubmitting(true);
     setError('');
     try {
-      // TODO: Upload photos to storage, get URLs
-      const photoUrls = photos.map((f) => URL.createObjectURL(f)); // Placeholder, replace with upload logic
-      const res = await fetch('/api/grading/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          farmer_id: 'demo-farmer', // Replace with real user
-          commodity,
-          grade: suggestedGrade,
-          criteria_met: criteriaChecked,
-          photos: photoUrls,
-          grade_badge_url: '/badge/demo.png', // Placeholder
-        })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submission failed');
-      setBadgeUrl(data.grade_badge_url);
-      setStep(5);
+      throw new Error('Grading submission is not enabled yet. Connect storage and grading APIs before going live.');
     } catch (e) {
       if (e instanceof Error) {
         setError(e.message);
@@ -110,14 +93,14 @@ export default function GradingPage() {
       {step === 1 && (
         <div>
           <label className="block mb-2">Select Commodity</label>
-          <select value={commodity} onChange={handleCommodityChange} className="border rounded p-2 mb-4 w-full">
+          <select value={commodity} onChange={handleCommodityChange} className="border rounded p-2 mb-4 w-full" aria-label="Select commodity">
             <option value="">-- Select --</option>
             {COMMODITIES.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
           <label className="block mb-2">Upload Photos (3-6)</label>
-          <input type="file" accept="image/*" multiple onChange={handlePhotoChange} className="mb-4" />
+          <input type="file" accept="image/*" multiple onChange={handlePhotoChange} className="mb-4" aria-label="Upload produce photos" />
           {error && <div className="text-red-500 mb-2">{error}</div>}
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded"

@@ -1,4 +1,10 @@
 export const dynamic = 'force-dynamic'
 
-// Analytics Service API route placeholder
-export async function GET() { return Response.json({ message: 'Analytics Service' }); }
+import { NextResponse } from "next/server";
+
+export async function GET() {
+	return NextResponse.json(
+		{ status: "error", code: "not_implemented", message: "Analytics route is not implemented." },
+		{ status: 501 }
+	);
+}

@@ -2,25 +2,18 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from "next/server";
 
-// In-memory mock DB for demonstration (replace with real DB logic)
-type Order = { _id: string; status?: string; [key: string]: unknown };
-interface GlobalWithOrders extends globalThis.Global {
-  orders: Order[];
-}
-const g = globalThis as unknown as GlobalWithOrders;
-const orders: Order[] = g.orders || [];
-g.orders = orders;
-
 export async function POST(
-  req: NextRequest,
+  _req: NextRequest,
   context: { params: Promise<{ orderId: string }> }
 ) {
   const { orderId } = await context.params;
-  // Find and update the order status
-  const idx = orders.findIndex((o) => o._id === orderId);
-  if (idx === -1) {
-    return NextResponse.json({ error: "Order not found" }, { status: 404 });
-  }
-  orders[idx].status = "cancelled";
-  return NextResponse.json({ success: true, order: orders[idx] });
+  return NextResponse.json(
+    {
+      status: "error",
+      code: "not_implemented",
+      message: "Order cancel route is not implemented.",
+      orderId,
+    },
+    { status: 501 }
+  );
 }

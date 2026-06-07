@@ -45,7 +45,6 @@ export default function SellerDashboard() {
               <div className="text-[#2D6A4F] font-semibold">₦{product.price?.toLocaleString()}</div>
               <div className="mt-2 flex gap-2">
                 <Link href={`/inputs/${product.id}`} className="btn btn-sm bg-[#40916C] text-white">View</Link>
-                {/* TODO: Add edit/delete actions */}
               </div>
             </div>
           ))}

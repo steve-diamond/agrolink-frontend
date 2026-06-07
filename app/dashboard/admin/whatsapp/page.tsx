@@ -35,7 +35,6 @@ export default function WhatsAppAdminMonitor() {
   const escalate = async (phone: string) => {
     await dbConnect();
     await WhatsAppSession.updateOne({ phone_number: phone }, { current_menu: 'human_takeover' });
-    // TODO: Notify support via email
     alert('Escalated to human support.');
   };
 

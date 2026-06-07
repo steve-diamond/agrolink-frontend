@@ -1,4 +1,5 @@
 module.exports = {
+  ignorePatterns: ['frontend/**'],
   extends: [
     'next/core-web-vitals',
     'eslint:recommended',

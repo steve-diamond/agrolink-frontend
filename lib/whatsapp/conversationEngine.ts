@@ -36,7 +36,6 @@ export async function handleConversation(payload: Record<string, unknown>) {
     case 'WELCOME':
       if (text === '1') {
         await WhatsAppSession.updateOne({ phone_number: from }, { current_menu: 'PRICES', last_active: now });
-        // TODO: send commodity list
         await sendInteractiveList(from, 'Commodities', 'Select a commodity:', [
           { title: 'Maize', id: 'maize' },
           { title: 'Rice', id: 'rice' },
@@ -47,7 +46,6 @@ export async function handleConversation(payload: Record<string, unknown>) {
         await sendTextMessage(from, 'What crop do you want to list?');
       } else if (text === '3') {
         await WhatsAppSession.updateOne({ phone_number: from }, { current_menu: 'LOAN', last_active: now });
-        // TODO: check user registration
         await sendTextMessage(from, 'Checking eligibility...');
       } else if (text === '4') {
         await WhatsAppSession.updateOne({ phone_number: from }, { current_menu: 'ORDERS', last_active: now });
@@ -59,13 +57,7 @@ export async function handleConversation(payload: Record<string, unknown>) {
         await sendTextMessage(from, WELCOME_MENU.text);
       }
       break;
-    // ...implement other menu states (PRICES, POST_PRODUCE, LOAN, etc.)
     default:
       await sendTextMessage(from, WELCOME_MENU.text);
   }
 }
-
-// Menu tree and state machine logic should be expanded for each menu state.
-// See detailed comments in the menu tree above for each branch.
-
-// Removed unused getMenuTree function

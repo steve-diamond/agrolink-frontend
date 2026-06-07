@@ -1,7 +1,10 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import API from "@services/api";
-import { Notification } from "@/types/notification";
+import { useEffect, useRef } from "react";
+import { useNotifications } from "../lib/hooks/useNotifications";
+import type { Notification } from "@/types/notification";
+import AnimatedLayout from "components/ui/AnimatedLayout";
+import { ToastProvider } from "components/ui/ToastManager";
+import { useState } from "react";
 
 function NotificationToast({ notification, onClose }: { notification: Notification | null, onClose: () => void }) {
   useEffect(() => {
@@ -23,34 +26,24 @@ export default function ClientRootLayout({ children }: { children: React.ReactNo
   const [latestNotification, setLatestNotification] = useState<Notification | null>(null);
   const lastIdRef = useRef<string | null>(null);
 
-  // Poll for notifications every 10s
+  // React Query polls for notifications every 30 s (REALTIME_QUERY_OPTIONS).
+  const { data: notifications } = useNotifications();
+
   useEffect(() => {
-    let mounted = true;
-    const poll = async () => {
-      try {
-        const res = await API.get("/notifications");
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const notifs = Array.isArray(res) ? res as Notification[] : (Array.isArray((res as any).data) ? (res as any).data as Notification[] : []);
-        if (notifs.length > 0) {
-          const newest = notifs[0];
-          if (newest && newest._id !== lastIdRef.current) {
-            setLatestNotification(newest);
-            lastIdRef.current = newest._id ?? null;
-          }
-        }
-      } catch {
-        // ignore
-      }
-      if (mounted) setTimeout(poll, 10000);
-    };
-    poll();
-    return () => { mounted = false; };
-  }, []);
+    if (!notifications || notifications.length === 0) return;
+    const newest = notifications[0];
+    const newestId = newest._id ?? newest.id ?? null;
+    if (newest && newestId !== lastIdRef.current) {
+      setLatestNotification(newest);
+      lastIdRef.current = newestId;
+    }
+  }, [notifications]);
 
   return (
     <>
       <NotificationToast notification={latestNotification} onClose={() => setLatestNotification(null)} />
-      {children}
+      <AnimatedLayout>{children}</AnimatedLayout>
+      <ToastProvider />
     </>
   );
 }

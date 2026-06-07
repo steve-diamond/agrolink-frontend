@@ -1,15 +1,10 @@
 export const dynamic = 'force-dynamic'
 
-// Farming Tips API route
-// TODO: Replace with real database logic
-const mockTips = [
-  { _id: "tip1", text: "Boost maize yield with split fertilizer timing." },
-  { _id: "tip2", text: "Use early harvest sorting for better pricing." },
-  { _id: "tip3", text: "Bundle logistics with nearby farmers." },
-  { _id: "tip4", text: "Rotate crops to improve soil health." },
-  { _id: "tip5", text: "Monitor weather forecasts for optimal planting." },
-];
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  return Response.json({ tips: mockTips });
+  return NextResponse.json(
+    { status: "error", code: "not_implemented", message: "Farming tips API is not implemented in this Next.js route. Use backend /api/v1/advisory endpoints." },
+    { status: 501 }
+  );
 }

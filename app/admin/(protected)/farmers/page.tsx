@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import {
   FaUserFriends, FaUsers, FaCheckCircle, FaHourglassHalf, FaShoppingCart,
   FaBoxOpen, FaChartBar, FaCog, FaBell, FaSearch, FaBan
@@ -140,7 +141,15 @@ export default function AdminFarmersPage() {
       {/* Sidebar */}
       <aside className="w-64 bg-linear-to-b from-green-900 to-green-700 text-white flex flex-col py-6 px-4 shadow-lg">
         <div className="flex items-center gap-3 mb-10">
-          <img src="/dos-agrolink-logo.jpg" alt="Dos Agrolink" className="w-10 h-10 rounded-full object-cover border-2 border-white/50" />
+          <OptimizedImage
+            src="/dos-agrolink-logo.jpg"
+            alt="Dos Agrolink"
+            width={40}
+            height={40}
+            priority
+            sizesContext="logo"
+            className="rounded-full object-cover border-2 border-white/50"
+          />
           <span className="text-xl font-extrabold tracking-tight">Dos Agrolink</span>
         </div>
         <nav className="flex-1 space-y-2">

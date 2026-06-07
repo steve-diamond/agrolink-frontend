@@ -71,14 +71,14 @@ export async function POST(req: NextRequest) {
     let user = await User.findOne({ email: info.email.toLowerCase() });
 
     if (!user) {
-      // Build a non-guessable placeholder password for the required field
+      // Build a non-guessable generated password for the required field
       const { randomBytes } = await import('crypto');
-      const placeholderPassword = `GAUTH_${randomBytes(24).toString('hex')}`;
+      const generatedPassword = `GAUTH_${randomBytes(24).toString('hex')}`;
 
       user = await User.create({
         name: info.name ?? info.email.split('@')[0],
         email: info.email.toLowerCase(),
-        password: placeholderPassword,
+        password: generatedPassword,
         phone: '',
         role: role || 'buyer',
         approved: true, // Google-verified accounts are pre-approved

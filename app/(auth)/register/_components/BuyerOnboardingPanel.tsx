@@ -1,3 +1,4 @@
+import { useAnalytics } from "@/hooks/useAnalytics";
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -238,6 +239,7 @@ const isValidNigerianPhone = (input: string): boolean => /^\+234\d{10}$/.test(no
 
 export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
   const router = useRouter();
+  const { trackRegistration, trackError } = useAnalytics();
 
   const [form, setForm] = useState<BuyerForm>(defaultForm);
   const [step, setStep] = useState(1);
@@ -860,6 +862,7 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
         queueSubmission(payload);
         localStorage.removeItem(DRAFT_KEY);
         const appId = uid();
+        trackRegistration("buyer", "email");
         router.push(`/register/buyer/success?name=${encodeURIComponent(form.businessName || accountForm.name)}&appId=${encodeURIComponent(appId)}&queued=1&verificationPending=1`);
         return;
       }
@@ -868,8 +871,10 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
       localStorage.removeItem(DRAFT_KEY);
       const appId = String(res?.data?.applicationId || uid());
       const verificationPending = res?.data?.verificationPending ? "1" : "0";
+      trackRegistration("buyer", "email");
       router.push(`/register/buyer/success?name=${encodeURIComponent(form.businessName || accountForm.name)}&appId=${encodeURIComponent(appId)}&queued=0&verificationPending=${verificationPending}`);
     } catch (err: unknown) {
+      trackError(err, { module: "register", role: "buyer" });
       let statusCode: number | undefined = undefined;
       let errorMessage = "";
       if (err && typeof err === "object" && "response" in err && err.response) {
@@ -1132,16 +1137,17 @@ export default function BuyerOnboardingPanel({ accountForm, language }: Props) {
                 ))}
               </div>
             </div>
-            <label className="grid gap-1 text-sm font-semibold text-green-950">Preferred delivery method <span className="text-red-500">*</span>
+            <fieldset className="grid gap-1">
+              <legend className="text-sm font-semibold text-green-950">Preferred delivery method <span className="text-red-500" aria-label="required">*</span></legend>
               <div className="grid gap-2">
                 {["Farmer delivers to my warehouse", "I pick up from farm", "Agrolink logistics"].map((method) => (
                   <label key={method} className="flex min-h-12 items-center gap-2 rounded-lg border border-green-200 bg-white px-3">
-                    <input type="radio" checked={form.deliveryMethod === method} onChange={() => setField("deliveryMethod", method)} />
+                    <input type="radio" name="deliveryMethod" value={method} checked={form.deliveryMethod === method} onChange={() => setField("deliveryMethod", method)} />
                     <span>{method}</span>
                   </label>
                 ))}
               </div>
-            </label>
+            </fieldset>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="grid gap-1 text-sm font-semibold text-green-950">Storage capacity (optional)
                 <input type="number" min="0" value={form.storageCapacity} onChange={(e) => setField("storageCapacity", e.target.value)} className="min-h-12 rounded-lg border border-green-200 px-3" />

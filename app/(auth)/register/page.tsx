@@ -16,6 +16,7 @@ import AuthShell from "../_components/AuthShell";
 import PasswordEyeIcon from "../_components/PasswordEyeIcon";
 import BuyerOnboardingPanel from "./_components/BuyerOnboardingPanel";
 import SocialAuthButtons from "../_components/SocialAuthButtons";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 type UserRole = "buyer" | "farmer";
 type YesNo = "yes" | "no";
@@ -278,6 +279,7 @@ const uid = (): string => `AGR-${Math.floor(Math.random() * 900000 + 100000)}`;
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { trackRegistration, trackError, trackEvent } = useAnalytics();
   const { copy } = useLocalizedCopy();
 
   const [accountForm, setAccountForm] = useState({
@@ -543,6 +545,17 @@ export default function RegisterPage() {
     const timer = window.setTimeout(() => otpInputRef.current?.focus(), 50);
     return () => window.clearTimeout(timer);
   }, [otpSent, otpVerified]);
+
+  useEffect(() => {
+    if (accountForm.role !== "farmer") return;
+
+    trackEvent("funnel_step_view", {
+      funnel_name: "farmer_registration",
+      step_number: currentFarmerStep,
+      step_name: stepLabels[currentFarmerStep - 1],
+      role: "farmer",
+    });
+  }, [accountForm.role, currentFarmerStep, trackEvent]);
 
   const validateAccountStep = (): string => {
     if (!accountForm.name.trim()) return getText("Full name is required.", "Abeg put your full name.");
@@ -1010,6 +1023,12 @@ export default function RegisterPage() {
     try {
       if (!networkOnline) {
         queueSubmission({ ...applicationPayload, status: "queued" });
+        trackEvent("funnel_conversion", {
+          funnel_name: "farmer_registration",
+          conversion_name: "application_queued",
+          role: "farmer",
+        });
+        trackRegistration("farmer", "email");
         setSuccess(getText("Account created. Farmer form saved offline and queued for sync.", "Account don create. Farmer form don save offline and queue for send."));
         clearDraft();
         const offlineId = uid();
@@ -1055,9 +1074,16 @@ export default function RegisterPage() {
       const res = await API.post("/api/farmer-applications", { ...applicationPayload, status: "pending" }) as { data?: { applicationId?: string; kycPending?: boolean } };
       const appId = res?.data?.applicationId || uid();
       const kycPending = res?.data?.kycPending ? "1" : "0";
+      trackEvent("funnel_conversion", {
+        funnel_name: "farmer_registration",
+        conversion_name: "application_submitted",
+        role: "farmer",
+      });
+      trackRegistration("farmer", "email");
       clearDraft();
       router.push(`/register/success?name=${encodeURIComponent(accountForm.name.trim())}&appId=${encodeURIComponent(appId)}&queued=0&kycPending=${kycPending}`);
       } catch (err: unknown) {
+        trackError(err, { module: "register", role: "farmer" });
         const error = err as { response?: { status?: number; data?: { message?: string; error?: string } }; message?: string };
         const statusCode = error.response?.status;
         const errorMessage = String(
@@ -1115,6 +1141,13 @@ export default function RegisterPage() {
       setError(stepError);
       return;
     }
+
+    trackEvent("funnel_step_complete", {
+      funnel_name: "farmer_registration",
+      step_number: currentFarmerStep,
+      step_name: stepLabels[currentFarmerStep - 1],
+      role: "farmer",
+    });
 
     setCurrentFarmerStep((prev) => Math.min(6, prev + 1));
   };
@@ -1452,8 +1485,8 @@ export default function RegisterPage() {
         />
       </label>
 
-      <label className="grid gap-1 text-sm font-semibold text-green-950">
-        Land ownership <span className="text-red-500">*</span>
+      <fieldset className="grid gap-1">
+        <legend className="text-sm font-semibold text-green-950">Land ownership <span className="text-red-500" aria-label="required">*</span></legend>
         <div className="grid gap-2">
           {[
             { value: "owned", label: "Owned" },
@@ -1465,6 +1498,7 @@ export default function RegisterPage() {
               <input
                 type="radio"
                 name="landOwnership"
+                value={option.value}
                 checked={farmerForm.landOwnership === option.value}
                 onChange={() => setFarmerField("landOwnership", option.value as FarmerForm["landOwnership"])}
               />
@@ -1472,11 +1506,11 @@ export default function RegisterPage() {
             </label>
           ))}
         </div>
-      </label>
+      </fieldset>
 
-      <div className="grid gap-2 text-sm font-semibold text-green-950">
-        <span>
-          Primary crops grown <span className="text-red-500">*</span>
+      <div className="grid gap-2 text-sm font-semibold text-green-950" role="group" aria-labelledby="crops-group-label">
+        <span id="crops-group-label">
+          Primary crops grown <span className="text-red-500" aria-label="required">*</span>
         </span>
         <div className="flex flex-wrap gap-2">
           {CROPS.map((crop) => (
@@ -1757,12 +1791,14 @@ export default function RegisterPage() {
 
   const renderConsentStep = (
     <div className="grid gap-3">
-      <label className="grid gap-1 text-sm font-semibold text-green-950">
-        Membership tier <span className="text-red-500">*</span>
+      <fieldset className="grid gap-1">
+        <legend className="text-sm font-semibold text-green-950">Membership tier <span className="text-red-500" aria-label="required">*</span></legend>
         <div className="grid gap-2">
           <label className="flex min-h-12 items-center gap-2 rounded-lg border border-green-200 bg-white px-3">
             <input
               type="radio"
+              name="membershipTier"
+              value="basic"
               checked={farmerForm.membershipTier === "basic"}
               onChange={() => setFarmerField("membershipTier", "basic")}
             />
@@ -1771,13 +1807,15 @@ export default function RegisterPage() {
           <label className="flex min-h-12 items-center gap-2 rounded-lg border border-green-200 bg-white px-3">
             <input
               type="radio"
+              name="membershipTier"
+              value="premium"
               checked={farmerForm.membershipTier === "premium"}
               onChange={() => setFarmerField("membershipTier", "premium")}
             />
             <span>Premium (small fee for credit access)</span>
           </label>
         </div>
-      </label>
+      </fieldset>
 
       <label className="grid gap-1 text-sm font-semibold text-green-950">
         Emergency contact name <span className="text-red-500">*</span>

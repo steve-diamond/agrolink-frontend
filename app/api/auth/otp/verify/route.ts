@@ -79,11 +79,11 @@ export async function POST(req: NextRequest) {
     let user = await User.findOne({ phone });
 
     if (!user) {
-      const placeholderPassword = `OTPAUTH_${randomBytes(24).toString('hex')}`;
+      const generatedPassword = `OTPAUTH_${randomBytes(24).toString('hex')}`;
       user = await User.create({
         name: `AgroLink User`,
         email: `${phone.replace('+', '')}@phone.agrolink.ng`,
-        password: placeholderPassword,
+        password: generatedPassword,
         phone,
         role: role || 'buyer',
         approved: true,

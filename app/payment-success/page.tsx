@@ -4,9 +4,11 @@ import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import API from "@services/api";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 function PaymentSuccessContent() {
   const params = useSearchParams();
+  const { trackPurchase, trackError } = useAnalytics();
   const [status, setStatus] = useState<"loading" | "success" | "failed">("loading");
   const [message, setMessage] = useState("Verifying your payment...");
 
@@ -21,51 +23,57 @@ function PaymentSuccessContent() {
 
     API.get(`/api/payment/verify/${reference}`)
       .then((res) => {
-        const data = (res as { data: { status: string } }).data;
+        const data = (res as { data: { status: string; amount?: number; transactionId?: string } }).data;
         if (data.status === "success") {
           setStatus("success");
           setMessage("Payment verified! Your order is confirmed.");
+          trackPurchase({
+            transaction_id: data.transactionId || reference,
+            value: Number(data.amount || 0),
+            currency: "NGN",
+          });
         } else {
           setStatus("failed");
           setMessage("Payment was not successful. Please try again.");
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        trackError(error, { module: "payment_success", action: "verify" });
         setStatus("failed");
         setMessage("Verification failed. Please contact support.");
       });
-  }, [params]);
+  }, [params, trackPurchase, trackError]);
 
-  const colorMap = { loading: "#555", success: "#16a34a", failed: "#dc2626" };
+  const headingColorClass =
+    status === "success"
+      ? "text-green-600"
+      : status === "failed"
+      ? "text-red-600"
+      : "text-gray-600";
 
   return (
-    <main style={{ padding: '1.5rem', paddingLeft: '1rem', paddingRight: '1rem', textAlign: 'center', maxWidth: 480, margin: '0 auto', width: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 24 }}>
-        <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={38} height={38} style={{ borderRadius: 8, boxShadow: '0 2px 8px #d1fae5' }} priority />
-        <span style={{ fontWeight: 800, fontSize: 22, color: '#166534', letterSpacing: '-0.02em' }}>DOS AGROLINK</span>
+    <main className="mx-auto w-full max-w-120 px-4 py-6 text-center">
+      <div className="mb-6 flex items-center justify-center gap-3">
+        <Image
+          src="/dos-agrolink-logo.png"
+          alt="DOS Agrolink Logo"
+          width={38}
+          height={38}
+          className="rounded-lg shadow-sm shadow-emerald-100"
+          priority
+        />
+        <span className="text-[22px] font-extrabold tracking-tight text-green-800">DOS AGROLINK</span>
       </div>
-      <h1 style={{ color: colorMap[status] }}>
+      <h1 className={headingColorClass}>
         {status === "loading" && "Processing Payment..."}
         {status === "success" && "Payment Successful!"}
         {status === "failed" && "Payment Failed"}
       </h1>
-      <p style={{ color: "#444", marginTop: "1rem" }}>{message}</p>
+      <p className="mt-4 text-gray-700">{message}</p>
       {status !== "loading" && (
         <a
           href="/marketplace"
-          style={{
-            display: 'block',
-            marginTop: '2rem',
-            padding: '10px 20px',
-            background: '#16a34a',
-            color: 'white',
-            borderRadius: 8,
-            textDecoration: 'none',
-            width: '100%',
-            maxWidth: 320,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}
+          className="mx-auto mt-8 block w-full max-w-80 rounded-lg bg-green-600 px-5 py-2.5 text-white no-underline hover:bg-green-700"
         >
           Back to Marketplace
         </a>

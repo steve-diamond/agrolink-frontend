@@ -20,22 +20,11 @@ interface FarmCampaignCardProps {
 }
 
 const FarmCampaignCard: React.FC<FarmCampaignCardProps> = ({ campaign }) => {
-  // Placeholder data for demo
-  const data =
-    campaign ? campaign : {
-      id: "demo",
-      cover_image_url: "/public/farm-demo.jpg",
-      crop_type: "Maize",
-      farmer_name: "A. Okafor",
-      state: "Benue",
-      raised_amount: 1200000,
-      target_amount: 2000000,
-      expected_return_pct: 18,
-      duration_months: 10,
-      min_investment: 150000,
-      investor_count: 42,
-      status: "active",
-    };
+  if (!campaign) {
+    return null;
+  }
+
+  const data = campaign;
   const percent = Math.min(100, Math.round((data.raised_amount / data.target_amount) * 100));
 
   return (
@@ -61,9 +50,7 @@ const FarmCampaignCard: React.FC<FarmCampaignCardProps> = ({ campaign }) => {
           <span className="text-xs text-gray-500 ml-auto">{data.farmer_name} · {data.state}</span>
         </div>
         <div className="mb-2">
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div className="bg-green-600 h-2 rounded-full" style={{ width: percent + '%' }} />
-          </div>
+          <progress className="h-2 w-full overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-gray-200 [&::-webkit-progress-value]:bg-green-600 [&::-moz-progress-bar]:bg-green-600" value={percent} max={100} aria-label="Campaign funding progress" />
           <div className="flex justify-between text-xs mt-1">
             <span>₦{data.raised_amount.toLocaleString()} / ₦{data.target_amount.toLocaleString()}</span>
             <span>{percent}%</span>

@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import { GradeBadge } from "../../components/grading/GradeBadge";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getProducts, Product } from "@services/productService";
+import PullToRefresh from "../../components/PullToRefresh";
 import API from "@services/api";
 import { useLocalizedCopy } from "@services/useLocalizedCopy";
+import { absoluteUrl, breadcrumbSchema } from "@/lib/seo";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import type { IconType } from "react-icons";
 import {
   FaSearch, FaFilter, FaStar, FaShoppingCart, FaWhatsapp,
@@ -67,8 +70,10 @@ const TRUST_STATS: Array<{ Icon: IconType; iconClass: string; value: string; lab
 
 export default function Marketplace() {
   const { copy, language } = useLocalizedCopy();
+  const { trackSearch, trackProductView, trackAddToCart, trackEvent, trackError } = useAnalytics();
   const router = useRouter();
   const pathname = usePathname();
+  const trackedProductViewIds = useRef<Set<string>>(new Set());
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
@@ -141,15 +146,21 @@ export default function Marketplace() {
     { title: copy.marketplacePromoWarehouseTitle, detail: copy.marketplacePromoWarehouseDetail, cta: copy.marketplacePromoWarehouseCta, href: "/warehouse", gradient: "from-amber-600 to-orange-800", accent: "bg-amber-500/20 text-amber-100", icon: <FaShieldAlt className="text-4xl text-amber-200" /> },
   ];
 
-  useEffect(() => {
-    getProducts({ approved: true })
-      .then((items) => {
-        setProducts(items);
-        setQuantities(Object.fromEntries(items.map((i) => [i._id, 1])));
-      })
-      .catch((err) => setFetchError(err.message))
-      .finally(() => setLoading(false));
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const items = await getProducts({ approved: true });
+      setProducts(items);
+      setQuantities(Object.fromEntries(items.map((i) => [i._id, 1])));
+    } catch (err) {
+      setFetchError(err instanceof Error ? err.message : "Failed to load");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { void fetchProducts(); }, [fetchProducts]);
 
   function getProductGrade(product: Product): "A"|"B"|"C"|"U" {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -175,7 +186,73 @@ export default function Marketplace() {
     );
   }), [products, debouncedSearchTerm, selectedCategory, minPrice, maxPrice, gradeFilter]);
 
+  useEffect(() => {
+    if (!debouncedSearchTerm || debouncedSearchTerm.length < 2) return;
+    trackSearch(debouncedSearchTerm, filteredProducts.length);
+  }, [debouncedSearchTerm, filteredProducts.length, trackSearch]);
+
   const trendingProducts = useMemo(() => [...filteredProducts].sort((a, b) => Number(b.quantity || 0) - Number(a.quantity || 0)).slice(0, 9), [filteredProducts]);
+
+  useEffect(() => {
+    trendingProducts.forEach((product) => {
+      if (trackedProductViewIds.current.has(product._id)) return;
+      trackedProductViewIds.current.add(product._id);
+      trackProductView({
+        product_id: product._id,
+        product_name: product.name,
+        price: Number(product.price || 0),
+        category: normalizeCategory(product.category),
+      });
+    });
+  }, [trendingProducts, trackProductView]);
+
+  const marketplaceStructuredData = useMemo(() => {
+    const productsSchema = filteredProducts.slice(0, 24).map((product) => {
+      const rating = getSellerRating(product._id);
+      const reviews = getReviewsCount(product._id);
+      const image = isValidRemoteImageUrl(product.imageUrl)
+        ? product.imageUrl
+        : absoluteUrl("/agropro/images/banner.jpg");
+
+      return {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.name,
+        image,
+        description: product.description || `${product.name} listed on DOS Agrolink marketplace.`,
+        category: product.category || "Agricultural Product",
+        brand: {
+          "@type": "Brand",
+          name: product.farmer || "DOS Agrolink Verified Seller",
+        },
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "NGN",
+          price: Number(product.price || 0),
+          availability:
+            Number(product.quantity || 0) > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+          url: absoluteUrl("/marketplace"),
+        },
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: rating,
+          reviewCount: reviews,
+        },
+      };
+    });
+
+    const breadcrumb = breadcrumbSchema([
+      { name: "Home", url: absoluteUrl("/") },
+      { name: "Marketplace", url: absoluteUrl("/marketplace") },
+    ]);
+
+    return {
+      productsSchema,
+      breadcrumb,
+    };
+  }, [filteredProducts]);
 
   const handleBuyNow = async (product: Product) => {
     const user = getStoredUser();
@@ -187,11 +264,25 @@ export default function Marketplace() {
     type PaymentApiResponse = { data: { data: { authorization_url: string } } };
     try {
       setBuyingProductId(product._id);
+      trackAddToCart({
+        product_id: product._id,
+        product_name: product.name,
+        price: Number(product.price || 0),
+        category: normalizeCategory(product.category),
+        quantity,
+      });
       const orderRes = await API.post("/api/orders", { products: [{ productId: product._id, quantity }] }) as OrderApiResponse;
       const order = orderRes.data;
+      trackEvent("begin_checkout", {
+        product_id: product._id,
+        product_name: product.name,
+        value: Number(order.totalAmount ?? order.totalPrice ?? 0),
+        currency: "NGN",
+      });
       const paymentRes = await API.post("/api/payment/initialize", { email: user.email, amount: order.totalAmount ?? order.totalPrice, orderId: order._id, callback_url: `${window.location.origin}/payment-success` }) as PaymentApiResponse;
       window.location.href = paymentRes.data.data.authorization_url;
     } catch (error) {
+      trackError(error, { module: "marketplace", action: "handleBuyNow" });
       let errMsg = "Payment failed. Please try again.";
       if (error && typeof error === "object" && "response" in error) {
         const data = (error as { response?: { data?: { message?: string; error?: string } } }).response?.data;
@@ -202,10 +293,22 @@ export default function Marketplace() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PullToRefresh onRefresh={fetchProducts} successMessage="Listings updated">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(marketplaceStructuredData.breadcrumb) }}
+      />
+      {marketplaceStructuredData.productsSchema.map((productSchema, index) => (
+        <script
+          key={`product-schema-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        />
+      ))}
 
-      {/* â”€â”€ HERO SECTION â”€â”€ */}
-      <section className="relative overflow-hidden bg-linear-to-br from-green-950 via-green-800 to-emerald-700">
+      {/* ── HERO SECTION ── */}
+      <section className="relative overflow-hidden bg-linear-to-br from-green-950 via-green-800 to-emerald-700" aria-labelledby="marketplace-hero-heading">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-10 marketplace-dot-pattern" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
@@ -216,7 +319,7 @@ export default function Marketplace() {
               <FaBolt className="text-amber-400" />
               {copy.marketplaceHeroTag || "Agrolink Marketplace"}
             </span>
-            <h1 className="text-3xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight">
+            <h1 id="marketplace-hero-heading" className="text-3xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight">
               {copy.marketplaceHeroTitle || "Trending Agricultural Products From Verified Sellers"}
             </h1>
             <p className="mt-4 text-lg text-green-100/80 max-w-2xl">
@@ -224,23 +327,27 @@ export default function Marketplace() {
             </p>
 
             {/* Embedded search bar */}
-            <div className="mt-8 flex gap-2 max-w-2xl">
+            <div className="mt-8 flex gap-2 max-w-2xl" role="search">
               <div className="flex-1 relative">
-                <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+                <label htmlFor="marketplace-search" className="sr-only">Search products</label>
                 <input
+                  id="marketplace-search"
                   type="search"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  placeholder="Search maize, tomatoes, equipmentâ€¦"
+                  placeholder="Search maize, tomatoes, equipment…"
+                  aria-label="Search agricultural products"
                   className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm bg-white text-gray-900 border-0 shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-400"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => setShowFilters((v) => !v)}
+                aria-controls="marketplace-filters"
                 className="flex items-center gap-2 px-4 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-semibold transition-all"
               >
-                <FaFilter /> Filters
+                <FaFilter aria-hidden="true" /> Filters
               </button>
             </div>
           </div>
@@ -287,7 +394,7 @@ export default function Marketplace() {
                       : `${cfg.bg} ${cfg.color} ${cfg.border} hover:shadow-sm`
                   }`}
                 >
-                  <cfg.Icon /> {cat.label}
+                  <cfg.Icon aria-hidden="true" /> {cat.label}
                 </button>
               );
             })}
@@ -295,7 +402,7 @@ export default function Marketplace() {
 
           {/* Advanced filters (toggle) */}
           {showFilters && (
-            <div className="pt-4 border-t border-gray-100 grid gap-3 sm:grid-cols-3">
+            <div id="marketplace-filters" className="pt-4 border-t border-gray-100 grid gap-3 sm:grid-cols-3">
               <div className="relative">
                 <FaTag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
                 <select
@@ -312,16 +419,22 @@ export default function Marketplace() {
                   <option value="U">Ungraded</option>
                 </select>
               </div>
+              <label className="sr-only" htmlFor="min-price">Minimum price in Naira</label>
               <input
+                id="min-price"
                 type="number" min={0} value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                placeholder="Min Price (â‚¦)"
+                placeholder="Min Price (₦)"
+                aria-label="Minimum price"
                 className="px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
               />
+              <label className="sr-only" htmlFor="max-price">Maximum price in Naira</label>
               <input
+                id="max-price"
                 type="number" min={0} value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                placeholder="Max Price (â‚¦)"
+                placeholder="Max Price (₦)"
+                aria-label="Maximum price"
                 className="px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
               />
             </div>
@@ -371,9 +484,10 @@ export default function Marketplace() {
           </div>
 
           {loading && (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div role="status" aria-live="polite" aria-label="Loading products" className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <span className="sr-only">Loading products, please wait…</span>
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden animate-pulse">
+                <div key={i} aria-hidden="true" className="rounded-2xl bg-white border border-gray-100 shadow-sm overflow-hidden animate-pulse">
                   <div className="h-52 bg-gray-200" />
                   <div className="p-5 space-y-3">
                     <div className="h-4 bg-gray-200 rounded w-3/4" />
@@ -386,8 +500,8 @@ export default function Marketplace() {
           )}
 
           {fetchError && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 flex items-center gap-3">
-              <FaShieldAlt className="text-red-400 shrink-0" />
+            <div role="alert" aria-live="assertive" className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 flex items-center gap-3">
+              <FaShieldAlt className="text-red-400 shrink-0" aria-hidden="true" />
               Failed to load products. Please refresh the page.
             </div>
           )}
@@ -452,7 +566,7 @@ export default function Marketplace() {
                       </div>
 
                       {/* Product name */}
-                      <h2 className="font-bold text-gray-900 text-base leading-snug line-clamp-2">{product.name}</h2>
+                      <h3 className="font-bold text-gray-900 text-base leading-snug line-clamp-2">{product.name}</h3>
 
                       {/* Location */}
                       {product.location && (
@@ -506,21 +620,22 @@ export default function Marketplace() {
                           type="button"
                           onClick={() => handleBuyNow(product)}
                           disabled={buyingProductId === product._id}
+                          aria-label={buyingProductId === product._id ? `Processing order for ${product.name}` : `Buy ${product.name}`}
                           className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-green-700 hover:bg-green-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-bold py-2.5 px-4 transition-all shadow-sm hover:shadow-md"
                         >
                           {buyingProductId === product._id ? (
-                            <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />{copy.creatingOrder}</span>
+                            <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true" />{copy.creatingOrder}</span>
                           ) : (
-                            <><FaShoppingCart /> {copy.buyNow || "Buy Now"}</>
+                            <><FaShoppingCart aria-hidden="true" /> {copy.buyNow || "Buy Now"}</>
                           )}
                         </button>
                         <a
                           href="https://wa.me/2348030001020?text=Hello%20Agrolink%2C%20I%20need%20help%20with%20a%20marketplace%20order."
                           target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 transition-all"
-                          title="Chat on WhatsApp"
+                          aria-label={`Chat about ${product.name} on WhatsApp (opens in new tab)`}
                         >
-                          <FaWhatsapp className="text-lg" />
+                          <FaWhatsapp className="text-lg" aria-hidden="true" />
                         </a>
                       </div>
                     </div>
@@ -581,7 +696,8 @@ export default function Marketplace() {
         </section>
 
       </div>
-    </div>
+    </main>
+    </PullToRefresh>
   );
 }
 

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { findVisionPointBySlug, visionPoints } from "@/lib/visionPoints";
+import { absoluteUrl, breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 type VisionDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -9,6 +11,27 @@ type VisionDetailPageProps = {
 
 export function generateStaticParams() {
   return visionPoints.map((item) => ({ slug: item.slug }));
+}
+
+export async function generateMetadata({ params }: VisionDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const point = findVisionPointBySlug(slug);
+
+  if (!point) {
+    return pageMetadata({
+      title: "Vision Detail Not Found",
+      description: "The requested vision detail page could not be found on DOS Agrolink.",
+      path: `/vision/${slug}`,
+      keywords: ["agriculture vision", "Dos Agrolink", "Nigeria"],
+    });
+  }
+
+  return pageMetadata({
+    title: `${point.title} - Agricultural Vision for Nigeria`,
+    description: point.summary.slice(0, 155),
+    path: `/vision/${point.slug}`,
+    keywords: ["nigerian agriculture", "agricultural innovation", "farmer support", point.title],
+  });
 }
 
 export default async function VisionDetailPage({ params }: VisionDetailPageProps) {
@@ -19,8 +42,45 @@ export default async function VisionDetailPage({ params }: VisionDetailPageProps
     notFound();
   }
 
+  const pageBreadcrumb = breadcrumbSchema([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Vision", url: absoluteUrl("/vision") },
+    { name: point.title, url: absoluteUrl(`/vision/${point.slug}`) },
+  ]);
+
+  const testimonialReviewSchema = {
+    "@context": "https://schema.org",
+    "@type": "Review",
+    itemReviewed: {
+      "@type": "Service",
+      name: point.title,
+      provider: {
+        "@type": "Organization",
+        name: "DOS AGROLINK NIGERIA",
+      },
+    },
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: "5",
+      bestRating: "5",
+    },
+    author: {
+      "@type": "Organization",
+      name: "DOS AGROLINK NIGERIA",
+    },
+    reviewBody: point.summary,
+  };
+
   return (
     <main className="mx-auto grid max-w-6xl gap-4 sm:gap-6 py-4 sm:py-6 px-2 sm:px-0">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageBreadcrumb) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(testimonialReviewSchema) }}
+      />
       <section className="card overflow-hidden w-full flex items-center gap-3 mb-4">
         <Image src="/dos-agrolink-logo.png" alt="DOS Agrolink Logo" width={44} height={44} className="rounded-lg shadow" priority />
         <span className="text-xl font-extrabold text-green-900 tracking-tight">DOS AGROLINK</span>

@@ -1,7 +1,7 @@
 
 "use client";
 import { FaWhatsapp, FaPhone } from 'react-icons/fa';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -32,6 +32,8 @@ export default function NavBar() {
   const [language, setLanguage] = useState<UiLanguage>("en");
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const mobileNavId = "mobile-nav";
 
   useEffect(() => {
     setLanguage(getStoredLanguage());
@@ -43,6 +45,19 @@ export default function NavBar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close mobile menu on Escape
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        hamburgerRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
 
   const handleLanguageChange = (nextLanguage: UiLanguage) => {
     setLanguage(nextLanguage);
@@ -58,14 +73,14 @@ export default function NavBar() {
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl transition-all hover:scale-110"
-        title="Chat with us on WhatsApp"
-        aria-label="WhatsApp"
+        aria-label="Chat with us on WhatsApp (opens in new tab)"
       >
-        <FaWhatsapp className="text-white text-2xl" />
+        <FaWhatsapp className="text-white text-2xl" aria-hidden="true" />
       </a>
 
       {/* ── Unified Sticky Header ── */}
       <header
+        id="main-nav"
         className={`sticky top-0 z-40 w-full transition-all duration-200 ${
           scrolled
             ? "shadow-lg bg-green-950/98 backdrop-blur-sm"
@@ -77,18 +92,19 @@ export default function NavBar() {
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs text-green-200/80">
             <div className="flex items-center gap-4">
               <a href="tel:+2348030001020" className="flex items-center gap-1.5 hover:text-white transition-colors">
-                <FaPhone className="text-green-400" />
+                <FaPhone className="text-green-400" aria-hidden="true" />
                 <span className="hidden sm:inline">+234 803 000 1020</span>
                 <span className="sm:hidden">Call Us</span>
               </a>
-              <span className="opacity-40">|</span>
+              <span className="opacity-40" aria-hidden="true">|</span>
               <a
                 href={`https://wa.me/${whatsappNumber}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 hover:text-white transition-colors"
+                aria-label="WhatsApp us (opens in new tab)"
               >
-                <FaWhatsapp className="text-green-400" />
+                <FaWhatsapp className="text-green-400" aria-hidden="true" />
                 <span>WhatsApp</span>
               </a>
             </div>
@@ -104,6 +120,7 @@ export default function NavBar() {
                       ? "bg-amber-500 text-green-950"
                       : "text-green-300 hover:text-white"
                   }`}
+              aria-label={`Switch language to ${opt.label}`}
                 >
                   {opt.label}
                 </button>
@@ -141,6 +158,7 @@ export default function NavBar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={active ? "page" : undefined}
                   className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     active
                       ? "bg-amber-500 text-green-950 shadow"
@@ -168,16 +186,20 @@ export default function NavBar() {
               Get Started
             </Link>
             {/* Mobile hamburger */}
-            <button
+<button
+              ref={hamburgerRef}
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
               className="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
-              aria-label="Toggle menu"
+              aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-controls={mobileNavId}
+              aria-haspopup="true"
             >
-              <span className={`block w-5 transition-all ${menuOpen ? "opacity-0" : ""}`}>
-                <span className="block w-full h-0.5 bg-white mb-1 rounded" />
-                <span className="block w-full h-0.5 bg-white mb-1 rounded" />
-                <span className="block w-full h-0.5 bg-white rounded" />
+              {/* Animated hamburger / close icon */}
+              <span aria-hidden="true" className="flex flex-col items-center justify-center w-5 h-4 gap-1.25">
+                <span className={`block w-full h-0.5 bg-white rounded transition-transform origin-center duration-200 ${menuOpen ? "translate-y-1.75 rotate-45" : ""}`} />
+                <span className={`block w-full h-0.5 bg-white rounded transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+                <span className={`block w-full h-0.5 bg-white rounded transition-transform origin-center duration-200 ${menuOpen ? "-translate-y-1.75 -rotate-45" : ""}`} />
               </span>
             </button>
           </div>
@@ -185,12 +207,17 @@ export default function NavBar() {
 
         {/* Mobile dropdown menu */}
         {menuOpen && (
-          <nav className="lg:hidden border-t border-white/10 bg-green-900/95 backdrop-blur-sm px-4 py-3 space-y-1" aria-label="Mobile navigation">
+          <nav
+            id={mobileNavId}
+            className="lg:hidden border-t border-white/10 bg-green-900/95 backdrop-blur-sm px-4 py-3 space-y-1"
+            aria-label="Mobile navigation"
+          >
             {navLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
+                aria-current={isRouteActive(pathname, item.href) ? "page" : undefined}
                 className={`block px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
                   isRouteActive(pathname, item.href)
                     ? "bg-amber-500 text-green-950"

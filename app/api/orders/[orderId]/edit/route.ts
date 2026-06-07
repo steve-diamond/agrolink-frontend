@@ -3,24 +3,17 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   context: { params: Promise<{ orderId: string }> }
 ) {
-  try {
-    const { orderId } = await context.params;
-    const body = await request.json();
-
-    // TODO: your update logic here
-
-    return NextResponse.json({
-      success: true,
+  const { orderId } = await context.params;
+  return NextResponse.json(
+    {
+      status: "error",
+      code: "not_implemented",
+      message: "Order edit route is not implemented.",
       orderId,
-      data: body,
-    });
-  } catch {
-    return NextResponse.json(
-      { success: false, message: "Failed to edit order" },
-      { status: 500 }
-    );
-  }
+    },
+    { status: 501 }
+  );
 }
