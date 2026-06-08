@@ -3,24 +3,17 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from 'lib/mongoose';
 import User from 'models/User';
+import { handleError } from 'lib/errorHandler';
+import { authRateLimit } from 'lib/rateLimit';
+import { Schemas, validateBody } from 'lib/validators';
 
 export async function POST(req: NextRequest) {
+  const rateLimitResponse = await authRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
-    const { token, password } = await req.json();
-
-    if (!token || typeof token !== 'string') {
-      return NextResponse.json(
-        { status: 'error', message: 'Reset token is required.' },
-        { status: 400 }
-      );
-    }
-
-    if (!password || typeof password !== 'string' || password.length < 8) {
-      return NextResponse.json(
-        { status: 'error', message: 'Password must be at least 8 characters long.' },
-        { status: 400 }
-      );
-    }
+    const body = await req.json();
+    const { token, password } = validateBody(Schemas.resetPassword, body);
 
     await dbConnect();
 
@@ -44,10 +37,6 @@ export async function POST(req: NextRequest) {
       message: 'Password has been reset successfully.',
     });
   } catch (err: unknown) {
-    console.error('[/api/auth/reset-password]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Unable to reset password. Please try again.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }

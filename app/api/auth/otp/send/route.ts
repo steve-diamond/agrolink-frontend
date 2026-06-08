@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { randomBytes } from 'crypto';
+import { randomBytes, randomInt } from 'crypto';
 import bcrypt from 'bcryptjs';
 import { dbConnect } from 'lib/mongoose';
 import OtpSession from 'models/OtpSession';
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     }
 
     /* ---- Generate OTP ---- */
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const otp = String(randomInt(100000, 1000000));
     const ref = randomBytes(16).toString('hex');
     const otpHash = await bcrypt.hash(otp, 10);
     const expiresAt = new Date(Date.now() + OTP_TTL_SECONDS * 1000);

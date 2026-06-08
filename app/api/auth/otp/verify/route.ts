@@ -1,14 +1,25 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { randomBytes } from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { dbConnect } from 'lib/mongoose';
 import OtpSession from 'models/OtpSession';
 import User from 'models/User';
+import { authRateLimit } from 'lib/rateLimit';
+import { handleError } from 'lib/errorHandler';
+import { validateBody } from 'lib/validators';
 
 const MAX_ATTEMPTS = 5;
+
+const verifyOtpPayloadSchema = z.object({
+  phone: z.string().min(7),
+  otp: z.string().length(6),
+  ref: z.string().min(1),
+  role: z.string().optional(),
+});
 
 function normalizePhone(input: string): string {
   const digits = input.replace(/\D/g, '');
@@ -20,17 +31,13 @@ function normalizePhone(input: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json() as { phone?: string; otp?: string; ref?: string; role?: string };
-    const { otp, ref, role } = body;
-    const rawPhone = (body.phone ?? '').trim();
+  const rateLimitResponse = await authRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
 
-    if (!rawPhone || !otp || !ref) {
-      return NextResponse.json(
-        { status: 'error', message: 'Phone, OTP, and ref are required.' },
-        { status: 400 }
-      );
-    }
+  try {
+    const body = await req.json();
+    const { phone: incomingPhone, otp, ref, role } = validateBody(verifyOtpPayloadSchema, body);
+    const rawPhone = incomingPhone.trim();
 
     const phone = normalizePhone(rawPhone);
 
@@ -116,10 +123,6 @@ export async function POST(req: NextRequest) {
     });
     return response;
   } catch (err: unknown) {
-    console.error('[/api/auth/otp/verify]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Verification failed. Please try again.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }
