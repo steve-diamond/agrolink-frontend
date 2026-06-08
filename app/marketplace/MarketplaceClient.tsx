@@ -66,13 +66,6 @@ const normalizeCategory = (category?: string): Exclude<MarketplaceCategoryValue,
   return "general";
 };
 
-const TRUST_STATS: Array<{ Icon: IconType; iconClass: string; value: string; label: string }> = [
-  { Icon: FaStar,      iconClass: "text-amber-400",  value: "4.8/5",   label: "Avg Seller Rating" },
-  { Icon: MdVerified,  iconClass: "text-blue-400",   value: "2,400+",  label: "Verified Sellers" },
-  { Icon: FaShieldAlt, iconClass: "text-green-400",  value: "100%",    label: "Secure Payments" },
-  { Icon: FaTruck,     iconClass: "text-purple-400", value: "48hr",    label: "Avg Delivery" },
-];
-
 export default function Marketplace() {
   const { copy, language } = useLocalizedCopy();
   const { trackSearch, trackProductView, trackAddToCart, trackEvent, trackError } = useAnalytics();
@@ -198,6 +191,40 @@ export default function Marketplace() {
 
   const trendingProducts = useMemo(() => [...filteredProducts].sort((a, b) => Number(b.quantity || 0) - Number(a.quantity || 0)).slice(0, 9), [filteredProducts]);
 
+  const trustStats = useMemo<Array<{ Icon: IconType; iconClass: string; value: string; label: string }>>(() => {
+    const uniqueSellers = new Set(
+      products
+        .map((product) => {
+          const seller = product.farmer;
+          if (typeof seller === "string") return seller.trim();
+          if (seller && typeof seller === "object" && "toString" in seller) return String(seller);
+          return "";
+        })
+        .filter(Boolean)
+    );
+
+    const ratings = products
+      .map((product) => getSellerMetrics(product).rating)
+      .filter((rating): rating is number => typeof rating === "number" && Number.isFinite(rating) && rating > 0);
+
+    const averageRating = ratings.length > 0
+      ? (ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length).toFixed(1)
+      : "N/A";
+
+    const inStockListings = products.filter((product) => Number(product.quantity || 0) > 0).length;
+
+    const avgPrice = products.length > 0
+      ? products.reduce((sum, product) => sum + Number(product.price || 0), 0) / products.length
+      : 0;
+
+    return [
+      { Icon: FaStar, iconClass: "text-amber-400", value: averageRating === "N/A" ? "N/A" : `${averageRating}/5`, label: "Avg Seller Rating" },
+      { Icon: MdVerified, iconClass: "text-blue-400", value: formatCount(uniqueSellers.size), label: "Active Sellers" },
+      { Icon: FaCheckCircle, iconClass: "text-green-400", value: formatCount(inStockListings), label: "In-Stock Listings" },
+      { Icon: FaTag, iconClass: "text-purple-400", value: formatCurrency(avgPrice), label: "Avg Listing Price" },
+    ];
+  }, [products, formatCount, formatCurrency]);
+
   useEffect(() => {
     trendingProducts.forEach((product) => {
       if (trackedProductViewIds.current.has(product._id)) return;
@@ -310,7 +337,7 @@ export default function Marketplace() {
               {copy.marketplaceHeroTitle || "Trending Agricultural Products From Verified Sellers"}
             </h1>
             <p className="mt-4 text-lg text-green-100/80 max-w-2xl">
-              {copy.marketplaceHeroDescription || "Nigeria's most trusted agri-marketplace â€” direct from farmers to buyers with secure payments and fast delivery."}
+              {copy.marketplaceHeroDescription || "Nigeria's most trusted agri-marketplace - direct from farmers to buyers with secure payments and fast delivery."}
             </p>
 
             {/* Embedded search bar */}
@@ -341,7 +368,7 @@ export default function Marketplace() {
 
           {/* Trust stats row */}
           <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {TRUST_STATS.map((s) => (
+            {trustStats.map((s) => (
               <div key={s.label} className="flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3">
                 <span className="text-xl"><s.Icon className={s.iconClass} /></span>
                 <div>
@@ -400,9 +427,9 @@ export default function Marketplace() {
                   className="w-full pl-8 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300"
                 >
                   <option value="all">All Grades</option>
-                  <option value="A">Grade A â€” Premium</option>
-                  <option value="B">Grade B â€” Standard</option>
-                  <option value="C">Grade C â€” Processing</option>
+                  <option value="A">Grade A - Premium</option>
+                  <option value="B">Grade B - Standard</option>
+                  <option value="C">Grade C - Processing</option>
                   <option value="U">Ungraded</option>
                 </select>
               </div>
