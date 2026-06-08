@@ -13,6 +13,10 @@ export type Product = {
   approved?: boolean;
   grade?: "A" | "B" | "C" | "U";
   commodity?: string;
+  rating?: number;
+  ratingValue?: number;
+  reviewCount?: number;
+  reviewsCount?: number;
   createdAt?: string;
   updatedAt?: string;
   // Optionally, add other fields as needed

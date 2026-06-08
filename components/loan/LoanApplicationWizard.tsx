@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { submitLoanApplication } from "@/services/loanService";
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -1736,6 +1737,15 @@ export function LoanApplicationWizard() {
   const onSubmit = form.handleSubmit(async () => {
     try {
       const values = form.getValues();
+      const result = await submitLoanApplication({
+        amountNeeded: Number(values.amountNeeded || 0),
+        loanPurpose: String(values.loanPurpose || ""),
+        repaymentPeriod: String(values.repaymentPeriod || ""),
+        farmSize: Number.isFinite(Number(values.inventoryValue))
+          ? Number(values.inventoryValue)
+          : undefined,
+      });
+
       trackLoanApplication({
         amount: Number(values.amountNeeded || 0),
         purpose: String(values.loanPurpose || "unknown"),
@@ -1746,10 +1756,7 @@ export function LoanApplicationWizard() {
         conversion_name: "application_submitted",
       });
 
-      const tracking = `AGL-${new Date().getFullYear()}-${Math.random()
-        .toString(36)
-        .slice(2, 8)
-        .toUpperCase()}`;
+      const tracking = String(result.loan._id || "").slice(-12).toUpperCase();
       setTrackingNumber(tracking);
       setSubmitted(true);
       try {

@@ -42,14 +42,19 @@ const getStoredUser = () => {
   catch { return {}; }
 };
 
-const getSellerRating = (productId: string) => {
-  const s = productId.split("").reduce((sum, c) => sum + c.charCodeAt(0), 0);
-  return (4.2 + (s % 8) / 10).toFixed(1);
-};
+const getSellerMetrics = (product: Product): { rating: number | null; reviews: number | null } => {
+  const ratingCandidates = [product.rating, product.ratingValue]
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value) && value > 0);
 
-const getReviewsCount = (productId: string) => {
-  const s = productId.split("").reduce((sum, c) => sum + c.charCodeAt(0), 0);
-  return 12 + (s % 120);
+  const reviewCandidates = [product.reviewCount, product.reviewsCount]
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value) && value >= 0);
+
+  return {
+    rating: ratingCandidates.length > 0 ? ratingCandidates[0] : null,
+    reviews: reviewCandidates.length > 0 ? reviewCandidates[0] : null,
+  };
 };
 
 const normalizeCategory = (category?: string): Exclude<MarketplaceCategoryValue, "all"> | "general" => {
@@ -208,13 +213,12 @@ export default function Marketplace() {
 
   const marketplaceStructuredData = useMemo(() => {
     const productsSchema = filteredProducts.slice(0, 24).map((product) => {
-      const rating = getSellerRating(product._id);
-      const reviews = getReviewsCount(product._id);
+      const { rating, reviews } = getSellerMetrics(product);
       const image = isValidRemoteImageUrl(product.imageUrl)
         ? String(product.imageUrl)
         : absoluteUrl("/agropro/images/banner.jpg");
 
-      return productSchema({
+      const schemaPayload = {
         name: product.name,
         image,
         description: product.description || `${product.name} listed on DOS Agrolink marketplace.`,
@@ -226,9 +230,14 @@ export default function Marketplace() {
             ? "https://schema.org/InStock"
             : "https://schema.org/OutOfStock",
         url: absoluteUrl("/marketplace"),
-        ratingValue: rating,
-        reviewCount: reviews,
-      });
+      } as Parameters<typeof productSchema>[0];
+
+      if (rating !== null && reviews !== null && reviews > 0) {
+        schemaPayload.ratingValue = rating.toFixed(1);
+        schemaPayload.reviewCount = Math.trunc(reviews);
+      }
+
+      return productSchema(schemaPayload);
     });
 
     return {
@@ -496,8 +505,7 @@ export default function Marketplace() {
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {trendingProducts.map((product: Product) => {
                 const grade = getProductGrade(product);
-                const rating = getSellerRating(product._id);
-                const reviews = getReviewsCount(product._id);
+                const { rating, reviews } = getSellerMetrics(product);
                 const catNorm = normalizeCategory(product.category);
 
                 return (
@@ -555,15 +563,22 @@ export default function Marketplace() {
                       )}
 
                       {/* Rating */}
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex">
-                          {[1,2,3,4,5].map((star) => (
-                            <FaStar key={star} className={Number(rating) >= star ? "text-amber-400 text-xs" : "text-gray-200 text-xs"} />
-                          ))}
+                      {rating !== null && reviews !== null && reviews > 0 ? (
+                        <div className="flex items-center gap-1.5">
+                          <div className="flex">
+                            {[1,2,3,4,5].map((star) => (
+                              <FaStar key={star} className={rating >= star ? "text-amber-400 text-xs" : "text-gray-200 text-xs"} />
+                            ))}
+                          </div>
+                          <span className="text-xs font-semibold text-gray-700">{rating.toFixed(1)}</span>
+                          <span className="text-xs text-gray-400">({formatCount(reviews)} reviews)</span>
                         </div>
-                        <span className="text-xs font-semibold text-gray-700">{rating}</span>
-                        <span className="text-xs text-gray-400">({formatCount(reviews)} reviews)</span>
-                      </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                          <FaStar className="text-gray-300" />
+                          <span>New listing</span>
+                        </div>
+                      )}
 
                       {/* Price + stock */}
                       <div className="flex items-end justify-between">
