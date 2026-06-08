@@ -119,12 +119,18 @@ export async function PATCH(req: NextRequest) {
       .update(rawBody)
       .digest('hex');
 
-    if (signature !== expectedSignature) {
+    const signatureBuffer = Buffer.from(signature, 'utf8');
+    const expectedBuffer = Buffer.from(expectedSignature, 'utf8');
+    const validSignature =
+      signatureBuffer.length === expectedBuffer.length &&
+      crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
+
+    if (!validSignature) {
       logError('[Paystack webhook] Invalid signature', new Error('Signature mismatch'));
       return NextResponse.json({ status: 'error', message: 'Invalid signature.' }, { status: 401 });
     }
 
-    const event = JSON.parse(rawBody) as {
+    let event: {
       event: string;
       data: {
         status: string;
@@ -133,6 +139,20 @@ export async function PATCH(req: NextRequest) {
         metadata?: { orderId?: string };
       };
     };
+
+    try {
+      event = JSON.parse(rawBody) as {
+        event: string;
+        data: {
+          status: string;
+          reference: string;
+          amount: number;
+          metadata?: { orderId?: string };
+        };
+      };
+    } catch {
+      return NextResponse.json({ status: 'error', message: 'Invalid webhook payload.' }, { status: 400 });
+    }
 
     if (event.event === 'charge.success') {
       const { reference, metadata } = event.data;

@@ -14,17 +14,28 @@ const counterfeitReportSchema = new mongoose.Schema(
     reason: {
       type: String,
       required: true,
+      trim: true,
+      minlength: 5,
+      maxlength: 2000,
     },
     evidence_url: {
       type: String,
+      trim: true,
+      default: "",
     },
     created_at: {
       type: Date,
       default: Date.now,
       required: true,
+      immutable: true,
     },
   },
   { timestamps: false }
 );
 
-module.exports = mongoose.model("CounterfeitReport", counterfeitReportSchema);
+counterfeitReportSchema.index({ product_id: 1, created_at: -1 });
+counterfeitReportSchema.index({ reporter_id: 1, created_at: -1 });
+
+module.exports =
+  mongoose.models.CounterfeitReport ||
+  mongoose.model("CounterfeitReport", counterfeitReportSchema);
