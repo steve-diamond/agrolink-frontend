@@ -136,7 +136,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
       <section className="dash-kpi-grid" aria-label="Key metrics">
         <article className="dash-kpi">
           <h2>Wallet Balance</h2>
-          <strong>{formatNaira(walletBalance || 150500)}</strong>
+          <strong>{formatNaira(walletBalance)}</strong>
         </article>
         <article className="dash-kpi">
           <h2>Active Loans</h2>
@@ -144,7 +144,7 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
         </article>
         <article className="dash-kpi">
           <h2>Pending Orders</h2>
-          <strong>{pendingOrders || 3}</strong>
+          <strong>{pendingOrders}</strong>
         </article>
       </section>
 
