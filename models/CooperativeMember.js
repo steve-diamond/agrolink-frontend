@@ -23,7 +23,15 @@ const cooperativeMemberSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: false }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+cooperativeMemberSchema.index({ cooperative_id: 1, farmer_id: 1 }, { unique: true });
+cooperativeMemberSchema.index({ farmer_id: 1, role: 1 });
+cooperativeMemberSchema.index({ cooperative_id: 1, createdAt: -1 });
 
 module.exports = mongoose.model("CooperativeMember", cooperativeMemberSchema);

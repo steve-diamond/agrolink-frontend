@@ -21,12 +21,18 @@ const inputOrderSchema = new mongoose.Schema(
     },
     delivery_address: {
       type: String,
+      trim: true,
+      maxlength: 500,
     },
     payment_status: {
       type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
+      default: "pending",
     },
     order_status: {
       type: String,
+      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+      default: "pending",
     },
     created_at: {
       type: Date,
@@ -34,7 +40,20 @@ const inputOrderSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: false }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+inputOrderSchema.index({ buyer_id: 1, createdAt: -1 });
+inputOrderSchema.index({ product_id: 1, order_status: 1 });
+inputOrderSchema.index({ payment_status: 1, createdAt: -1 });
+
+inputOrderSchema.pre("save", function normalizeInputOrder(next) {
+  if (this.delivery_address) this.delivery_address = this.delivery_address.trim();
+  next();
+});
 
 module.exports = mongoose.model("InputOrder", inputOrderSchema);
