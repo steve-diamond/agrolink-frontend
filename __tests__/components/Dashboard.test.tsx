@@ -9,7 +9,7 @@ import * as React from 'react';
 import { axe } from 'jest-axe';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { http, HttpResponse } from 'msw';
+import { rest } from 'msw';
 import { server } from '../mocks/server.js';
 
 // ── Next.js mocks ─────────────────────────────────────────────────────────────
@@ -118,9 +118,9 @@ describe('Dashboard — loading state', () => {
   beforeEach(() => {
     // Mock API to delay a bit so we can catch loading state
     server.use(
-      http.get('*/api/orders', async () => {
+      rest.get('*/api/orders', async (_req, res, ctx) => {
         await new Promise((r) => setTimeout(r, 50));
-        return HttpResponse.json(mockOrders);
+        return res(ctx.status(200), ctx.json(mockOrders));
       })
     );
   });
@@ -335,18 +335,19 @@ describe('Dashboard — transactions table', () => {
 
 describe('Dashboard — farming tips', () => {
   it('renders tips when available', () => {
-    const tips = [
+    type Tip = { title: string; content: string };
+    const tips: Tip[] = [
       { title: 'Irrigation', content: 'Water crops in the morning.' },
       { title: 'Soil', content: 'Rotate crops for fertility.' },
     ];
 
-    function MockTips({ tips }: { tips: typeof tips }) {
+    function MockTips({ tips }: { tips: Tip[] }) {
       return (
         <article>
           <h3>Farming Tips</h3>
           <ul>
             {tips.length > 0
-              ? tips.map((t) => <li key={t.title}>{t.content}</li>)
+              ? tips.map((t: Tip) => <li key={t.title}>{t.content}</li>)
               : <li>No tips available</li>}
           </ul>
         </article>

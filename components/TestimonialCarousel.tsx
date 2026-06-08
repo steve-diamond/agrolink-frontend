@@ -3,7 +3,6 @@
 import React, {
   useCallback,
   useEffect,
-  useId,
   useRef,
   useState,
 } from "react";
@@ -19,7 +18,7 @@ import {
   ChevronRightIcon,
   MapPinIcon,
   XMarkIcon,
-  QuoteIcon,
+  ChatBubbleBottomCenterTextIcon,
 } from "@heroicons/react/24/solid";
 import { cn } from "@/components/ui/utils";
 
@@ -205,7 +204,6 @@ interface StarRatingProps {
 }
 
 function StarRating({ rating, className }: StarRatingProps) {
-  const uid = useId();
   return (
     <div
       className={cn("flex items-center gap-0.5", className)}
@@ -398,7 +396,7 @@ function TestimonialCard({ testimonial, isActive }: TestimonialCardProps) {
           )}
         >
           {/* Decorative quote mark */}
-          <QuoteIcon
+          <ChatBubbleBottomCenterTextIcon
             className="absolute top-5 right-5 size-9 text-emerald-500/15 pointer-events-none"
             aria-hidden
           />
@@ -581,15 +579,13 @@ function NavigationDots({
   return (
     <div
       className="flex items-center justify-center gap-2 mt-8"
-      role="tablist"
-      aria-label="Testimonial navigation"
+      role="group"
+      aria-label="Testimonial slide navigation"
     >
       {Array.from({ length: count }).map((_, i) => (
         <button
           key={i}
           type="button"
-          role="tab"
-          aria-selected={i === selectedIndex ? "true" : "false"}
           aria-label={`Go to testimonial ${i + 1} of ${count}`}
           onClick={() => onSelect(i)}
           className={cn(

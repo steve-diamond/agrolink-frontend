@@ -189,8 +189,22 @@ function HighlightText({ text, query }: { text: string; query: string }) {
 
 // ─── VoiceSearchButton ─────────────────────────────────────────────────────
 
+type SpeechRecognitionLike = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+
 type WebkitWindow = typeof window & {
-  webkitSpeechRecognition?: new () => SpeechRecognition;
+  SpeechRecognition?: SpeechRecognitionCtor;
+  webkitSpeechRecognition?: SpeechRecognitionCtor;
 };
 
 function VoiceSearchButton({
@@ -204,7 +218,7 @@ function VoiceSearchButton({
 }) {
   const [listening, setListening] = useState(false);
   const [available, setAvailable] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     const w = window as WebkitWindow;
@@ -219,16 +233,18 @@ function VoiceSearchButton({
     }
 
     const w = window as WebkitWindow;
-    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    const SR = (w.SpeechRecognition ?? w.webkitSpeechRecognition) as
+      | SpeechRecognitionCtor
+      | undefined;
     if (!SR) return;
 
     try {
-      const recognition = new SR();
+      const recognition: SpeechRecognitionLike = new SR();
       recognition.lang = "en-NG";
       recognition.continuous = false;
       recognition.interimResults = false;
 
-      recognition.onresult = (event) => {
+      recognition.onresult = (event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => {
         const transcript = event.results[0]?.[0]?.transcript ?? "";
         if (transcript) onTranscript(transcript.trim());
         setListening(false);

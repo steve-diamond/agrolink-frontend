@@ -134,7 +134,7 @@ export function useFormValidation<T extends Record<string, string>>(
         k,
         { value: initialValues[k as keyof T], error: undefined, touched: false, dirty: false },
       ])
-    ) as Fields;
+    ) as unknown as Fields;
   }, [initialValues]);
 
   const [fields, setFields] = useState<Fields>(buildInitial);

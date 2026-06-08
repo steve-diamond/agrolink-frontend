@@ -24,7 +24,7 @@ export const CardImage: React.FC<CardImageProps> = ({
   </div>
 );
 
-export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardHeaderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /** Large heading */
   title?: React.ReactNode;
   /** Subtitle / description beneath the title */
@@ -67,7 +67,30 @@ export const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 
 // ── Card root ─────────────────────────────────────────────────────────────────
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardProps
+  extends Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    | "onAnimationStart"
+    | "onAnimationStartCapture"
+    | "onAnimationEnd"
+    | "onAnimationEndCapture"
+    | "onAnimationIteration"
+    | "onAnimationIterationCapture"
+    | "onDrag"
+    | "onDragCapture"
+    | "onDragStart"
+    | "onDragStartCapture"
+    | "onDragEnd"
+    | "onDragEndCapture"
+    | "onDragEnter"
+    | "onDragEnterCapture"
+    | "onDragLeave"
+    | "onDragLeaveCapture"
+    | "onDragOver"
+    | "onDragOverCapture"
+    | "onDrop"
+    | "onDropCapture"
+  > {
   /** Lift the card with a deeper shadow on hover */
   hoverable?: boolean;
   /** Wrap in a clickable anchor-style element (adds cursor-pointer + focus ring) */

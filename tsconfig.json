@@ -20,7 +20,9 @@
     "jsx": "preserve",
     "incremental": true,
     "types": [
-      "node"
+      "node",
+      "jest",
+      "@testing-library/jest-dom"
     ],
     // "baseUrl" is deprecated in TS 7.0, see https://aka.ms/ts6
     "baseUrl": ".",

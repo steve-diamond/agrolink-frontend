@@ -38,7 +38,11 @@ const styles = {
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface AlertProps
+  extends Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    "onAnimationStart" | "onAnimationEnd" | "onAnimationIteration" | "onDrag"
+  > {
   /** Visual and semantic intent */
   variant?: keyof typeof styles;
   /** Alert heading */
@@ -87,49 +91,52 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       <AnimatePresence>
         {visible && (
           <motion.div
-            ref={ref}
-            role="alert"
-            aria-live="assertive"
-            aria-atomic="true"
             initial={{ opacity: 0, y: -6, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className={cn(
-              "flex gap-3 rounded-lg border p-4 text-sm",
-              styles[variant],
-              className
-            )}
-            {...props}
           >
-            {/* Icon */}
-            <span className="shrink-0 mt-0.5">
-              {icon ?? icons[variant]}
-            </span>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              {title && (
-                <p className="font-semibold mb-0.5">{title}</p>
+            <div
+              ref={ref}
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+              className={cn(
+                "flex gap-3 rounded-lg border p-4 text-sm",
+                styles[variant],
+                className
               )}
-              {children && (
-                <div className="opacity-90">{children}</div>
+              {...props}
+            >
+              {/* Icon */}
+              <span className="shrink-0 mt-0.5">
+                {icon ?? icons[variant]}
+              </span>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                {title && (
+                  <p className="font-semibold mb-0.5">{title}</p>
+                )}
+                {children && (
+                  <div className="opacity-90">{children}</div>
+                )}
+              </div>
+
+              {/* Dismiss button */}
+              {dismissible && (
+                <button
+                  type="button"
+                  aria-label="Dismiss alert"
+                  onClick={handleDismiss}
+                  className="shrink-0 -mt-0.5 -mr-1 rounded p-1 opacity-60 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
+                >
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="size-4" aria-hidden>
+                    <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
+                  </svg>
+                </button>
               )}
             </div>
-
-            {/* Dismiss button */}
-            {dismissible && (
-              <button
-                type="button"
-                aria-label="Dismiss alert"
-                onClick={handleDismiss}
-                className="shrink-0 -mt-0.5 -mr-1 rounded p-1 opacity-60 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
-              >
-                <svg viewBox="0 0 20 20" fill="currentColor" className="size-4" aria-hidden>
-                  <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
-                </svg>
-              </button>
-            )}
           </motion.div>
         )}
       </AnimatePresence>

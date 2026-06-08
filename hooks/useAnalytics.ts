@@ -5,7 +5,16 @@ import { event as gaEvent } from "nextjs-google-analytics";
 import * as Sentry from "@sentry/nextjs";
 import { hasAnalyticsConsent } from "@/components/analytics/AnalyticsProvider";
 
-type AnalyticsParams = Record<string, string | number | boolean | null | undefined>;
+type AnalyticsValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | AnalyticsValue[]
+  | { [key: string]: AnalyticsValue };
+
+type AnalyticsParams = Record<string, AnalyticsValue>;
 
 declare global {
   interface Window {
