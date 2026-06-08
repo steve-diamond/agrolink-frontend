@@ -213,7 +213,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
         <motion.div {...fadeDown(0.1)}>
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest bg-white/15 border border-white/25 text-green-100 backdrop-blur-sm">
             <span className="size-1.5 rounded-full bg-green-400 animate-pulse" />
-            Nigeria's #1 Agri Marketplace
+            Nigeria&apos;s #1 Agri Marketplace
           </span>
         </motion.div>
 
@@ -223,7 +223,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
             {...fadeDown(0.2)}
             className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] tracking-tight drop-shadow-md"
           >
-            Nigeria's Digital{" "}
+            Nigeria&apos;s Digital{" "}
             <span className="relative inline-block">
               <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-cyan-300">
                 Agriculture

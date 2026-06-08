@@ -109,7 +109,8 @@ export function MobileFileUpload({
   disabled,
   id: idProp,
 }: MobileFileUploadProps) {
-  const id = idProp ?? React.useId();
+  const generatedId = React.useId();
+  const id = idProp ?? generatedId;
   const cameraInputId = `${id}-camera`;
   const galleryInputId = `${id}-gallery`;
   const dropRef = React.useRef<HTMLDivElement>(null);

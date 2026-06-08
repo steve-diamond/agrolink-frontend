@@ -35,6 +35,28 @@ function formatNaira(value: number) {
   return `N${Math.round(value).toLocaleString()}`;
 }
 
+const isOrdersArray = (res: unknown): res is Order[] => {
+  return Array.isArray(res) && res.every((order) => typeof order === "object" && order !== null && "_id" in order);
+};
+
+const isOrdersObject = (res: unknown): res is { orders: Order[] } => {
+  return (
+    typeof res === "object" &&
+    res !== null &&
+    "orders" in res &&
+    Array.isArray((res as { orders: unknown }).orders)
+  );
+};
+
+const isOrdersDataObject = (res: unknown): res is { data: Order[] } => {
+  return (
+    typeof res === "object" &&
+    res !== null &&
+    "data" in res &&
+    Array.isArray((res as { data: unknown }).data)
+  );
+};
+
 function FarmerDashboard({ user }: { user: AuthUser }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -55,25 +77,6 @@ function FarmerDashboard({ user }: { user: AuthUser }) {
         getStorage(user._id),
         getFarmingTips(),
       ]);
-        function isOrdersArray(res: unknown): res is Order[] {
-          return Array.isArray(res) && res.every(order => typeof order === 'object' && order !== null && '_id' in order);
-        }
-        function isOrdersObject(res: unknown): res is { orders: Order[] } {
-          return (
-            typeof res === 'object' &&
-            res !== null &&
-            'orders' in res &&
-            Array.isArray((res as { orders: unknown }).orders)
-          );
-        }
-        function isOrdersDataObject(res: unknown): res is { data: Order[] } {
-          return (
-            typeof res === 'object' &&
-            res !== null &&
-            'data' in res &&
-            Array.isArray((res as { data: unknown }).data)
-          );
-        }
         let allOrders: Order[] = [];
         if (isOrdersArray(ordersRes)) {
           allOrders = ordersRes;

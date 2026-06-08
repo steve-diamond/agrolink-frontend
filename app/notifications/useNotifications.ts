@@ -22,7 +22,9 @@ export function useNotifications() {
   return {
     notifications,
     loading,
-    refetch: () => { void refetch(); },
+    refetch: async () => {
+      await refetch();
+    },
     queryClient,
   };
 }

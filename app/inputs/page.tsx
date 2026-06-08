@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import ProductCard from 'components/inputs/ProductCard';
 import { useCartStore } from 'store/cart';
-import { useInputProducts } from '../../lib/hooks/useInputProducts';
+import { type InputProduct, useInputProducts } from '../../lib/hooks/useInputProducts';
 
 const CATEGORIES = [
   { label: 'All', value: '' },
@@ -75,17 +75,27 @@ export default function InputsMarketplacePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(products ?? []).map((product: import('components/inputs/ProductCard').ProductCardProps) => (
+            {(products ?? []).map((product: InputProduct) => (
               <ProductCard
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                key={(product as any).id ?? `${product.name}-${product.seller_name}-${product.state}`}
-                {...product}
+                key={product._id ?? `${product.name}-${product.state ?? 'unknown'}`}
+                name={product.name}
+                price_per_unit={product.price}
+                unit="unit"
+                image_url={product.imageUrl}
+                seller_name="Verified Seller"
+                state={product.state ?? 'Nigeria'}
+                is_nafdac_approved={product.nafdac}
                 onAddToCart={() =>
                   addItem({
-                    ...product,
+                    name: product.name,
+                    price_per_unit: product.price,
+                    unit: 'unit',
+                    image_url: product.imageUrl,
+                    seller_name: 'Verified Seller',
+                    state: product.state ?? 'Nigeria',
+                    is_nafdac_approved: product.nafdac,
                     quantity: 1,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    id: (product as any).id ?? `${product.name}-${product.seller_name}-${product.state}`,
+                    id: product._id ?? `${product.name}-${product.state ?? 'unknown'}`,
                   })
                 }
               />

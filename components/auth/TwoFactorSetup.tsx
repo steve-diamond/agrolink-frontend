@@ -313,7 +313,7 @@ function MethodStep({
             <div className="min-w-0">
               <p className="text-sm font-semibold text-slate-800">SMS Text Message</p>
               <p id="sms-desc" className="mt-0.5 text-xs text-slate-500">
-                We'll send a 6-digit code to your mobile phone when you sign in.
+                We&apos;ll send a 6-digit code to your mobile phone when you sign in.
               </p>
             </div>
           </label>
@@ -481,7 +481,7 @@ function VerifyStep({
               </div>
             </div>
             <p className="mt-3 text-center text-xs text-slate-500">
-              Can't scan?{" "}
+              Can&apos;t scan?{" "}
               <button
                 type="button"
                 className="font-medium text-green-700 underline hover:text-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 rounded"

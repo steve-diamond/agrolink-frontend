@@ -8,14 +8,13 @@ import SiteFooter from "components/SiteFooter";
 import ClientErrorBoundary from "components/ClientErrorBoundary";
 import ServiceWorkerRegistration from "components/ServiceWorkerRegistration";
 import InstallPWA from "components/InstallPWA";
+import CoreWebVitals from "components/CoreWebVitals";
 import { FocusManager } from "components/FocusManager";
 import { RouteAnnouncer } from "components/RouteAnnouncer";
 import type { Metadata, Viewport } from "next";
 import QueryProvider from "components/QueryProvider";
 import { AccessibilityProvider } from "components/AccessibilityProvider";
 import { absoluteUrl, organizationSchema, siteConfig } from "@/lib/seo";
-import CoreWebVitals from "components/CoreWebVitals";
-import AnalyticsProvider from "components/analytics/AnalyticsProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -109,14 +108,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
-        <AnalyticsProvider />
-        <CoreWebVitals />
         <QueryProvider>
         <AccessibilityProvider>
         <ClientErrorBoundary>
           {/* Skip navigation — first focusable element in the DOM */}
           <FocusManager searchInputId="global-search" />
           <RouteAnnouncer />
+          <CoreWebVitals />
           <ServiceWorkerRegistration />
           <NavBar />
           {/*

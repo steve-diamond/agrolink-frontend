@@ -1,7 +1,7 @@
 import QuoteCalculator from 'components/insurance/QuoteCalculator';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { absoluteUrl, breadcrumbSchema, pageMetadata } from '@/lib/seo';
+import { absoluteUrl, breadcrumbSchema, faqPageSchema, pageMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Agricultural Insurance in Nigeria - Protect Your Harvest',
@@ -70,18 +70,9 @@ export default function InsuranceLandingPage() {
     { name: 'Insurance', url: absoluteUrl('/insurance') },
   ]);
 
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map((faq) => ({
-      '@type': 'Question',
-      name: faq.q,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: faq.a,
-      },
-    })),
-  };
+  const faqSchema = faqPageSchema(
+    faqs.map((faq) => ({ question: faq.q, answer: faq.a }))
+  );
 
   return (
     <div className="min-h-screen bg-[#F8FAF9] pb-24">

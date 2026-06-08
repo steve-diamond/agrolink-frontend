@@ -428,9 +428,7 @@ const ToastCard: React.FC<ToastCardProps> = ({ entry, isMobile }) => {
           </button>
         </div>
 
-        {/* ── Progress bar ──────────────────────────────────────────────────── *
-         * Shrinks from full width to zero over `duration` ms.                 *
-         * Hidden for loading-type toasts (duration === 0).                    */}
+        {/* Progress bar: shrinks from full width to zero; hidden for persistent loading toasts. */}
         {duration > 0 && (
           <div className="h-0.5 w-full bg-black/10 shrink-0" aria-hidden>
             <motion.div
@@ -442,8 +440,7 @@ const ToastCard: React.FC<ToastCardProps> = ({ entry, isMobile }) => {
           </div>
         )}
       </motion.div>
-    </div>
-  );
+    );
 };
 
 // ── ToastStack — renders the visible queue ────────────────────────────────────

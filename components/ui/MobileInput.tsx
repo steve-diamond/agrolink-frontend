@@ -98,7 +98,8 @@ export const MobileInput = React.forwardRef<HTMLInputElement, MobileInputProps>(
     },
     ref
   ) {
-    const id = idProp ?? React.useId();
+    const generatedId = React.useId();
+    const id = idProp ?? generatedId;
     const descId = `${id}-desc`;
 
     // ── Controlled / uncontrolled value tracking ──────────────────────────

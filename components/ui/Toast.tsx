@@ -95,8 +95,6 @@ const ToastCard: React.FC<{
     return () => clearTimeout(t);
   }, [id, duration, onDismiss]);
 
-  const bottom = isBottom(position);
-
   return (
     <motion.div
       layout
@@ -108,22 +106,22 @@ const ToastCard: React.FC<{
       exit={{ opacity: 0, x: 40, scale: 0.95 }}
       transition={{ type: "spring", stiffness: 350, damping: 30 }}
       className={cn(
-        "flex items-start gap-3 w-80 max-w-[90vw] rounded-lg border border-[var(--color-border)]",
-        "shadow-[var(--shadow-lg)] px-4 py-3 text-sm",
+        "flex items-start gap-3 w-80 max-w-[90vw] rounded-lg border border-(--color-border)",
+        "shadow-(--shadow-lg) px-4 py-3 text-sm",
         variantStyles[variant]
       )}
     >
       {icon ?? variantIcons[variant]}
       <div className="flex-1 min-w-0">
         {title && <p className="font-semibold mb-0.5">{title}</p>}
-        <p className="text-[var(--color-fg-muted)]">{message}</p>
+        <p className="text-(--color-fg-muted)">{message}</p>
       </div>
       {dismissible && (
         <button
           type="button"
           aria-label="Dismiss notification"
           onClick={() => onDismiss(id)}
-          className="shrink-0 -mr-1 rounded p-1 text-[var(--color-fg-muted)] opacity-60 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          className="shrink-0 -mr-1 rounded p-1 text-(--color-fg-muted) opacity-60 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="size-4" aria-hidden>
             <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
@@ -187,7 +185,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
       <div
         aria-label="Notifications"
         className={cn(
-          "fixed z-[var(--z-toast)] flex flex-col pointer-events-none",
+          "fixed z-(--z-toast) flex flex-col pointer-events-none",
           bottom ? "flex-col-reverse" : "flex-col",
           "gap-2",
           positionClasses[position]

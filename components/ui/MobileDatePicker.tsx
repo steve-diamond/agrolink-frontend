@@ -104,7 +104,8 @@ export function MobileDatePicker({
   id: idProp,
   presets,
 }: MobileDatePickerProps) {
-  const id = idProp ?? React.useId();
+  const generatedId = React.useId();
+  const id = idProp ?? generatedId;
   const descId = `${id}-desc`;
   const nativeRef = React.useRef<HTMLInputElement>(null);
 

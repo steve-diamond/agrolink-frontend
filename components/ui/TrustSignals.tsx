@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { cn } from "./utils";
 import { Tooltip } from "./Tooltip";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "./Modal";
@@ -102,37 +102,7 @@ function NewMemberIcon({ className }: { className?: string }) {
   );
 }
 
-function InfoIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className={cn("h-3.5 w-3.5 shrink-0", className)}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 16v-4" />
-      <path d="M12 8h.01" />
-    </svg>
-  );
-}
 
-function XIcon() {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className="size-5"
-      aria-hidden
-    >
-      <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" />
-    </svg>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. SSL Badge

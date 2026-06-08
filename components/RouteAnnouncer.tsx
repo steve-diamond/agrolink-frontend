@@ -48,7 +48,7 @@ export const RouteAnnouncer: React.FC = () => {
 
     // Build the announcement from the document title or pathname
     const pageTitle = document.title
-      ? document.title.replace(/\s*[|–\-]\s*.+$/, "").trim() // strip " | Site Name"
+      ? document.title.replace(/\s*[|–-]\s*.+$/, "").trim() // strip " | Site Name"
       : pathnameToTitle(pathname);
 
     const message = `Navigated to ${pageTitle}`;

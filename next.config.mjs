@@ -1,6 +1,5 @@
 import path from "path";
 import bundleAnalyzer from "@next/bundle-analyzer";
-import { withSentryConfig } from "@sentry/nextjs";
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -109,42 +108,12 @@ const nextConfig = {
         destination: "/insurance",
         permanent: true,
       },
-      {
-        source: "/loan",
-        destination: "/loan-application",
-        permanent: true,
-      },
-      {
-        source: "/agri-market",
-        destination: "/marketplace",
-        permanent: true,
-      },
-      {
-        source: "/investments",
-        destination: "/invest",
-        permanent: true,
-      },
-      {
-        source: "/about",
-        destination: "/about-us",
-        permanent: true,
-      },
-      {
-        source: "/contact",
-        destination: "/join-us",
-        permanent: true,
-      },
-      {
-        source: "/old-marketplace/:path*",
-        destination: "/marketplace/:path*",
-        permanent: true,
-      },
     ];
   },
   async headers() {
     return [
       {
-        source: "/:path*",
+        source: "/(.*)",
         headers: [
           {
             key: "Strict-Transport-Security",
@@ -197,13 +166,4 @@ const nextConfig = {
   },
 };
 
-const analyzedConfig = withBundleAnalyzer(nextConfig);
-
-export default withSentryConfig(analyzedConfig, {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  silent: true,
-  widenClientFileUpload: true,
-  disableLogger: true,
-  automaticVercelMonitors: true,
-});
+export default withBundleAnalyzer(nextConfig);

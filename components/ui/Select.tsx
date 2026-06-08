@@ -44,7 +44,8 @@ export const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProp
     },
     ref
   ) => {
-    const id = idProp ?? React.useId();
+    const generatedId = React.useId();
+    const id = idProp ?? generatedId;
     const descId = `${id}-desc`;
     const hasError = Boolean(error);
 
@@ -166,7 +167,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   defaultValue, onChange, placeholder = "Select…",
   disabled, required, fullWidth, className, id: idProp,
 }) => {
-  const id = idProp ?? React.useId();
+  const generatedId = React.useId();
+  const id = idProp ?? generatedId;
   const listId = `${id}-list`;
   const [open, setOpen] = React.useState(false);
   const [internalValue, setInternalValue] = React.useState(defaultValue ?? "");

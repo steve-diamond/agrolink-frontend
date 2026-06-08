@@ -45,7 +45,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     },
     ref
   ) => {
-    const id = idProp ?? React.useId();
+    const generatedId = React.useId();
+    const id = idProp ?? generatedId;
     const descId = `${id}-desc`;
     const hasError = Boolean(error);
     const [length, setLength] = React.useState(

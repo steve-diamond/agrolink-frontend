@@ -18,35 +18,26 @@ export function absoluteUrl(pathname = "/") {
   return `${base}${path}`;
 }
 
-function truncateDescription(value: string, maxLength = 155) {
-  const clean = value.replace(/\s+/g, " ").trim();
-  if (clean.length <= maxLength) {
-    return clean;
-  }
-  return `${clean.slice(0, maxLength - 1).trim()}…`;
-}
-
 export function pageMetadata(input: {
   title: string;
   description: string;
   path: string;
   keywords?: string[];
-  imagePath?: string;
 }): Metadata {
+  const normalizedDescription = truncateDescription(input.description);
   const url = absoluteUrl(input.path);
-  const imageUrl = absoluteUrl(input.imagePath || siteConfig.ogImage);
-  const description = truncateDescription(input.description);
+  const imageUrl = absoluteUrl(siteConfig.ogImage);
 
   return {
     title: input.title,
-    description,
+    description: normalizedDescription,
     keywords: input.keywords,
     alternates: {
       canonical: url,
     },
     openGraph: {
       title: input.title,
-      description,
+      description: normalizedDescription,
       url,
       type: "website",
       siteName: siteConfig.name,
@@ -63,11 +54,19 @@ export function pageMetadata(input: {
     twitter: {
       card: "summary_large_image",
       title: input.title,
-      description,
+      description: normalizedDescription,
       creator: siteConfig.twitterHandle,
       images: [imageUrl],
     },
   };
+}
+
+export function truncateDescription(description: string, maxLength = 155) {
+  const clean = description.replace(/\s+/g, " ").trim();
+  if (clean.length <= maxLength) {
+    return clean;
+  }
+  return `${clean.slice(0, maxLength - 1).trimEnd()}…`;
 }
 
 export function organizationSchema() {
@@ -106,83 +105,6 @@ export function breadcrumbSchema(items: Array<{ name: string; url: string }>) {
   };
 }
 
-export function productSchema(input: {
-  name: string;
-  description: string;
-  path: string;
-  image?: string;
-  category?: string;
-  sku?: string;
-  price?: number;
-  currency?: string;
-  availability?: "https://schema.org/InStock" | "https://schema.org/OutOfStock";
-  aggregateRating?: {
-    ratingValue: number;
-    reviewCount: number;
-  };
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: input.name,
-    description: truncateDescription(input.description, 300),
-    image: input.image ? [input.image] : [absoluteUrl(siteConfig.ogImage)],
-    category: input.category,
-    sku: input.sku,
-    url: absoluteUrl(input.path),
-    brand: {
-      "@type": "Brand",
-      name: siteConfig.shortName,
-    },
-    offers:
-      typeof input.price === "number"
-        ? {
-            "@type": "Offer",
-            url: absoluteUrl(input.path),
-            priceCurrency: input.currency || "NGN",
-            price: input.price,
-            availability: input.availability || "https://schema.org/InStock",
-          }
-        : undefined,
-    aggregateRating: input.aggregateRating
-      ? {
-          "@type": "AggregateRating",
-          ratingValue: input.aggregateRating.ratingValue,
-          reviewCount: input.aggregateRating.reviewCount,
-        }
-      : undefined,
-  };
-}
-
-export function reviewSchema(input: {
-  itemName: string;
-  itemType?: "Service" | "Product" | "Organization";
-  reviewBody: string;
-  ratingValue: number;
-  authorName: string;
-  itemPath?: string;
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Review",
-    itemReviewed: {
-      "@type": input.itemType || "Service",
-      name: input.itemName,
-      url: input.itemPath ? absoluteUrl(input.itemPath) : undefined,
-    },
-    author: {
-      "@type": "Person",
-      name: input.authorName,
-    },
-    reviewRating: {
-      "@type": "Rating",
-      ratingValue: String(input.ratingValue),
-      bestRating: "5",
-    },
-    reviewBody: input.reviewBody,
-  };
-}
-
 export function faqPageSchema(items: Array<{ question: string; answer: string }>) {
   return {
     "@context": "https://schema.org",
@@ -195,5 +117,68 @@ export function faqPageSchema(items: Array<{ question: string; answer: string }>
         text: item.answer,
       },
     })),
+  };
+}
+
+export function aggregateReviewSchema(input: {
+  name: string;
+  url: string;
+  ratingValue: string;
+  ratingCount: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "AggregateRating",
+    itemReviewed: {
+      "@type": "Organization",
+      name: input.name,
+      url: input.url,
+    },
+    ratingValue: input.ratingValue,
+    bestRating: "5",
+    ratingCount: input.ratingCount,
+  };
+}
+
+export function productSchema(input: {
+  name: string;
+  description: string;
+  image: string;
+  category: string;
+  seller: string;
+  price: number;
+  currency?: string;
+  url: string;
+  availability: "https://schema.org/InStock" | "https://schema.org/OutOfStock";
+  ratingValue?: string;
+  reviewCount?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: input.name,
+    image: input.image,
+    description: truncateDescription(input.description, 240),
+    category: input.category,
+    brand: {
+      "@type": "Brand",
+      name: input.seller,
+    },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: input.currency ?? "NGN",
+      price: input.price,
+      availability: input.availability,
+      url: input.url,
+    },
+    ...(input.ratingValue && input.reviewCount
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: input.ratingValue,
+            reviewCount: input.reviewCount,
+          },
+        }
+      : {}),
   };
 }

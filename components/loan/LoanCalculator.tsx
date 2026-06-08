@@ -901,7 +901,7 @@ export function LoanCalculator({
             applicable processing fees.
           </li>
           <li>
-            Loan approval is not guaranteed and is subject to Agrolink's
+            Loan approval is not guaranteed and is subject to Agrolink&apos;s
             credit policies and eligibility criteria.
           </li>
         </ul>

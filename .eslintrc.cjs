@@ -1,5 +1,16 @@
 module.exports = {
-  ignorePatterns: ['frontend/**'],
+  ignorePatterns: [
+    'frontend/**',
+    'backend/**',
+    'web/**',
+    'mobile/**',
+    'models/**/*.js',
+    'jest.setup.js',
+    'next-env.d.ts',
+    'public/sw.js',
+    'services/productService.ts',
+    'services/useLocalizedCopy.ts',
+  ],
   extends: [
     'next/core-web-vitals',
     'eslint:recommended',

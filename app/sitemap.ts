@@ -10,15 +10,9 @@ const staticRoutes = [
   "/prices",
   "/vision",
   "/loan-application",
-  "/loan-calculator",
   "/logistics",
   "/warehouse",
   "/insurance",
-  "/cooperatives",
-  "/equipment-listing",
-  "/inputs",
-  "/invest",
-  "/product-listing",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

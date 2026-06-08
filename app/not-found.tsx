@@ -1,8 +1,32 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+import { absoluteUrl, breadcrumbSchema } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "404 - Page Not Found | DOS AGROLINK",
+  description:
+    "The requested page was not found. Continue browsing DOS Agrolink marketplace, vision, and services from these quick links.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: absoluteUrl("/404"),
+  },
+};
 
 export default function NotFoundPage() {
+  const notFoundBreadcrumb = breadcrumbSchema([
+    { name: "Home", url: absoluteUrl("/") },
+    { name: "Not Found", url: absoluteUrl("/404") },
+  ]);
+
   return (
     <main className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-4 py-16 text-center">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(notFoundBreadcrumb) }}
+      />
       <p className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-800">
         404 Error
       </p>

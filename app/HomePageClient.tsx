@@ -220,7 +220,6 @@ export default function Home() {
           */}
           <div
             className="dos-hero-carousel"
-            role="region"
             aria-label="DosAgrolink vision highlights"
             aria-roledescription="carousel"
           >
@@ -321,33 +320,6 @@ export default function Home() {
         </section>
 
         <section className="dos-cta-strip" aria-labelledby="cta-heading">
-          <section aria-labelledby="faq-heading" className="rounded-2xl border border-green-100 bg-white p-5 sm:p-7">
-            <h2 id="faq-heading" className="text-2xl font-bold text-green-900">Frequently Asked Questions</h2>
-            <dl className="mt-4 grid gap-4 text-left">
-              <div>
-                <dt className="font-semibold text-slate-900">How do I sell produce on DOS AGROLINK?</dt>
-                <dd className="mt-1 text-sm text-slate-700">
-                  Register as a farmer, complete your profile, and publish listings in the
-                  <Link href="/marketplace" className="ml-1 font-semibold text-green-800 underline underline-offset-2">marketplace</Link>.
-                </dd>
-              </div>
-              <div>
-                <dt className="font-semibold text-slate-900">Can I request logistics for orders?</dt>
-                <dd className="mt-1 text-sm text-slate-700">
-                  Yes. You can request transport and track delivery status from the
-                  <Link href="/logistics" className="ml-1 font-semibold text-green-800 underline underline-offset-2">logistics portal</Link>.
-                </dd>
-              </div>
-              <div>
-                <dt className="font-semibold text-slate-900">Is warehouse support available for stored crops?</dt>
-                <dd className="mt-1 text-sm text-slate-700">
-                  Yes. Book secure storage and manage inventory release through
-                  <Link href="/warehouse" className="ml-1 font-semibold text-green-800 underline underline-offset-2">warehouse services</Link>.
-                </dd>
-              </div>
-            </dl>
-          </section>
-
           <h2 id="cta-heading">Ready to Get Started?</h2>
           <div className="dos-cta-actions">
             <Link href="/join-us" className="dos-btn-cream">Contact Us</Link>

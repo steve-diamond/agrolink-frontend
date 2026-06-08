@@ -420,7 +420,7 @@ function RecoveryScreen({
         <div>
           <p className="text-sm font-semibold text-red-800">Account Recovery</p>
           <p className="mt-0.5 text-xs text-red-700">
-            We'll send a secure recovery link to your registered email address.
+            We&apos;ll send a secure recovery link to your registered email address.
           </p>
         </div>
       </div>
@@ -433,7 +433,7 @@ function RecoveryScreen({
             Check your inbox at <strong>{email}</strong> and follow the link within 30 minutes.
           </p>
           <p className="mt-3 text-xs text-slate-500">
-            Didn't receive it? Check your spam folder or{" "}
+            Didn&apos;t receive it? Check your spam folder or{" "}
             <button type="button" onClick={() => setSent(false)} className="underline text-green-700 hover:text-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 rounded">
               try again
             </button>.
