@@ -6,6 +6,7 @@ import { getStorage, Storage } from "@services/warehouseService";
 export default function WarehousePage() {
   const [storage, setStorage] = useState<Storage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [search, setSearch] = useState("");
   const [warehouseFilter, setWarehouseFilter] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -16,11 +17,21 @@ export default function WarehousePage() {
   const handleReleaseStorage = useCallback(async (storageId: string) => {
     if (!window.confirm("Are you sure you want to release this storage record?")) return;
     setReleasingId(storageId);
+    setActionMessage(null);
     try {
-      await fetch(`/api/warehouse/${storageId}/release`, { method: "POST" });
+      const response = await fetch(`/api/warehouse/${storageId}/release`, { method: "POST" });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({})) as { message?: string };
+        throw new Error(payload.message || "Failed to release storage.");
+      }
+
       setStorage((prev) => prev.map((s) => s._id === storageId ? { ...s, released: true } : s));
-    } catch {
-      alert("Failed to release storage. Please try again.");
+      setActionMessage({ type: "success", text: "Storage released successfully." });
+    } catch (err: unknown) {
+      setActionMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to release storage. Please try again.",
+      });
     } finally {
       setReleasingId(null);
     }
@@ -93,6 +104,11 @@ export default function WarehousePage() {
 
       <section className="card p-5 w-full">
         <h2 className="font-bold text-green-900 mb-2">Your Storage Records</h2>
+        {actionMessage ? (
+          <p className={`mb-3 rounded px-3 py-2 text-sm ${actionMessage.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
+            {actionMessage.text}
+          </p>
+        ) : null}
         {loading ? (
           <p className="text-slate-600">Loading storage records...</p>
         ) : paginatedStorage.length === 0 ? (

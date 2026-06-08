@@ -5,6 +5,7 @@ import { getShipments, Shipment } from "@services/logisticsService";
 export default function LogisticsPage() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -15,11 +16,21 @@ export default function LogisticsPage() {
   const handleCancelShipment = useCallback(async (shipmentId: string) => {
     if (!window.confirm("Are you sure you want to cancel this shipment?")) return;
     setCancellingId(shipmentId);
+    setActionMessage(null);
     try {
-      await fetch(`/api/logistics/${shipmentId}/cancel`, { method: "POST" });
+      const response = await fetch(`/api/logistics/${shipmentId}/cancel`, { method: "POST" });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({})) as { message?: string };
+        throw new Error(payload.message || "Failed to cancel shipment.");
+      }
+
       setShipments((prev) => prev.map((s) => s._id === shipmentId ? { ...s, status: "cancelled" } : s));
-    } catch {
-      alert("Failed to cancel shipment. Please try again.");
+      setActionMessage({ type: "success", text: "Shipment cancelled successfully." });
+    } catch (err: unknown) {
+      setActionMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Failed to cancel shipment. Please try again.",
+      });
     } finally {
       setCancellingId(null);
     }
@@ -86,6 +97,11 @@ export default function LogisticsPage() {
 
       <section className="card p-5">
         <h2 className="font-bold text-green-900 mb-2">Your Shipments</h2>
+        {actionMessage ? (
+          <p className={`mb-3 rounded px-3 py-2 text-sm ${actionMessage.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
+            {actionMessage.text}
+          </p>
+        ) : null}
         {loading ? (
           <p className="text-slate-600">Loading shipments...</p>
         ) : paginatedShipments.length === 0 ? (
