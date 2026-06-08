@@ -46,6 +46,12 @@ const OrderSchema = new Schema<IOrder>(
   { timestamps: true }
 );
 
+// Indexes for common query patterns
+OrderSchema.index({ user: 1, createdAt: -1 });
+OrderSchema.index({ status: 1, createdAt: -1 });
+OrderSchema.index({ paymentStatus: 1 });
+OrderSchema.index({ paymentReference: 1 }, { sparse: true });
+
 const Order: Model<IOrder> =
   (mongoose.models.Order as Model<IOrder>) ||
   mongoose.model<IOrder>('Order', OrderSchema);

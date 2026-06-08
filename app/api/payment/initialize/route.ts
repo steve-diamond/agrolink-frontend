@@ -3,25 +3,28 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth } from 'lib/auth';
 import crypto from 'crypto';
+import { handleError } from 'lib/errorHandler';
+import { apiRateLimit } from 'lib/rateLimit';
+import { Schemas, validateBody } from 'lib/validators';
+import { dbConnect } from 'lib/mongoose';
+import Order from 'models/Order';
 
 export async function POST(req: NextRequest) {
+  const rateLimitResponse = await apiRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const auth = verifyAuth(req);
   if ('error' in auth) return auth.error;
 
   try {
     const body = await req.json();
-    const { email, amount, orderId, callback_url } = body as {
-      email: string;
-      amount: number;
-      orderId: string;
-      callback_url?: string;
-    };
+    const { email, orderId, callback_url } = validateBody(Schemas.initializePayment, body);
 
-    if (!email || !amount || !orderId) {
-      return NextResponse.json(
-        { status: 'error', message: 'email, amount, and orderId are required.' },
-        { status: 400 }
-      );
+    // Fetch order to get the amount
+    await dbConnect();
+    const order = await Order.findById(orderId).lean();
+    if (!order) {
+      return NextResponse.json({ status: 'error', message: 'Order not found.' }, { status: 404 });
     }
 
     const paystackSecret = process.env.PAYSTACK_SECRET_KEY;
@@ -34,8 +37,8 @@ export async function POST(req: NextRequest) {
 
     const reference = `agrolink-${orderId}-${crypto.randomBytes(6).toString('hex')}`;
 
-    // Amount must be in kobo (multiply NGN by 100)
-    const amountKobo = Math.round(Number(amount) * 100);
+    // Amount in kobo (1 NGN = 100 kobo)
+    const amountKobo = Math.round(order.totalAmount * 100);
 
     const payload: Record<string, unknown> = {
       email,
@@ -56,7 +59,9 @@ export async function POST(req: NextRequest) {
 
     if (!paystackRes.ok) {
       const errBody = await paystackRes.json().catch(() => ({}));
-      console.error('[POST /api/payment/initialize] Paystack error:', errBody);
+      import('lib/errorHandler').then(({ logError }) =>
+        logError('[POST /api/payment/initialize] Paystack error', new Error(JSON.stringify(errBody)))
+      );
       return NextResponse.json(
         { status: 'error', message: 'Failed to initialize payment.' },
         { status: 502 }
@@ -70,10 +75,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ status: 'success', data: result });
   } catch (err: unknown) {
-    console.error('[POST /api/payment/initialize]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Payment initialization failed.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }

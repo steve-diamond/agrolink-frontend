@@ -4,36 +4,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { dbConnect } from 'lib/mongoose';
 import User, { type UserRole } from 'models/User';
-
-const ALLOWED_ROLES: UserRole[] = [
-  'farmer', 'buyer', 'cooperative', 'logistics', 'warehouse', 'investor', 'admin',
-];
+import { handleError } from 'lib/errorHandler';
+import { authRateLimit } from 'lib/rateLimit';
+import { Schemas, validateBody } from 'lib/validators';
 
 export async function POST(req: NextRequest) {
+  const rateLimitResponse = await authRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await req.json();
-    const {
-      name, email, password, phone, role,
-      organizationName, metadata, inviteCode,
-    } = body as {
-      name: string;
-      email: string;
-      password: string;
-      phone?: string;
-      role?: string;
-      organizationName?: string;
-      metadata?: Record<string, unknown>;
-      inviteCode?: string;
-    };
-
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { status: 'error', message: 'Name, email, and password are required.' },
-        { status: 400 }
-      );
-    }
-
-    const resolvedRole: UserRole = (ALLOWED_ROLES.includes(role as UserRole) ? role : 'buyer') as UserRole;
+    const validated = validateBody(Schemas.register, body);
+    const { name, email, password, phone, organizationName, inviteCode } = validated;
+    const resolvedRole: UserRole = validated.role as UserRole;
 
     // Admin registration requires a valid invite code
     if (resolvedRole === 'admin') {
@@ -64,7 +47,6 @@ export async function POST(req: NextRequest) {
       phone: phone || '',
       role: resolvedRole,
       organizationName: organizationName || undefined,
-      metadata: metadata || undefined,
       approved: resolvedRole === 'admin',
     });
 
@@ -92,10 +74,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (err: unknown) {
-    console.error('[/api/auth/register]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Unable to complete registration. Please try again.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }

@@ -4,8 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from 'lib/mongoose';
 import Product from 'models/Product';
 import { verifyAuth } from 'lib/auth';
+import { handleError } from 'lib/errorHandler';
+import { apiRateLimit, publicRateLimit } from 'lib/rateLimit';
+import { Schemas, validateBody } from 'lib/validators';
 
 export async function GET(req: NextRequest) {
+  const rateLimitResponse = await publicRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     await dbConnect();
 
@@ -44,47 +50,25 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ status: 'success', data: products });
   } catch (err: unknown) {
-    console.error('[GET /api/products]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Failed to fetch products.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimitResponse = await apiRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const auth = verifyAuth(req);
   if ('error' in auth) return auth.error;
 
   try {
     const body = await req.json();
-    const { name, price, quantity, category, location, description, imageUrl } = body as {
-      name: string;
-      price: number;
-      quantity: number;
-      category?: string;
-      location: string;
-      description?: string;
-      imageUrl?: string;
-    };
-
-    if (!name || price == null || quantity == null || !location) {
-      return NextResponse.json(
-        { status: 'error', message: 'Name, price, quantity, and location are required.' },
-        { status: 400 }
-      );
-    }
+    const validated = validateBody(Schemas.createProduct, body);
 
     await dbConnect();
 
     const product = await Product.create({
-      name,
-      price: Number(price),
-      quantity: Number(quantity),
-      category: category || '',
-      location,
-      description: description || '',
-      imageUrl: imageUrl || '',
+      ...validated,
       farmer: auth.payload.id,
       approved: false,
     });
@@ -94,10 +78,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (err: unknown) {
-    console.error('[POST /api/products]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Failed to create product.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }

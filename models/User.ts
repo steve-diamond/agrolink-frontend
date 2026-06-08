@@ -56,12 +56,16 @@ const UserSchema = new mongoose.Schema<IUser>(
 
 UserSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
-  this.password = await bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 12);
 });
 
 UserSchema.methods.comparePassword = async function (candidate: string): Promise<boolean> {
   return bcrypt.compare(candidate, this.password);
 };
+
+// Indexes
+UserSchema.index({ role: 1, status: 1 });
+UserSchema.index({ createdAt: -1 });
 
 const User: Model<IUser> =
   (mongoose.models.User as Model<IUser>) ||

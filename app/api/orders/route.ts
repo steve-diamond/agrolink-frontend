@@ -5,10 +5,16 @@ import { dbConnect } from 'lib/mongoose';
 import Order from 'models/Order';
 import Product from 'models/Product';
 import { verifyAuth } from 'lib/auth';
+import { handleError } from 'lib/errorHandler';
+import { apiRateLimit } from 'lib/rateLimit';
+import { Schemas, validateBody } from 'lib/validators';
 
 const COMMISSION_RATE = 0.05; // 5% platform commission
 
 export async function GET(req: NextRequest) {
+  const rateLimitResponse = await apiRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const auth = verifyAuth(req);
   if ('error' in auth) return auth.error;
 
@@ -22,42 +28,25 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ status: 'success', data: orders });
   } catch (err: unknown) {
-    console.error('[GET /api/orders]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Failed to fetch orders.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimitResponse = await apiRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const auth = verifyAuth(req);
   if ('error' in auth) return auth.error;
 
   try {
     const body = await req.json();
-    const { products } = body as {
-      products: Array<{ productId: string; quantity: number }>;
-    };
-
-    if (!products || !Array.isArray(products) || products.length === 0) {
-      return NextResponse.json(
-        { status: 'error', message: 'At least one product is required.' },
-        { status: 400 }
-      );
-    }
+    const { products } = validateBody(Schemas.createOrder, body);
 
     await dbConnect();
 
-    // Validate products and compute total
     let subtotal = 0;
     for (const item of products) {
-      if (!item.productId || !item.quantity || item.quantity < 1) {
-        return NextResponse.json(
-          { status: 'error', message: 'Each product must have a valid productId and quantity.' },
-          { status: 400 }
-        );
-      }
       const product = await Product.findById(item.productId).lean();
       if (!product) {
         return NextResponse.json(
@@ -89,10 +78,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (err: unknown) {
-    console.error('[POST /api/orders]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Failed to create order.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }

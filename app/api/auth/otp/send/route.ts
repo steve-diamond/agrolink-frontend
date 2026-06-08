@@ -6,6 +6,8 @@ import bcrypt from 'bcryptjs';
 import { dbConnect } from 'lib/mongoose';
 import OtpSession from 'models/OtpSession';
 import { sendSMS } from 'lib/sms';
+import { handleError, logError } from 'lib/errorHandler';
+import { authRateLimit } from 'lib/rateLimit';
 
 const OTP_TTL_SECONDS = 10 * 60; // 10 minutes
 
@@ -19,6 +21,9 @@ function normalizePhone(input: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimitResponse = await authRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await req.json() as { phone?: string };
     const rawPhone = (body.phone ?? '').trim();
@@ -55,10 +60,11 @@ export async function POST(req: NextRequest) {
     try {
       await sendSMS(phone, `Your DOS AgroLink verification code is: ${otp}. Valid for 10 minutes.`);
     } catch (smsErr) {
-      console.error('[OTP send] SMS delivery failed:', smsErr);
-      /* In development / if AT credentials absent, log OTP to console */
+      logError('[OTP send] SMS delivery failed', smsErr as Error, { phone: phone.slice(0, 7) + '****' });
+      // Only expose OTP in dev when SMS fails — never in production
       if (process.env.NODE_ENV !== 'production') {
-        console.log(`[DEV OTP] ${phone} → ${otp}`);
+        // Log to stderr (not stdout) — masked in non-dev environments
+        logError('[DEV OTP fallback — NOT for production]', new Error(`${phone.slice(-4)} → ${otp}`));
       } else {
         return NextResponse.json(
           { status: 'error', message: 'Could not deliver OTP via SMS. Please try again.' },
@@ -69,10 +75,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ status: 'success', data: { ref } });
   } catch (err: unknown) {
-    console.error('[/api/auth/otp/send]', err);
-    return NextResponse.json(
-      { status: 'error', message: 'Could not send OTP. Please try again later.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }

@@ -2,101 +2,98 @@ export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from 'lib/mongoose';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const CommodityPrice = require('models/CommodityPrice');
-// import Listing from 'models/Listing.ts'; // Uncomment and implement if Listing model exists
+import CommodityPrice from 'models/CommodityPrice';
 import { sendListingConfirmedSMS } from 'lib/sms';
+import { logError } from 'lib/errorHandler';
+import { apiRateLimit } from 'lib/rateLimit';
+
+function ussdResponse(message: string): NextResponse {
+  return new NextResponse(message, {
+    status: 200,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
 
 export async function POST(req: NextRequest) {
-  await dbConnect();
-  const body = await req.formData();
-  // const sessionId = body.get('sessionId') as string; // Removed to fix ESLint unused variable warning
-  const phoneNumber = body.get('phoneNumber') as string;
-  const text = (body.get('text') as string) || '';
-  const inputs = text.split('*');
+  const rateLimitResponse = await apiRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
 
-  // Main Menu
-  if (text === '' || text === '0') {
-    return NextResponse.json({
-      message: 'CON Welcome to DosAgroLink\n1. Check Commodity Prices\n2. Post Produce for Sale\n3. Apply for Loan\n4. Check Loan Status\n5. Contact Support'
-    });
+  try {
+    const body = await req.formData();
+    const sessionId = body.get('sessionId') as string;
+    const phoneNumber = body.get('phoneNumber') as string;
+    const text = (body.get('text') as string) ?? '';
+    const inputs = text.split('*');
+
+    if (!phoneNumber || !sessionId) {
+      return ussdResponse('END Invalid session. Please try again.');
+    }
+
+    await dbConnect();
+
+    // Main Menu
+    if (text === '' || text === '0') {
+      return ussdResponse('CON Welcome to DosAgroLink\n1. Check Commodity Prices\n2. Post Produce for Sale\n3. Apply for Loan\n4. Check Loan Status\n5. Contact Support');
+    }
+
+    // Option 1: Check Commodity Prices
+    if (inputs[0] === '1') {
+      if (!inputs[1]) {
+        return ussdResponse('CON Select Commodity:\n1. Maize\n2. Cassava\n3. Rice\n4. Poultry\n5. Fishery\n6. Vegetables\n7. Mixed');
+      }
+      if (!inputs[2]) {
+        return ussdResponse('CON Select State:\n1. Lagos\n2. Kano\n3. Kaduna\n4. Ogun\n5. Oyo\n6. Benue\n7. Abia');
+      }
+      const commodities = ['Maize', 'Cassava', 'Rice', 'Poultry', 'Fishery', 'Vegetables', 'Mixed'];
+      const states = ['Lagos', 'Kano', 'Kaduna', 'Ogun', 'Oyo', 'Benue', 'Abia'];
+      const commodity = commodities[Number(inputs[1]) - 1] ?? 'Maize';
+      const state = states[Number(inputs[2]) - 1] ?? 'Lagos';
+      const price = await CommodityPrice.findOne({ commodity_name: commodity, state }).sort({ updated_at: -1 }).lean() as {
+        price: number; price_per_kg?: number; trend?: string; price_change_pct?: number; updated_at: Date;
+      } | null;
+      if (!price) {
+        return ussdResponse(`END No price data for ${commodity} in ${state}.`);
+      }
+      const arrow = price.trend === 'up' ? '↑' : price.trend === 'down' ? '↓' : '→';
+      return ussdResponse(
+        `END ${commodity} in ${state}: ₦${price.price_per_kg ?? price.price}/kg ${arrow}${price.price_change_pct ?? 0}% | Updated: ${new Date(price.updated_at).toLocaleString('en-NG', { hour: '2-digit', minute: '2-digit' })}`
+      );
+    }
+
+    // Option 2: Post Produce for Sale
+    if (inputs[0] === '2') {
+      if (!inputs[1]) return ussdResponse('CON Enter quantity in KG:');
+      if (!inputs[2]) return ussdResponse('CON Enter asking price per KG (₦):');
+      if (!inputs[3]) {
+        return ussdResponse(`CON Confirm Listing:\nQuantity: ${inputs[1]}kg\nPrice: ₦${inputs[2]}/kg\n1. Yes\n2. No`);
+      }
+      if (inputs[3] === '1') {
+        await sendListingConfirmedSMS(phoneNumber, 'Produce', Number(inputs[1]), Number(inputs[2])).catch(
+          (smsErr) => logError('[USSD listing SMS]', smsErr as Error, { phone: phoneNumber.slice(-4) })
+        );
+        return ussdResponse('END Listing submitted. You will receive an SMS confirmation shortly.');
+      }
+      return ussdResponse('END Listing cancelled.');
+    }
+
+    // Option 3–5
+    if (inputs[0] === '3') {
+      return ussdResponse('END For loan applications, visit dosagrolink.ng or contact your nearest DosAgroLink agent.');
+    }
+
+
+
+
+    if (inputs[0] === '4') {
+      return ussdResponse('END Please login to your DosAgroLink dashboard at dosagrolink.ng or contact support.');
+    }
+    if (inputs[0] === '5') {
+      return ussdResponse('END Call 0800-DOS-AGRO or email support@dosagrolink.com.ng');
+    }
+
+    return ussdResponse('END Invalid selection. Please dial again and choose a valid option.');
+  } catch (err: unknown) {
+    logError('[USSD route]', err as Error);
+    return ussdResponse('END Service temporarily unavailable. Please try again.');
   }
-
-  // Option 1: Check Commodity Prices
-  if (inputs[0] === '1') {
-    // Step 1: Select commodity
-    if (!inputs[1]) {
-      return NextResponse.json({
-        message: 'CON Select Commodity:\n1. Maize\n2. Cassava\n3. Rice\n4. Poultry\n5. Fishery\n6. Vegetables\n7. Mixed'
-      });
-    }
-    // Step 2: Select state
-    if (!inputs[2]) {
-      return NextResponse.json({
-        message: 'CON Select State:\n1. Lagos\n2. Kano\n3. Kaduna\n4. Ogun\n5. Oyo\n6. Benue\n7. Abia'
-      });
-    }
-    // Step 3: Show price
-    const commodities = ['Maize','Cassava','Rice','Poultry','Fishery','Vegetables','Mixed'];
-    const states = ['Lagos','Kano','Kaduna','Ogun','Oyo','Benue','Abia'];
-    const commodity = commodities[Number(inputs[1])-1] || 'Maize';
-    const state = states[Number(inputs[2])-1] || 'Lagos';
-    // Fetch latest price
-    const price = await CommodityPrice.findOne({ commodity_name: commodity, state }).sort({ updated_at: -1 }).lean();
-    if (!price) {
-      return NextResponse.json({ message: `END No price data for ${commodity} in ${state}.` });
-    }
-    const arrow = price.trend === 'up' ? '↑' : price.trend === 'down' ? '↓' : '→';
-    return NextResponse.json({
-      message: `END ${commodity} in ${state}: ₦${price.price_per_kg}/kg ${arrow}${price.price_change_pct || 0}% | Updated: ${new Date(price.updated_at).toLocaleString('en-NG', { hour: '2-digit', minute: '2-digit' })} | Reply 0 for Main Menu`
-    });
-  }
-
-  // Option 2: Post Produce for Sale
-  if (inputs[0] === '2') {
-    // Step 1: Enter quantity
-    if (!inputs[1]) {
-      return NextResponse.json({ message: 'CON Enter quantity in KG:' });
-    }
-    // Step 2: Enter price
-    if (!inputs[2]) {
-      return NextResponse.json({ message: 'CON Enter asking price per KG:' });
-    }
-    // Step 3: Confirm
-    if (!inputs[3]) {
-      return NextResponse.json({ message: `CON Confirm Listing:\nQuantity: ${inputs[1]}kg\nPrice: ₦${inputs[2]}/kg\n1. Yes\n2. No` });
-    }
-    if (inputs[3] === '1') {
-      // Create draft listing
-      // Uncomment and implement if Listing model exists
-      // await Listing.create({
-      //   phone: phoneNumber,
-      //   quantity: Number(inputs[1]),
-      //   price_per_kg: Number(inputs[2]),
-      //   source: 'ussd_draft',
-      //   status: 'draft',
-      // });
-      await sendListingConfirmedSMS(phoneNumber, 'Produce', Number(inputs[1]), Number(inputs[2]));
-      return NextResponse.json({ message: 'END Listing created. Confirmation SMS sent.' });
-    }
-    return NextResponse.json({ message: 'END Listing cancelled.' });
-  }
-
-  // Option 3: Apply for Loan
-  if (inputs[0] === '3') {
-    return NextResponse.json({ message: 'END Applications require smartphone. Visit nearest DosAgroLink agent or call 0800-DOS-AGRO for assistance.' });
-  }
-
-  // Option 4: Check Loan Status
-  if (inputs[0] === '4') {
-    return NextResponse.json({ message: 'END Please login to your DosAgroLink dashboard or contact support.' });
-  }
-
-  // Option 5: Contact Support
-  if (inputs[0] === '5') {
-    return NextResponse.json({ message: 'END Call 0800-DOS-AGRO or email support@dosagrolink.com.ng' });
-  }
-
-  // Fallback
-  return NextResponse.json({ message: 'END Invalid selection. Reply 0 for Main Menu.' });
 }

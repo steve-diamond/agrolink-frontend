@@ -1,10 +1,17 @@
 export const dynamic = 'force-dynamic'
 
-import { NextResponse } from "next/server";
+import { NextRequest } from 'next/server';
+import { publicRateLimit } from 'lib/rateLimit';
+import { handleError } from 'lib/errorHandler';
+import { proxyToBackend } from 'lib/backendProxy';
 
-export async function GET() {
-  return NextResponse.json(
-    { status: "error", code: "not_implemented", message: "Farming tips API is not implemented in this Next.js route. Use backend /api/v1/advisory endpoints." },
-    { status: 501 }
-  );
+export async function GET(req: NextRequest) {
+  const rateLimitResponse = await publicRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
+
+  try {
+    return await proxyToBackend(req, '/advisory');
+  } catch (err: unknown) {
+    return handleError(err);
+  }
 }

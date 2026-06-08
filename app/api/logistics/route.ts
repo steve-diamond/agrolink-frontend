@@ -1,10 +1,28 @@
 export const dynamic = 'force-dynamic'
 
-import { NextResponse } from "next/server";
+import { NextRequest } from 'next/server';
+import { handleError } from 'lib/errorHandler';
+import { apiRateLimit } from 'lib/rateLimit';
+import { proxyToBackend } from 'lib/backendProxy';
 
-export async function GET() {
-	return NextResponse.json(
-		{ status: "error", code: "not_implemented", message: "Logistics API is not implemented in this Next.js route. Use backend /api/v1/logistics endpoints." },
-		{ status: 501 }
-	);
+export async function GET(req: NextRequest) {
+	const rateLimitResponse = await apiRateLimit(req);
+	if (rateLimitResponse) return rateLimitResponse;
+
+	try {
+		return await proxyToBackend(req, '/logistics');
+	} catch (err: unknown) {
+		return handleError(err);
+	}
+}
+
+export async function POST(req: NextRequest) {
+	const rateLimitResponse = await apiRateLimit(req);
+	if (rateLimitResponse) return rateLimitResponse;
+
+	try {
+		return await proxyToBackend(req, '/logistics');
+	} catch (err: unknown) {
+		return handleError(err);
+	}
 }

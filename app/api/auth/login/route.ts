@@ -4,17 +4,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import { dbConnect } from 'lib/mongoose';
 import User from 'models/User';
+import { handleError } from 'lib/errorHandler';
+import { authRateLimit } from 'lib/rateLimit';
+import { Schemas, validateBody } from 'lib/validators';
 
 export async function POST(req: NextRequest) {
-  try {
-    const { email, password } = await req.json();
+  const rateLimitResponse = await authRateLimit(req);
+  if (rateLimitResponse) return rateLimitResponse;
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { status: 'error', message: 'Email and password are required.' },
-        { status: 400 }
-      );
-    }
+  try {
+    const body = await req.json();
+    const { email, password } = validateBody(Schemas.login, body);
 
     await dbConnect();
 
@@ -60,25 +60,6 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error('[/api/auth/login]', message);
-
-    // Surface actionable hints in the response (no secrets leaked)
-    if (message.includes('MONGODB_URI')) {
-      return NextResponse.json(
-        { status: 'error', message: 'Server is not configured. Contact support.' },
-        { status: 503 }
-      );
-    }
-    if (message.includes('ECONNREFUSED') || message.includes('timed out') || message.includes('ETIMEDOUT') || message.includes('querySrv')) {
-      return NextResponse.json(
-        { status: 'error', message: 'Database is temporarily unreachable. Try again in a moment.' },
-        { status: 503 }
-      );
-    }
-    return NextResponse.json(
-      { status: 'error', message: 'Unable to process login. Please try again.' },
-      { status: 500 }
-    );
+    return handleError(err);
   }
 }
