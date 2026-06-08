@@ -211,7 +211,7 @@ export default function Marketplace() {
       const rating = getSellerRating(product._id);
       const reviews = getReviewsCount(product._id);
       const image = isValidRemoteImageUrl(product.imageUrl)
-        ? product.imageUrl
+        ? String(product.imageUrl)
         : absoluteUrl("/agropro/images/banner.jpg");
 
       return productSchema({
