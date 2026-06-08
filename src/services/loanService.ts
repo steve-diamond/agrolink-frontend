@@ -10,10 +10,14 @@ export type Loan = {
 };
 
 type LoanListResponse = {
+  status?: string;
+  message?: string;
   data?: {
     loans?: unknown[];
     items?: unknown[];
     loan?: Loan;
+    success?: boolean;
+    message?: string;
   };
 };
 
@@ -43,8 +47,19 @@ export async function getLoans(userId?: string): Promise<Loan[]> {
 }
 
 export async function repayLoan(loanId: string): Promise<{ success: boolean; message: string }> {
-  const res = await API.post<unknown, { data: { success: boolean; message: string } }>("/api/loan", { loanId });
-  return res.data;
+  const res = await API.post<unknown, LoanListResponse>("/api/loan", { loanId });
+
+  const success =
+    typeof res.data?.success === "boolean"
+      ? res.data.success
+      : String(res.status || "").toLowerCase() === "success";
+
+  const message =
+    res.data?.message ||
+    res.message ||
+    (success ? "Loan repayment submitted successfully." : "Loan repayment failed.");
+
+  return { success, message };
 }
 
 export async function submitLoanApplication(payload: LoanApplicationPayload): Promise<{ loan: Loan }> {
