@@ -73,7 +73,44 @@ export default function GradingPage() {
     setSubmitting(true);
     setError('');
     try {
-      throw new Error('Grading submission is not enabled yet. Connect storage and grading APIs before going live.');
+      if (!commodity || !suggestedGrade) {
+        throw new Error('Select a commodity and complete grading before submission.');
+      }
+
+      const standards = GRADING_STANDARDS[commodity][suggestedGrade].criteria;
+      const offset =
+        suggestedGrade === 'A'
+          ? 0
+          : suggestedGrade === 'B'
+            ? GRADING_STANDARDS[commodity]['A'].criteria.length
+            : GRADING_STANDARDS[commodity]['A'].criteria.length + GRADING_STANDARDS[commodity]['B'].criteria.length;
+      const criteria_met: Record<string, boolean> = {};
+      standards.forEach((criterion: string, idx: number) => {
+        criteria_met[criterion] = Boolean(criteriaChecked[idx + offset]);
+      });
+
+      const payload = {
+        commodity,
+        grade: suggestedGrade,
+        criteria_met,
+        photos: photos.map((p) => p.name),
+      };
+
+      const res = await fetch('/api/grading/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || data?.message || 'Submission failed');
+      }
+
+      if (data?.data?.badgeUrl) {
+        setBadgeUrl(data.data.badgeUrl as string);
+      }
+      setStep(5);
     } catch (e) {
       if (e instanceof Error) {
         setError(e.message);

@@ -62,7 +62,7 @@ export async function proxyToBackend(
     req.nextUrl.searchParams.forEach((value, key) => target.searchParams.append(key, value));
   }
 
-  const hasBody = method !== 'GET' && method !== 'HEAD';
+  const hasBody = method !== 'GET';
   const forceJsonBody = options?.jsonBody !== undefined;
   const headers = buildProxyHeaders(req, hasBody, forceJsonBody);
 
