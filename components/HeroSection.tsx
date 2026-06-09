@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "./ui/utils";
 
+const EASE_STANDARD: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 // ── Activity feed data ────────────────────────────────────────────────────────
 
 const FEED_ITEMS = [
@@ -99,13 +101,13 @@ const USER_CARDS = [
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 28 },
   animate:  { opacity: 1, y: 0 },
-  transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as const, delay },
+  transition: { duration: 0.65, ease: EASE_STANDARD, delay },
 });
 
 const fadeDown = (delay = 0) => ({
   initial: { opacity: 0, y: -20 },
   animate:  { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const, delay },
+  transition: { duration: 0.6, ease: EASE_STANDARD, delay },
 });
 
 // ── Live activity feed ────────────────────────────────────────────────────────
@@ -234,7 +236,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
                 className="absolute -bottom-1 left-0 right-0 h-1 rounded-full bg-gradient-to-r from-green-400 to-cyan-400"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ delay: 0.7, duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
+                transition={{ delay: 0.7, duration: 0.6, ease: EASE_STANDARD }}
                 style={{ transformOrigin: "left" }}
               />
             </span>{" "}
@@ -253,7 +255,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const, delay: 0.45 }}
+          transition={{ duration: 0.7, ease: EASE_STANDARD, delay: 0.45 }}
           className="w-full grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6"
         >
           {USER_CARDS.map((card, i) => (
