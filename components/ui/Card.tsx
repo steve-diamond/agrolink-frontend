@@ -3,16 +3,16 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import type { ImageProps } from "next/image";
 import { cn } from "./utils";
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-export interface CardImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> {
+export interface CardImageProps extends Omit<ImageProps, "src" | "alt" | "fill"> {
   src: string;
+  alt?: string;
   /** Aspect ratio class, e.g. "aspect-video" or "aspect-square" */
   aspectClass?: string;
-  /** Sizes hint forwarded to Next Image */
-  sizes?: string;
 }
 
 /** Full-bleed image at the top of a Card */
