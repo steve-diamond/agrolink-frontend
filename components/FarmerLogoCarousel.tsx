@@ -21,7 +21,7 @@ const farmerLogos: FarmerLogo[] = [
 
 const slideGroups: FarmerLogo[][] = [
   farmerLogos.slice(0, 4),
-  farmerLogos.slice(3, 7),
+  farmerLogos.slice(4, 8),
 ];
 
 export default function FarmerLogoCarousel() {
@@ -34,19 +34,17 @@ export default function FarmerLogoCarousel() {
       <div className="carousel-inner">
         {slideGroups.map((group, index) => (
           <div key={`slide-${index}`} className={`carousel-item ${index === 0 ? "active" : ""}`}>
-            <div className="row g-2 g-sm-3 justify-content-center w-100 flex-wrap">
+            <div className="dos-farmer-logo-grid" role="list" aria-label="Farmer partner groups">
               {group.map((item) => (
-                <div key={item.name} className="col-12 col-sm-6 col-lg-3 d-flex">
-                  <article className="dos-farmer-logo-card h-100">
-                    <div className="dos-farmer-logo-media">
-                      <Image src={item.image} alt={item.name} fill sizes="(max-width: 1200px) 50vw, 25vw" className="dos-farmer-logo-image" />
-                    </div>
-                    <div className="dos-farmer-logo-body">
-                      <h3>{item.name}</h3>
-                      <p>{item.tag}</p>
-                    </div>
-                  </article>
-                </div>
+                <article key={item.name} className="dos-farmer-logo-card" role="listitem">
+                  <div className="dos-farmer-logo-media">
+                    <Image src={item.image} alt={item.name} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw" className="dos-farmer-logo-image" />
+                  </div>
+                  <div className="dos-farmer-logo-body">
+                    <h3>{item.name}</h3>
+                    <p>{item.tag}</p>
+                  </div>
+                </article>
               ))}
             </div>
           </div>

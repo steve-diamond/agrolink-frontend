@@ -710,7 +710,7 @@ body {
 .dos-hero-content {
   position: relative;
   z-index: 1;
-  width: min(710px, 100%);
+  width: min(760px, 100%);
   padding: 2rem 1.2rem;
 }
 
@@ -724,7 +724,8 @@ body {
   padding: 1rem 1.05rem;
 }
 
-.dos-hero-content h1 {
+.dos-hero-content h1,
+.dos-hero-content h2 {
   margin: 0;
   color: var(--dos-text-strong);
   font-family: "Sora", "Segoe UI", sans-serif;
@@ -868,7 +869,8 @@ body {
   box-shadow: inset 0 -2px 4px rgba(124, 81, 10, 0.15);
 }
 
-.dos-value-card h2 {
+.dos-value-card h2,
+.dos-value-card h3 {
   margin: 0;
   color: var(--dos-green-900);
   font-size: 1.16rem;
@@ -1088,8 +1090,32 @@ body {
 }
 
 .dos-partners .carousel {
-  margin-top: 1rem;
+  margin: 1rem auto 0;
+  max-width: 1220px;
   padding: 0 2.2rem;
+}
+
+.dos-partners .carousel-item {
+  padding: 0.15rem 0.1rem;
+}
+
+.dos-farmer-logo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: stretch;
+}
+
+@media (min-width: 700px) {
+  .dos-farmer-logo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1120px) {
+  .dos-farmer-logo-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .dos-farmer-logo-card {
@@ -1098,12 +1124,13 @@ body {
   background: linear-gradient(180deg, #fffaf0 0%, #f2e9d3 100%);
   overflow: hidden;
   display: grid;
+  grid-template-rows: 170px minmax(84px, auto);
   box-shadow: 0 10px 18px rgba(44, 53, 40, 0.08);
 }
 
 .dos-farmer-logo-media {
   position: relative;
-  min-height: 120px;
+  min-height: 170px;
   border-bottom: 1px solid #d8c8a4;
 }
 
@@ -3624,7 +3651,8 @@ button {
     gap: 0.25rem;
   }
 
-  .dos-hero-content h1 {
+  .dos-hero-content h1,
+  .dos-hero-content h2 {
     font-size: clamp(1.78rem, 9vw, 2.5rem);
   }
 

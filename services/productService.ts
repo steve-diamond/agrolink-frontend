@@ -50,20 +50,37 @@ export function normalizeProductsResponse(raw: unknown): Product[] {
   if (Array.isArray(raw)) arr = raw;
   else if (Array.isArray((raw as any)?.data?.items)) arr = (raw as any).data.items;
   else if (Array.isArray((raw as any)?.data?.products)) arr = (raw as any).data.products;
+  else if (Array.isArray((raw as any)?.data)) arr = (raw as any).data;
   else if (Array.isArray((raw as any)?.products)) arr = (raw as any).products;
   else if (Array.isArray((raw as any)?.items)) arr = (raw as any).items;
   return arr.filter(isProduct);
 }
 
-export async function getProducts(filters: ProductFilters = {}): Promise<Product[]> {
-  const res = await API.get<unknown>("/api/products", {
+async function fetchProductsFromEndpoint(endpoint: string, filters: ProductFilters): Promise<Product[]> {
+  const res = await API.get<unknown>(endpoint, {
     params: {
       ...filters,
       approved:
         typeof filters.approved === "boolean" ? String(filters.approved) : undefined,
     },
   });
+
   return normalizeProductsResponse((res as { data?: unknown }).data);
+}
+
+export async function getProducts(filters: ProductFilters = {}): Promise<Product[]> {
+  const endpoints = ["/api/products", "/api/marketplace"];
+  let lastError: Error | null = null;
+
+  for (const endpoint of endpoints) {
+    try {
+      return await fetchProductsFromEndpoint(endpoint, filters);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error("Failed to load products");
+    }
+  }
+
+  throw lastError ?? new Error("Failed to load products");
 }
 
 export async function createProduct(data: NewProduct): Promise<Product> {

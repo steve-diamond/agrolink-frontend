@@ -2,14 +2,17 @@ import Link from "next/link";
 
 export default function JoinUsPage() {
   return (
-    <main className="mx-auto grid max-w-5xl gap-6 py-6">
-      <section className="card bg-gradient-to-r from-green-950 via-green-900 to-green-700 p-6 text-green-50">
-        <p className="text-xs font-bold tracking-[0.2em] text-amber-200">JOIN DOS AGROLINK NIGERIA</p>
-        <h1 className="mt-2 text-3xl font-extrabold sm:text-5xl">Build a stronger farming business with us</h1>
-        <p className="mt-3 max-w-3xl text-sm text-green-100 sm:text-base">
-          Join the platform to access transparent markets, price intelligence, logistics, storage, financing pathways,
-          and practical advisory support tailored to Nigerian agriculture.
-        </p>
+    <main className="mx-auto grid max-w-5xl gap-6 px-4 py-6 sm:px-6">
+      <section className="relative overflow-hidden rounded-2xl border border-green-800/40 bg-linear-to-r from-green-950 via-green-900 to-green-700 p-6 text-white shadow-lg sm:p-10">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.16),transparent_36%),radial-gradient(circle_at_90%_0%,rgba(163,230,53,0.20),transparent_32%)]" aria-hidden="true" />
+        <div className="relative">
+          <p className="text-xs font-bold tracking-[0.2em] text-amber-300">JOIN DOS AGROLINK NIGERIA</p>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white drop-shadow-sm sm:text-5xl">Build a stronger farming business with us</h1>
+          <p className="mt-4 max-w-3xl text-sm text-green-100/95 sm:text-xl">
+            Join the platform to access transparent markets, price intelligence, logistics, storage, financing pathways,
+            and practical advisory support tailored to Nigerian agriculture.
+          </p>
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">

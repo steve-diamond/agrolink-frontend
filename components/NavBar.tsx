@@ -8,7 +8,9 @@ import { usePathname } from "next/navigation";
 import { isRouteActive } from "../src/lib/navigationActive";
 import { emitLanguageChanged, getStoredLanguage, listenToLanguageChanges, setStoredLanguage, type UiLanguage } from "@services/uiLanguage";
 
-const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '2348030001020';
+const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '2348129490467';
+const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || supportPhone;
+const formattedSupportPhone = '+234 812 949 0467';
 
 const languageOptions: Array<{ label: string; value: UiLanguage }> = [
   { label: "EN", value: "en" },
@@ -88,12 +90,12 @@ export default function NavBar() {
         }`}
       >
         {/* Top utility bar */}
-        <div className="border-b border-white/10 bg-green-900/60">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs text-green-200/80">
+        <div className="border-b border-white/10 bg-green-900/70">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-xs text-green-50/90">
             <div className="flex items-center gap-4">
-              <a href="tel:+2348030001020" className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <a href={`tel:+${supportPhone}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
                 <FaPhone className="text-green-400" aria-hidden="true" />
-                <span className="hidden sm:inline">+234 803 000 1020</span>
+                <span className="hidden sm:inline">{formattedSupportPhone}</span>
                 <span className="sm:hidden">Call Us</span>
               </a>
               <span className="opacity-40" aria-hidden="true">|</span>
@@ -151,7 +153,7 @@ export default function NavBar() {
           </Link>
 
           {/* Desktop nav links */}
-          <nav className="hidden lg:flex items-center gap-1" aria-label="Primary">
+          <nav className="hidden lg:flex items-center gap-1 rounded-xl bg-green-900/55 px-2 py-1 ring-1 ring-white/15" aria-label="Primary">
             {navLinks.map((item) => {
               const active = isRouteActive(pathname, item.href);
               return (
@@ -162,7 +164,7 @@ export default function NavBar() {
                   className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
                     active
                       ? "bg-amber-500 text-green-950 shadow"
-                      : "text-green-100 hover:bg-white/10 hover:text-white"
+                      : "text-emerald-50 hover:bg-white/15 hover:text-white"
                   }`}
                 >
                   {item.label}
@@ -175,7 +177,7 @@ export default function NavBar() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold text-green-200 border border-white/20 hover:bg-white/10 transition-all"
+              className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold text-white border border-white/30 hover:bg-white/10 transition-all"
             >
               Login
             </Link>

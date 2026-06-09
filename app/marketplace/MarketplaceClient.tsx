@@ -37,6 +37,8 @@ const isValidRemoteImageUrl = (value?: string) => {
   } catch { return false; }
 };
 
+const supportWhatsAppNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || process.env.NEXT_PUBLIC_SUPPORT_PHONE || "2348129490467";
+
 const getStoredUser = () => {
   try { return JSON.parse(localStorage.getItem("user") || "{}"); }
   catch { return {}; }
@@ -516,7 +518,9 @@ export default function Marketplace() {
           {fetchError && (
             <div role="alert" aria-live="assertive" className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 flex items-center gap-3">
               <FaShieldAlt className="text-red-400 shrink-0" aria-hidden="true" />
-              Failed to load products. Please refresh the page.
+              <span>
+                Failed to load products. {fetchError}
+              </span>
             </div>
           )}
 
@@ -650,7 +654,7 @@ export default function Marketplace() {
                           )}
                         </button>
                         <a
-                          href="https://wa.me/2348030001020?text=Hello%20Agrolink%2C%20I%20need%20help%20with%20a%20marketplace%20order."
+                          href={`https://wa.me/${supportWhatsAppNumber}?text=Hello%20Agrolink%2C%20I%20need%20help%20with%20a%20marketplace%20order.`}
                           target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-green-50 hover:bg-green-100 border border-green-200 text-green-700 transition-all"
                           aria-label={`Chat about ${product.name} on WhatsApp (opens in new tab)`}
