@@ -11,6 +11,8 @@ const Cooperative = require('models/Cooperative');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const CooperativeMember = require('models/CooperativeMember');
 
+export const dynamic = 'force-dynamic';
+
 const SIDEBAR = [
   { label: 'Overview', key: 'overview' },
   { label: 'Members', key: 'members' },

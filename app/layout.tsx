@@ -1,7 +1,6 @@
 
 import "./globals.css";
 import "../styles/agrolink-dashboard.css";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import NavBar from "components/NavBar";
 import MobileBottomNav from "components/MobileBottomNav";
 import SiteFooter from "components/SiteFooter";
@@ -15,18 +14,6 @@ import type { Metadata, Viewport } from "next";
 import QueryProvider from "components/QueryProvider";
 import { AccessibilityProvider } from "components/AccessibilityProvider";
 import { absoluteUrl, organizationSchema, siteConfig } from "@/lib/seo";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plus-jakarta",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -102,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const orgSchema = organizationSchema();
 
   return (
-    <html lang="en-NG" className={`${inter.variable} ${plusJakarta.variable}`}>
+    <html lang="en-NG">
       <body>
         <script
           type="application/ld+json"
