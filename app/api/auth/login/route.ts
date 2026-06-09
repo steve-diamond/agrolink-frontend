@@ -8,6 +8,8 @@ import { handleError } from 'lib/errorHandler';
 import { authRateLimit } from 'lib/rateLimit';
 import { Schemas, validateBody } from 'lib/validators';
 
+const BCRYPT_HASH_REGEX = /^\$2[aby]\$\d{2}\$/;
+
 export async function POST(req: NextRequest) {
   const rateLimitResponse = await authRateLimit(req);
   if (rateLimitResponse) return rateLimitResponse;
@@ -19,7 +21,40 @@ export async function POST(req: NextRequest) {
     await dbConnect();
 
     const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
+      return NextResponse.json(
+        { status: 'error', message: 'Invalid email or password.' },
+        { status: 401 }
+      );
+    }
+
+    const storedPassword = typeof user.password === 'string' ? user.password : '';
+    if (!storedPassword) {
+      return NextResponse.json(
+        { status: 'error', message: 'Account is not configured for password login. Use Phone / OTP or reset your password.' },
+        { status: 401 }
+      );
+    }
+
+    let passwordMatches = false;
+    try {
+      if (typeof user.comparePassword === 'function') {
+        passwordMatches = await user.comparePassword(password);
+      }
+    } catch {
+      passwordMatches = false;
+    }
+
+    // Legacy compatibility: accept plain-text historical records once, then auto-upgrade to bcrypt.
+    if (!passwordMatches && !BCRYPT_HASH_REGEX.test(storedPassword)) {
+      passwordMatches = storedPassword === password;
+      if (passwordMatches) {
+        user.password = password;
+        await user.save();
+      }
+    }
+
+    if (!passwordMatches) {
       return NextResponse.json(
         { status: 'error', message: 'Invalid email or password.' },
         { status: 401 }

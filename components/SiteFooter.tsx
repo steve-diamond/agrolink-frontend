@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const quickLinks = [
   { href: "/marketplace", label: "Marketplace" },
@@ -20,6 +21,27 @@ const partners = [
 ];
 
 export default function SiteFooter() {
+  const pathname = usePathname();
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+  const authRoutes = [
+    "/login",
+    "/forgot-password",
+    "/reset-password",
+    "/admin/login",
+    "/admin/forgot-password",
+    "/admin/reset-password",
+  ];
+
+  const isAuthRoute =
+    normalizedPath === "/register" ||
+    normalizedPath.startsWith("/register/") ||
+    authRoutes.includes(normalizedPath) ||
+    authRoutes.some((route) => normalizedPath.endsWith(route));
+
+  if (isAuthRoute) {
+    return null;
+  }
+
   return (
     <footer className="mt-12 border-t border-green-700/70 bg-linear-to-b from-green-900 to-green-950 text-green-50" aria-label="Site footer">
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">

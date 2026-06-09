@@ -134,6 +134,26 @@ function Badge({ count }: { count: number }) {
 // ---------------------------------------------------------------------------
 export default function MobileBottomNav() {
   const pathname = usePathname();
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+  const authRoutes = [
+    "/login",
+    "/forgot-password",
+    "/reset-password",
+    "/admin/login",
+    "/admin/forgot-password",
+    "/admin/reset-password",
+  ];
+
+  const isAuthRoute =
+    normalizedPath === "/register" ||
+    normalizedPath.startsWith("/register/") ||
+    authRoutes.includes(normalizedPath) ||
+    authRoutes.some((route) => normalizedPath.endsWith(route));
+
+  if (isAuthRoute) {
+    return null;
+  }
+
   const navVisible = useScrollVisibility();
   const pendingCount = usePendingOrdersCount();
 

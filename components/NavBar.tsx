@@ -31,6 +31,26 @@ const navLinks = [
 
 export default function NavBar() {
   const pathname = usePathname();
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+  const authRoutes = [
+    "/login",
+    "/forgot-password",
+    "/reset-password",
+    "/admin/login",
+    "/admin/forgot-password",
+    "/admin/reset-password",
+  ];
+
+  const isAuthRoute =
+    normalizedPath === "/register" ||
+    normalizedPath.startsWith("/register/") ||
+    authRoutes.includes(normalizedPath) ||
+    authRoutes.some((route) => normalizedPath.endsWith(route));
+
+  if (isAuthRoute) {
+    return null;
+  }
+
   const [language, setLanguage] = useState<UiLanguage>("en");
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
