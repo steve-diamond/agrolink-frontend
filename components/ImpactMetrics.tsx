@@ -36,11 +36,6 @@ export interface MetricConfig {
   glowColor: string;
 }
 
-interface CounterState {
-  current: number;
-  started: boolean;
-}
-
 // ─── Easing ───────────────────────────────────────────────────────────────────
 
 /** Cubic ease-out — fast start, smooth deceleration */

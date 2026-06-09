@@ -20,7 +20,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FiPhone,
   FiMessageSquare,
-  FiShare2,
   FiAlertCircle,
   FiMapPin,
   FiPackage,

@@ -195,6 +195,8 @@ function PartnerCard({
       {/* Logo image */}
       <div className="flex items-center justify-center h-10 w-full">
         {!imgError ? (
+          // Logos may be provided from mixed local/external sources at runtime.
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={partner.logo}
             alt={`${partner.name} logo`}

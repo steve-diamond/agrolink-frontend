@@ -92,8 +92,8 @@ export default function Marketplace() {
 
   const currencyFormatter = useMemo(() => new Intl.NumberFormat(activeLocale, { style: "currency", currency: "NGN", maximumFractionDigits: 0 }), [activeLocale]);
   const numberFormatter = useMemo(() => new Intl.NumberFormat(activeLocale), [activeLocale]);
-  const formatCurrency = (v: number) => currencyFormatter.format(Number.isFinite(v) ? v : 0);
-  const formatCount = (v: number) => numberFormatter.format(Number.isFinite(v) ? v : 0);
+  const formatCurrency = useCallback((v: number) => currencyFormatter.format(Number.isFinite(v) ? v : 0), [currencyFormatter]);
+  const formatCount = useCallback((v: number) => numberFormatter.format(Number.isFinite(v) ? v : 0), [numberFormatter]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

@@ -314,22 +314,6 @@ export default function MarketplaceMapView({
     [scIndex]
   );
 
-  // ── Geolocation ────────────────────────────────────────────
-  const handleLocateMe = useCallback(() => {
-    navigator.geolocation?.getCurrentPosition(
-      (pos) => {
-        mapRef.current?.flyTo({
-          center: [pos.coords.longitude, pos.coords.latitude],
-          zoom: 11,
-          duration: 1000,
-        });
-      },
-      () => {
-        /* silently ignore denied */
-      }
-    );
-  }, []);
-
   return (
     <div className={cn("relative w-full h-full", className)}>
       <Map

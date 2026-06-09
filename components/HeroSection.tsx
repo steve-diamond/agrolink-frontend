@@ -258,7 +258,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className }) => {
           transition={{ duration: 0.7, ease: EASE_STANDARD, delay: 0.45 }}
           className="w-full grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6"
         >
-          {USER_CARDS.map((card, i) => (
+          {USER_CARDS.map((card) => (
             <motion.div
               key={card.title}
               whileHover={{ y: -6, scale: 1.02 }}

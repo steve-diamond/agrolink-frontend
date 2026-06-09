@@ -407,6 +407,8 @@ function TestimonialCard({ testimonial, isActive }: TestimonialCardProps) {
             <div className="relative shrink-0">
               <div className="size-18 sm:size-20 rounded-full overflow-hidden ring-2 ring-emerald-500/40 ring-offset-2 ring-offset-gray-900">
                 {!imgError ? (
+                  // Testimonial photos can be dynamic external URLs loaded at runtime.
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={testimonial.photo}
                     alt={`Photo of ${testimonial.name}`}

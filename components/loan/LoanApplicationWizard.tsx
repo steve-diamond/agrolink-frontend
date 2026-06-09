@@ -336,6 +336,8 @@ function FileUploadZone({
               className="flex items-center gap-3 rounded-lg border bg-white p-3"
             >
               {uf.preview ? (
+                // Preview URLs are blob/object URLs generated at runtime.
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={uf.preview}
                   alt=""

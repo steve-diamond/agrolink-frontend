@@ -580,7 +580,7 @@ function VerifyStep({
 // Step 4 – Backup Codes
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PLACEHOLDER_CODES = Array.from({ length: 10 }, (_, i) =>
+const PLACEHOLDER_CODES = Array.from({ length: 10 }, () =>
   `${Math.random().toString(36).slice(2, 6)}-${Math.random().toString(36).slice(2, 6)}`.toUpperCase()
 );
 
