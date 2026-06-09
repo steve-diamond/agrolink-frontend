@@ -12,6 +12,11 @@ import SocialAuthButtons from "../_components/SocialAuthButtons";
 
 function LoginForm() {
   const extractLoginError = (payload: unknown): string => {
+    if (typeof payload === "string") {
+      const trimmed = payload.trim();
+      return trimmed || "Login failed";
+    }
+
     if (!payload || typeof payload !== "object") return "Login failed";
 
     const body = payload as Record<string, unknown>;
@@ -22,7 +27,13 @@ function LoginForm() {
       : null;
     const nestedMessage = nested && typeof nested.message === "string" ? nested.message : null;
 
-    return message || error || nestedMessage || "Login failed";
+    const details = typeof body.details === "string" ? body.details : null;
+    const code = typeof body.code === "string" ? body.code : null;
+    if (code === "RATE_LIMITED") {
+      return "Too many login attempts. Please wait and try again.";
+    }
+
+    return message || error || nestedMessage || details || "Login failed";
   };
 
   const router = useRouter();
@@ -60,21 +71,40 @@ function LoginForm() {
         data?: LoginData;
       };
 
+      const normalizedEmail = form.email.trim().toLowerCase();
+
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ email: normalizedEmail, password: form.password }),
       });
 
-      const json: LoginResponse = await res.json();
-      const isSuccess = json.status === "success" || json.success === true;
+      const raw = await res.text();
+      let json: LoginResponse | null = null;
+      if (raw) {
+        try {
+          json = JSON.parse(raw) as LoginResponse;
+        } catch {
+          json = null;
+        }
+      }
 
-      if (!res.ok || !isSuccess || !json.data?.token || !json.data?.user) {
-        setError(extractLoginError(json));
+      const isSuccess = json?.status === "success" || json?.success === true;
+
+      if (!res.ok || !isSuccess || !json?.data?.token || !json?.data?.user) {
+        if (!json) {
+          setError(
+            res.status >= 500
+              ? "Login service is unavailable right now. Please try again shortly."
+              : "Unable to process server response. Please try again."
+          );
+        } else {
+          setError(extractLoginError(json));
+        }
         return;
       }
 
-      persistRememberedEmail(form.email);
+      persistRememberedEmail(normalizedEmail);
       localStorage.setItem("token", json.data.token);
       localStorage.setItem("user", JSON.stringify(json.data.user));
 

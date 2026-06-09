@@ -7,6 +7,11 @@ import Link from "next/link";
 
 export default function AdminLoginPage() {
   const extractLoginError = (payload: unknown): string => {
+    if (typeof payload === "string") {
+      const trimmed = payload.trim();
+      return trimmed || "Login failed. Please check your credentials.";
+    }
+
     if (!payload || typeof payload !== "object") {
       return "Login failed. Please check your credentials.";
     }
@@ -18,8 +23,14 @@ export default function AdminLoginPage() {
       ? (body.data as Record<string, unknown>)
       : null;
     const nestedMessage = nested && typeof nested.message === "string" ? nested.message : null;
+    const details = typeof body.details === "string" ? body.details : null;
+    const code = typeof body.code === "string" ? body.code : null;
 
-    return message || error || nestedMessage || "Login failed. Please check your credentials.";
+    if (code === "RATE_LIMITED") {
+      return "Too many login attempts. Please wait and try again.";
+    }
+
+    return message || error || nestedMessage || details || "Login failed. Please check your credentials.";
   };
 
   const router = useRouter();
@@ -38,18 +49,22 @@ export default function AdminLoginPage() {
     setIsSubmitting(true);
 
     try {
+      const normalizedEmail = form.email.trim().toLowerCase();
+
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ email: normalizedEmail, password: form.password }),
       });
 
-      let json: unknown;
-      try {
-        json = await res.json();
-      } catch {
-        setError("Unable to process server response. Please try again.");
-        return;
+      const raw = await res.text();
+      let json: unknown = null;
+      if (raw) {
+        try {
+          json = JSON.parse(raw) as unknown;
+        } catch {
+          json = null;
+        }
       }
 
       const body = json as {
@@ -60,7 +75,15 @@ export default function AdminLoginPage() {
       const isSuccess = body.status === "success" || body.success === true;
 
       if (!res.ok || !isSuccess || !body.data?.user || !body.data?.token) {
-        setError(extractLoginError(json));
+        if (!json) {
+          setError(
+            res.status >= 500
+              ? "Login service is unavailable right now. Please try again shortly."
+              : "Unable to process server response. Please try again."
+          );
+        } else {
+          setError(extractLoginError(json));
+        }
         return;
       }
 
