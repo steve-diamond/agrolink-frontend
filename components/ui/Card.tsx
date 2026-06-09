@@ -2,22 +2,29 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { cn } from "./utils";
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-export interface CardImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+export interface CardImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> {
+  src: string;
   /** Aspect ratio class, e.g. "aspect-video" or "aspect-square" */
   aspectClass?: string;
+  /** Sizes hint forwarded to Next Image */
+  sizes?: string;
 }
 
 /** Full-bleed image at the top of a Card */
 export const CardImage: React.FC<CardImageProps> = ({
-  className, alt = "", aspectClass = "aspect-video", ...props
+  className, alt = "", aspectClass = "aspect-video", sizes = "100vw", src, ...props
 }) => (
-  <div className={cn("overflow-hidden rounded-t-xl", aspectClass)}>
-    <img
+  <div className={cn("relative overflow-hidden rounded-t-xl", aspectClass)}>
+    <Image
+      src={src}
       alt={alt}
+      fill
+      sizes={sizes}
       className={cn("w-full h-full object-cover transition-transform duration-500 group-hover:scale-105", className)}
       {...props}
     />

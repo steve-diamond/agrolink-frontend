@@ -306,7 +306,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
               "bg-[var(--color-surface)] shadow-lg py-1 text-sm",
             )}
           >
-            {options.map((opt, i) => {
+            {options.map((opt) => {
               const isSelected = opt.value === value;
               const enabledIdx = enabledOptions.indexOf(opt);
               const isFocused = enabledIdx === focusedIdx;

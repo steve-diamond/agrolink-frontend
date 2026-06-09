@@ -85,8 +85,7 @@ const isBottom = (p: ToastPosition) => p.startsWith("bottom");
 const ToastCard: React.FC<{
   item: ToastItem;
   onDismiss: (id: string) => void;
-  position: ToastPosition;
-}> = ({ item, onDismiss, position }) => {
+}> = ({ item, onDismiss }) => {
   const { id, variant = "info", title, message, duration = 4000, dismissible = true, icon } = item;
 
   React.useEffect(() => {
@@ -194,7 +193,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
         <AnimatePresence mode="popLayout">
           {queue.map((item) => (
             <div key={item.id} className="pointer-events-auto">
-              <ToastCard item={item} onDismiss={dismiss} position={position} />
+              <ToastCard item={item} onDismiss={dismiss} />
             </div>
           ))}
         </AnimatePresence>

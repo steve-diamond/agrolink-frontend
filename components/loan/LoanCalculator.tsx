@@ -30,7 +30,6 @@ const GREEN = "#16a34a";
 const AMBER = "#d97706";
 const RED_COL = "#dc2626";
 const SLATE = "#475569";
-const TEAL = "#0891b2";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
