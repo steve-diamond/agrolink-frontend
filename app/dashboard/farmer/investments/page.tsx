@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import API from "@services/api";
 
@@ -11,7 +11,7 @@ type InvestmentUpdateRecord = {
   created_at?: string;
 };
 
-export default function FarmerInvestmentUpdates() {
+function FarmerInvestmentUpdatesContent() {
   const searchParams = useSearchParams();
   const campaignIdFromQuery = useMemo(() => searchParams.get("campaignId") || "", [searchParams]);
 
@@ -181,6 +181,14 @@ export default function FarmerInvestmentUpdates() {
         ) : null}
       </section>
     </main>
+  );
+}
+
+export default function FarmerInvestmentUpdates() {
+  return (
+    <Suspense fallback={<main className="max-w-3xl mx-auto py-8"><p className="text-sm text-gray-500">Loading...</p></main>}>
+      <FarmerInvestmentUpdatesContent />
+    </Suspense>
   );
 }
 
