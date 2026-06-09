@@ -33,6 +33,9 @@ export async function POST(req: NextRequest) {
       email = validated.email;
       password = validated.password;
     } catch (error) {
+      if (error instanceof SyntaxError) {
+        return authError('Invalid request body. Please submit valid JSON.', 400);
+      }
       return handleError(error);
     }
 
