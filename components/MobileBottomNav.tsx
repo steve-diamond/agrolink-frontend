@@ -29,12 +29,17 @@ interface NavItem {
 // ---------------------------------------------------------------------------
 // Hook: hide on scroll-down, show on scroll-up
 // ---------------------------------------------------------------------------
-function useScrollVisibility(threshold = 6) {
+function useScrollVisibility(threshold = 6, disabled = false) {
   const [visible, setVisible] = useState(true);
   const lastY = useRef(0);
   const ticking = useRef(false);
 
   useEffect(() => {
+    if (disabled) {
+      setVisible(true);
+      return;
+    }
+
     const onScroll = () => {
       if (ticking.current) return;
       ticking.current = true;
@@ -55,7 +60,7 @@ function useScrollVisibility(threshold = 6) {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [threshold]);
+  }, [threshold, disabled]);
 
   return visible;
 }
@@ -63,10 +68,15 @@ function useScrollVisibility(threshold = 6) {
 // ---------------------------------------------------------------------------
 // Hook: fetch pending orders count
 // ---------------------------------------------------------------------------
-function usePendingOrdersCount(): number {
+function usePendingOrdersCount(disabled = false): number {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+    if (disabled) {
+      setCount(0);
+      return;
+    }
+
     let cancelled = false;
     const controller = new AbortController();
 
@@ -102,7 +112,7 @@ function usePendingOrdersCount(): number {
       controller.abort();
       clearInterval(interval);
     };
-  }, []);
+  }, [disabled]);
 
   return count;
 }
@@ -150,12 +160,8 @@ export default function MobileBottomNav() {
     authRoutes.includes(normalizedPath) ||
     authRoutes.some((route) => normalizedPath.endsWith(route));
 
-  if (isAuthRoute) {
-    return null;
-  }
-
-  const navVisible = useScrollVisibility();
-  const pendingCount = usePendingOrdersCount();
+  const navVisible = useScrollVisibility(6, isAuthRoute);
+  const pendingCount = usePendingOrdersCount(isAuthRoute);
 
   const haptic = useCallback(() => {
     try {
@@ -204,6 +210,10 @@ export default function MobileBottomNav() {
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(href + "/");
   };
+
+  if (isAuthRoute) {
+    return null;
+  }
 
   return (
     // Only render on mobile/tablet — hidden on lg+ via Tailwind

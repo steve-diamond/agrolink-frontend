@@ -47,10 +47,6 @@ export default function NavBar() {
     authRoutes.includes(normalizedPath) ||
     authRoutes.some((route) => normalizedPath.endsWith(route));
 
-  if (isAuthRoute) {
-    return null;
-  }
-
   const [language, setLanguage] = useState<UiLanguage>("en");
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -58,18 +54,21 @@ export default function NavBar() {
   const mobileNavId = "mobile-nav";
 
   useEffect(() => {
+    if (isAuthRoute) return;
     setLanguage(getStoredLanguage());
     return listenToLanguageChanges(setLanguage);
-  }, []);
+  }, [isAuthRoute]);
 
   useEffect(() => {
+    if (isAuthRoute) return;
     const onScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isAuthRoute]);
 
   // Close mobile menu on Escape
   useEffect(() => {
+    if (isAuthRoute) return;
     if (!menuOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -79,13 +78,17 @@ export default function NavBar() {
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [menuOpen]);
+  }, [isAuthRoute, menuOpen]);
 
   const handleLanguageChange = (nextLanguage: UiLanguage) => {
     setLanguage(nextLanguage);
     setStoredLanguage(nextLanguage);
     emitLanguageChanged();
   };
+
+  if (isAuthRoute) {
+    return null;
+  }
 
   return (
     <>
