@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "cross-env NEXT_DISABLE_SWC_WORKER=1 NODE_OPTIONS=--max-old-space-size=4096 next build",
+    "build:windows-stable": "cross-env NEXT_DISABLE_SWC_WORKER=1 NODE_OPTIONS=--max-old-space-size=6144 next build",
     "start": "next start",
     "lint": "eslint",
     "analyze": "cross-env ANALYZE=true next build",
