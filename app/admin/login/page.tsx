@@ -6,6 +6,22 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function AdminLoginPage() {
+  const extractLoginError = (payload: unknown): string => {
+    if (!payload || typeof payload !== "object") {
+      return "Login failed. Please check your credentials.";
+    }
+
+    const body = payload as Record<string, unknown>;
+    const message = typeof body.message === "string" ? body.message : null;
+    const error = typeof body.error === "string" ? body.error : null;
+    const nested = body.data && typeof body.data === "object"
+      ? (body.data as Record<string, unknown>)
+      : null;
+    const nestedMessage = nested && typeof nested.message === "string" ? nested.message : null;
+
+    return message || error || nestedMessage || "Login failed. Please check your credentials.";
+  };
+
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -28,14 +44,27 @@ export default function AdminLoginPage() {
         body: JSON.stringify(form),
       });
 
-      const json = await res.json();
-
-      if (!res.ok || json.status !== "success") {
-        setError(json.message || "Login failed. Please check your credentials.");
+      let json: unknown;
+      try {
+        json = await res.json();
+      } catch {
+        setError("Unable to process server response. Please try again.");
         return;
       }
 
-      const { user, token } = json.data;
+      const body = json as {
+        status?: string;
+        success?: boolean;
+        data?: { user?: { role?: string }; token?: string };
+      };
+      const isSuccess = body.status === "success" || body.success === true;
+
+      if (!res.ok || !isSuccess || !body.data?.user || !body.data?.token) {
+        setError(extractLoginError(json));
+        return;
+      }
+
+      const { user, token } = body.data;
 
       if (user.role !== "admin") {
         setError("Access denied. This portal is for administrators only.");

@@ -11,6 +11,20 @@ import useRememberedEmail from "../_components/useRememberedEmail";
 import SocialAuthButtons from "../_components/SocialAuthButtons";
 
 function LoginForm() {
+  const extractLoginError = (payload: unknown): string => {
+    if (!payload || typeof payload !== "object") return "Login failed";
+
+    const body = payload as Record<string, unknown>;
+    const message = typeof body.message === "string" ? body.message : null;
+    const error = typeof body.error === "string" ? body.error : null;
+    const nested = body.data && typeof body.data === "object"
+      ? (body.data as Record<string, unknown>)
+      : null;
+    const nestedMessage = nested && typeof nested.message === "string" ? nested.message : null;
+
+    return message || error || nestedMessage || "Login failed";
+  };
+
   const router = useRouter();
   const { copy } = useLocalizedCopy();
   const searchParams = useSearchParams();
@@ -38,7 +52,13 @@ function LoginForm() {
 
     try {
       type LoginData = { token: string; user: { role?: string } };
-      type LoginResponse = { status: string; message?: string; data: LoginData };
+      type LoginResponse = {
+        status?: string;
+        success?: boolean;
+        message?: string;
+        error?: string;
+        data?: LoginData;
+      };
 
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -47,9 +67,10 @@ function LoginForm() {
       });
 
       const json: LoginResponse = await res.json();
+      const isSuccess = json.status === "success" || json.success === true;
 
-      if (!res.ok || json.status !== "success") {
-        setError(json.message || "Login failed");
+      if (!res.ok || !isSuccess || !json.data?.token || !json.data?.user) {
+        setError(extractLoginError(json));
         return;
       }
 
@@ -57,7 +78,7 @@ function LoginForm() {
       localStorage.setItem("token", json.data.token);
       localStorage.setItem("user", JSON.stringify(json.data.user));
 
-      const role = json.data.user?.role;
+      const role = json.data.user.role;
       if (role === "admin") {
         router.push("/admin");
       } else if (role === "farmer") {
@@ -68,7 +89,7 @@ function LoginForm() {
         router.push("/dashboard");
       }
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Login failed");
+      setError(error instanceof Error ? error.message : "Unable to complete login. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
